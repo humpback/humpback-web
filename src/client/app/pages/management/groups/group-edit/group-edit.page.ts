@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GroupService } from './../../../../services';
+import { GroupService, AuthService } from './../../../../services';
 
 declare let messager: any;
 
@@ -14,7 +14,13 @@ export class ManageGroupEditPage {
   private subscribers: Array<any> = [];
   private isNew: boolean = true;
 
-  private groupInfo: any = {};
+  private groupInfo: any = {
+    Name: '',
+    Description: '',
+    OpenToPublic: false,
+    Owners: [],
+    Servers: [],
+  };
 
   private users: Array<string> = [];
   private ownerSelect2Options: any;
@@ -22,7 +28,8 @@ export class ManageGroupEditPage {
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
-    private _groupService: GroupService) {
+    private _groupService: GroupService,
+    private _authService: AuthService) {
 
   }
 
@@ -56,6 +63,8 @@ export class ManageGroupEditPage {
         return `${item.UserId} - ${item.FullName}`;
       }
     };
+    let currentUser = this._authService.getUserInfoFromCache();
+    this.groupInfo.Owners.push(currentUser.UserID);
     let paramSub = this._route.params.subscribe(params => {
       let groupId = params['groupId'];
       if (groupId) {

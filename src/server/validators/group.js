@@ -6,9 +6,9 @@ exports.validate = (req, res, next) => {
   if (!group.Name) {
     return next(new Error("'Name' must not be empty."));
   }
-  if (!group.Servers) {
-    return next(new Error("'Servers' must not be empty."));
-  }
+  // if (!group.Servers) {
+  //   return next(new Error("'Servers' must not be empty."));
+  // }
   if (!group.Owners) {
     return next(new Error("'Owners' must not be empty."));
   }

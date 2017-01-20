@@ -42,10 +42,10 @@
           {{ log.Content | upperFirstWord }}
         </div>
       </div>
-      <div class="box-footer clearfix">
-        <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)">
-        </hb-pagination>
-      </div>
+    </div>
+    <div class="box-footer clearfix">
+      <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)">
+      </hb-pagination>
     </div>
   </div>
   <div class="well well-sm" *ngIf="!logs || logs.length == 0">

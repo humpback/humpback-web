@@ -27,9 +27,9 @@
           <i class="fa fa-rss"></i> <span>Activity</span>
         </a>
       </li>
-      <li class="header">MANAGEMENT NAVIGATION</li>
-      <li class="treeview" routerLinkActive="active" #accountMenu>
-        <a href="javascript:void(0)" (click)="toggleSubMenu(accountMenu)">
+      <li class="header">ADVANCE NAVIGATION</li>
+      <li class="treeview hide-border" routerLinkActive="show-border" #accountMenu [class.active]="activeSubMenu == 'account'">
+        <a href="javascript:void(0)" (click)="toggleSubMenu(accountMenu, 'account')">
           <i class="fa fa-user"></i> <span>Account</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
@@ -48,9 +48,9 @@
           </li>
         </ul>
       </li>
-      <li class="treeview" routerLinkActive="active" #advanceMenu>
-        <a href="javascript:void(0)" (click)="toggleSubMenu(advanceMenu)">
-          <i class="fa fa-gear"></i> <span>Advance</span>
+      <li class="treeview hide-border" routerLinkActive="show-border" #manageMenu [class.active]="activeSubMenu == 'manage'">
+        <a href="javascript:void(0)" (click)="toggleSubMenu(manageMenu, 'manage')">
+          <i class="fa fa-gear"></i> <span>Manage</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
           </span>
@@ -58,12 +58,12 @@
         <ul class="treeview-menu" routerLinkActive="menu-open">
           <li routerLinkActive="active">
             <a [routerLink]="['/manage', 'groups']">
-              <i class="fa fa-circle-o"></i> Group Management
+              <i class="fa fa-circle-o"></i> Groups
             </a>
           </li>
           <li routerLinkActive="active" *ngIf="userInfo?.IsAdmin">
             <a [routerLink]="['/manage', 'users']">
-              <i class="fa fa-users"></i> User Management
+              <i class="fa fa-users"></i> Users
             </a>
           </li>
         </ul>
