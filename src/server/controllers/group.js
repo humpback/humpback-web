@@ -27,14 +27,12 @@ exports.getByUser = (req, res, next) => {
   if (!user.IsAdmin) {
     queryOption = {
       $or: [
-        {
-          "Owners": user.UserID
-        },
-        {
-          "OpenToPublic": true
-        }
+        { "Owners": user.UserID }
       ]
     };
+    if (!req.query.formanage) {
+      queryOption['$or'].push({ "OpenToPublic": true });
+    }
   };
   db.find(queryOption).sort({ Name: 1 }).exec((err, docs) => {
     if (err) return next(err);
@@ -48,7 +46,6 @@ exports.getByID = (req, res, next) => {
     .then(group => res.json(group))
     .catch(err => next(err));
 }
-
 
 exports.create = (req, res, next) => {
   let userID = req.session.currentUser.UserID;

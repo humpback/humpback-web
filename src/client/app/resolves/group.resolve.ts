@@ -8,6 +8,6 @@ export class GroupResolve implements Resolve<any> {
   constructor(private groupService: GroupService) { }
 
   resolve(route: ActivatedRouteSnapshot) {
-    return this.groupService.get();
+    return this.groupService.get(true);
   }
 }

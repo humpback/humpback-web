@@ -1,4 +1,9 @@
-.treeview.ignore-active.active>a {
+.treeview.active.hide-border>a {
   background: transparent;
   border-left-color: transparent;
+}
+
+.treeview.active.hide-border.show-border>a, .treeview.active.hide-border:hover>a {
+  background: #1e282c;
+  border-left-color: #00a65a;
 }

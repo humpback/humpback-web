@@ -48,7 +48,7 @@ export class ManageGroupListPage {
   }
 
   private getGroups() {
-    this._groupService.get()
+    this._groupService.getForManage()
       .then(data => {
         this.groups = data;
         this.search(this.filterCondition);

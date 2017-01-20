@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, Renderer } from '@angular/core';
-import { animate, trigger, state, style, transition } from '@angular/core';
+import { Router } from '@angular/router';
 import { AppConfig } from './../../app.config';
 import { AuthService, EventNotifyService } from './../../services';
 
@@ -21,7 +21,10 @@ export class SideBarComponent {
   private groups: Array<Object>;
   private userInfo: any;
 
+  private activeSubMenu: string = '';
+
   constructor(
+    private _router: Router,
     private _renderer: Renderer,
     private _authService: AuthService,
     private _eventNotifyService: EventNotifyService) {
@@ -40,6 +43,12 @@ export class SideBarComponent {
         this.fixSidebar();
       }
     });
+    let currentUrl = this._router.url;
+    if (currentUrl.startsWith('/account')) {
+      this.activeSubMenu = 'account';
+    } else if (currentUrl.startsWith('/manage')) {
+      this.activeSubMenu = 'manage';
+    }
   }
 
   ngAfterViewInit() {
@@ -59,7 +68,12 @@ export class SideBarComponent {
     });
   }
 
-  private toggleSubMenu(element: HTMLElement) {
+  private toggleSubMenu(element: HTMLElement, subMenuName: string) {
+    if (this.activeSubMenu === subMenuName) {
+      this.activeSubMenu = '';
+    } else {
+      this.activeSubMenu = subMenuName;
+    }
     let isActive = element.classList.contains('active');
     this._renderer.setElementClass(element, 'active', !isActive);
   }

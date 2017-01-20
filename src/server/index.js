@@ -19,6 +19,7 @@ console.debug = function (args) {
 
 let app = express();
 app.disable('x-powered-by');
+app.disable('etag');
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(session({
@@ -50,7 +51,8 @@ let ignoreAuthPaths = [
   '/api/users/islogin',
   '/api/users/login',
   '/api/users/logout',
-  '/api/users/avatar'
+  '/api/users/avatar',
+  '/api/system-config'
 ];
 
 app.all('/api/*', (req, res, next) => {
@@ -79,6 +81,7 @@ app.use('/api/users', require('./routers/user'));
 app.use('/api/groups', require('./routers/group'));
 app.use('/api/images', require('./routers/imageInfo'));
 app.use('/api/logs', require('./routers/log'));
+app.use('/api/system-config', require('./routers/systemConfig'));
 
 errorHandler.title = `Humpback WebSite - ${config.version}`;
 app.use(errorHandler({ log: false }));

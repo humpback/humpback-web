@@ -39,6 +39,9 @@ export class GroupOverviewPage {
         .then(data => {
           this.groupInfo = data;
           let promiseArray = [];
+          if (!data.Servers || data.Servers.length === 0) {
+            return;
+          }
           for (let ip of data.Servers) {
             let temp: any = {
               ip: ip,
@@ -127,7 +130,7 @@ export class GroupOverviewPage {
             if (i === 0) {
               msg += `${param.name}`;
             }
-            if (param.data.errMsg) {
+            if (param.data && param.data.errMsg) {
               msg = `${param.name}<br>${param.data.errMsg}`;
               break;
             }
@@ -159,7 +162,7 @@ export class GroupOverviewPage {
           name: 'Stopped',
           type: 'bar',
           stack: 'Containers',
-          barWidth : 15,
+          barWidth: 15,
           data: chartData.stoppedData,
           itemStyle: {
             normal: {
@@ -171,7 +174,7 @@ export class GroupOverviewPage {
           name: 'Running',
           type: 'bar',
           stack: 'Containers',
-          barWidth : 15,
+          barWidth: 15,
           data: chartData.runningData,
           itemStyle: {
             normal: {
