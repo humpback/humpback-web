@@ -1,0 +1,21 @@
+.btn-panel {
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tail-select-panel {
+  max-width: 200px;
+}
+
+.logs-panel {
+  background: rgba(34, 45, 50, .7);
+  color: lightsteelblue;
+}
+
+.logs-panel[data-has-log] {
+  padding: 10px;
+}
+
+.logs-panel >p {
+  margin-bottom: 5px;
+}

@@ -1,0 +1,188 @@
+body {
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.align.center {
+    text-align: center !important;
+}
+
+.editor-toolbar.fullscreen, .CodeMirror-fullscreen {
+    z-index: 1979
+}
+
+.break-word {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.flex-display {
+    display: flex;
+}
+
+.flex-display>* {
+    margin-right: 10px;
+}
+
+.flex-display>*:last-child {
+    margin-right: initial;
+}
+
+.flex-display.flex-align-center {
+    align-items: center;
+}
+
+.flex-display .flex-1 {
+    flex: 1;
+}
+
+.flex-display.flex-wrapper {
+    flex-wrap: wrap;
+}
+
+.no-margin {
+    margin: initial;
+}
+
+.margin-top-10 {
+    margin-top: 10px;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+.margin-left-10 {
+    margin-left: 10px;
+}
+
+.description-editor .CodeMirror {
+    height: calc(100vh - 245px);
+}
+
+.form-group.has-error .select2-container {
+    border: 1px solid #dd4b39;
+}
+
+.form-group.has-error .select2-selection {
+    border: none;
+}
+
+
+/* Overide Admin LTE CSS Begin */
+
+.main-header .navbar, .content-wrapper, .right-side, .main-footer {
+    margin-left: 180px;
+}
+
+.main-sidebar, .left-side, .main-header .logo, .control-sidebar-bg, .control-sidebar {
+    width: 180px;
+}
+
+.control-sidebar-bg, .control-sidebar {
+    right: 180px;
+}
+
+.sidebar-mini.sidebar-collapse header.main-header .logo {
+    width: 50px;
+}
+
+.sidebar-mini.sidebar-collapse header.main-header .navbar {
+    margin-left: 50px;
+}
+
+@media(max-width: 767px) {
+    .sidebar-mini.sidebar-collapse header.main-header .logo {
+        width: 100%;
+    }
+    .main-header .navbar, .content-wrapper, .right-side, .main-footer, .sidebar-mini.sidebar-collapse header.main-header .navbar {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .main-sidebar, .left-side {
+        -webkit-transform: translate(-180px, 0);
+        -ms-transform: translate(-180px, 0);
+        -o-transform: translate(-180px, 0);
+        transform: translate(-180px, 0);
+    }
+}
+
+@media (min-width: 768px) {
+    .sidebar-collapse .main-sidebar, .sidebar-collapse .left-side {
+        -webkit-transform: translate(-180px, 0);
+        -ms-transform: translate(-180px, 0);
+        -o-transform: translate(-180px, 0);
+        transform: translate(-180px, 0);
+    }
+}
+
+@media (max-width: 767px) {
+    .sidebar-open .content-wrapper, .sidebar-open .right-side, .sidebar-open .main-footer {
+        -webkit-transform: translate(180px, 0);
+        -ms-transform: translate(180px, 0);
+        -o-transform: translate(180px, 0);
+        transform: translate(180px, 0);
+    }
+    .description-editor .CodeMirror {
+        height: calc(100vh - 325px);
+    }
+}
+
+@media (min-width: 768px) {
+    .control-sidebar-open .content-wrapper, .control-sidebar-open .right-side, .control-sidebar-open .main-footer {
+        margin-right: 180px;
+    }
+}
+
+.box.no-border {
+    border-top: none;
+}
+
+
+/* Overide Admin LTE CSS End */
+
+
+/* Overide select2 CSS Begin */
+
+.select2-container .select2-selection--multiple {
+    min-height: 34px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    padding: 0 10px;
+}
+
+.select2-container .select2-search--inline .select2-search__field {
+    margin-top: 6px;
+}
+
+
+/* Overide select2 CSS End */
+
+
+/* Font Face Begin */
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url('./../vendor/fonts/SourceSansPro-Regular.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Source Sans Pro Semibold'), local('SourceSansPro-Semibold'), url('./../vendor/fonts/SourceSansPro-Semibold.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+
+/* Font Face End */

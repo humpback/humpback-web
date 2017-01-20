@@ -1,0 +1,110 @@
+.index_waves {
+    background: url("./img/index_waves.png") center 0 no-repeat;
+}
+
+.wave3 {
+    height: 427px;
+    width: 2402px;
+    background-position: 0 0;
+}
+
+.wave2 {
+    height: 427px;
+    width: 2402px;
+    background-position: 0 -427px;
+}
+
+.wave1 {
+    height: 427px;
+    width: 2402px;
+    background-position: 0 -854px;
+}
+
+@keyframes wave {
+    0% {
+        transform: translate(0px, 0px);
+    }
+
+    50% {
+        transform: translate(-80px, 30px);
+    }
+
+    100% {
+        transform: translate(160px, -60px);
+    }
+}
+
+@-webkit-keyframes wave {
+    0% {
+        transform: translate(0px, 0px);
+    }
+
+    50% {
+        transform: translate(-80px, 30px);
+    }
+
+    100% {
+        transform: translate(160px, -60px);
+    }
+}
+
+@-moz-keyframes wave {
+    0% {
+        transform: translate(0px, 0px);
+    }
+
+    50% {
+        transform: translate(-80px, 30px);
+    }
+
+    100% {
+        transform: translate(160px, -60px);
+    }
+}
+
+.waves {
+    position: absolute;
+    bottom: -135px;
+    height: 527px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.waves > div {
+    position: absolute;
+    left: -180px;
+    bottom: 0;
+}
+
+.waves .wave1,
+.waves .wave2,
+.waves .wave3 {
+    animation: wave 5s ease-in-out alternate infinite;
+}
+
+.waves .wave2 {
+    animation-delay: 0.6s;
+}
+
+.waves .wave3 {
+    animation-delay: 1.2s;
+}
+
+.waveContent {
+    position: relative;
+    background-color: #219df3;
+    height: 500px;
+}
+
+h2 {
+    position: relative;
+    display: block;
+    color: #fff;
+    font-size: 48px;
+    font-family: "microsoft yahei";
+    font-weight: normal;
+    width: 1100px;
+    margin: 0 auto;
+    top: 180px;
+    z-index: 99;
+}

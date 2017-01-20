@@ -1,0 +1,125 @@
+td.container-name {
+  word-wrap: break-word;
+}
+
+td.image-name {
+  max-width: 250px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+td.command {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+th.status, td.status {
+  width: 100px;
+}
+
+td.status>i {
+  display: none;
+}
+
+td.status>span {
+  display: inline-block;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+th.create-time, td.create-time {
+  width: 90px;
+  text-align: center;
+}
+
+td.operate {
+  text-align: center;
+  width: 50px;
+}
+
+.operate > button {
+  background: transparent;
+  border-color: lightgray;
+}
+
+.operate .dropdown-menu {
+  left: initial;
+  right: 43px;
+  top: 0;
+  transition: opacity .1s ease;
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, .15);
+  background: #fff;
+  border: 1px solid rgba(34, 36, 38, .15);
+}
+
+.operate .dropdown-menu {
+  min-width: 120px;
+}
+
+.operate .dropdown-menu a {
+  color: rgba(0, 0, 0, .87);
+}
+
+.operate .dropdown-menu a >i.fa {
+  width: 20px;
+  margin: 0;
+}
+
+.operate .dropdown-menu a>i.fa.text-success {
+  color: #21BA45;
+}
+
+.operate .dropdown-menu::after {
+  top: .7em;
+  left: auto;
+  right: -.25em;
+  margin: 0;
+  -webkit-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  transform: rotate(135deg);
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  content: '';
+  visibility: visible;
+  width: .5em;
+  height: .5em;
+  box-shadow: -1px -1px 0 1px rgba(34, 36, 38, .15);
+  background: #FFF;
+}
+
+.operate.dropup .dropdown-menu {
+  top: initial;
+  bottom: 0;
+}
+
+.operate.dropup .dropdown-menu::after {
+  top: inherit;
+  bottom: .7em;
+}
+
+.important-text {
+  color: tomato;
+  padding: 0 10px;
+}
+
+@media(max-width:1024px) {
+  th.status, td.status {
+    width: auto;
+    max-width: initial;
+  }
+  th.command, td.command {
+    display: none
+  }
+  td.image-name {
+    max-width: initial;
+  }
+  td.status>i {
+    display: block;
+  }
+  td.status>span {
+    display: none;
+  }
+}

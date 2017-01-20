@@ -1,0 +1,8 @@
+.description {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.flex-display {
+  flex-wrap: wrap;  
+}

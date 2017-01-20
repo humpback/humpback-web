@@ -1,0 +1,16 @@
+<section class="content-header">
+  <h1> Container Monitor <small>{{ containerId }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/group', groupId, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li>
+      <a [routerLink]="['/group', groupId, ip, 'containers', containerId ]"> Detail </a>
+    </li>
+    <li class="active">Monitor</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="chart-container" #cpuChart></div>
+  <div class="chart-container" #memoryChart></div>
+</section>

@@ -1,0 +1,25 @@
+<div [attr.class]="getStyleClass()" *ngIf="options.show" (click)="dimmerClick($event)" [attr.id]="modalId">
+  <div [attr.class]="getSizeClass()" [@fadeInOut]="options.show">
+    <div class="modal-content">
+      <div class="modal-header">
+        <ng-content select="hb-modal-header"></ng-content>
+        <div *ngIf="!header">
+          <button type="button" class="close" (click)="options.show = false" *ngIf="!options.hideCloseBtn">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title">{{ options.title }}</h4>
+        </div>
+      </div>
+      <div class="modal-body" *ngIf="!options.hideBody">
+        <ng-content></ng-content>
+      </div>
+      <div class="modal-footer" *ngIf="!options.hideFooter">
+        <ng-content select="hb-modal-footer"></ng-content>
+        <div *ngIf="!footer">
+          <button type="button" class="btn btn-default btn-flat" (click)="cancelBtnClick()" *ngIf="!options.hideCancelBtn">{{ options.cancelBtn || 'Cancel' }}</button>
+          <button type="button" class="btn btn-success btn-flat" (click)="okBtnClick()" *ngIf="!options.hideOkBtn">{{ options.okBtn || 'Ok' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

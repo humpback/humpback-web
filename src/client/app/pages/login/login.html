@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="login-box">
+    <div class="login-logo">
+      <b>Humpback</b>
+    </div>
+    <div class="login-box-body">
+      <p class="login-box-msg">Sign in to start your docker's travel</p>
+      <form novalidate #form="ngForm" (ngSubmit)="login(form)">
+        <fieldset [attr.disabled]="isLogin ? 'disabled' : null">
+          <div class="form-group has-feedback" [ngClass]="{'has-error': form.submitted && userId.invalid }">
+            <input type="text" class="form-control" placeholder="UserID" name="UserID" autocomplete="off" #userId="ngModel" [(ngModel)]="user.UserID"
+              required maxlength="10" pattern="^[0-9a-zA-Z]*$">
+            <span class="fa fa-user form-control-feedback"></span>
+            <div [hidden]="userId.valid || !form.submitted">
+              <span class="help-block" *ngIf="userId.errors?.required">UserID cannot be empty.</span>
+              <span class="help-block" *ngIf="userId.errors?.maxlength">UserID cannot more than 10 characters.</span>
+              <span class="help-block" *ngIf="userId.errors?.pattern">UserID cannot contain any special symbol.</span>
+            </div>
+          </div>
+          <div class="form-group has-feedback" [ngClass]="{'has-error': form.submitted && password.invalid }">
+            <input type="password" class="form-control" placeholder="Password" #password="ngModel" name="Password" [(ngModel)]="user.Password"
+              minlength="5" maxlength="20" required pattern="^[0-9A-Za-z]*$">
+            <span class="fa fa-lock form-control-feedback"></span>
+            <div [hidden]="password.valid || !form.submitted">
+              <span class="help-block" *ngIf="password.errors?.required">Password cannot be empty.</span>
+              <span class="help-block" *ngIf="password.errors?.minlength">Password cannot less than 5 characters.</span>
+              <span class="help-block" *ngIf="password.errors?.maxlength">Password cannot more than 20 characters.</span>
+              <span class="help-block" *ngIf="password.errors?.pattern">Password cannot contain any special symbol.</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-8">
+              <div class="checkbox">
+                <label>
+                <input type="checkbox" name="RememberMe" [(ngModel)]="user.RememberMe"> Remember Me
+              </label>
+              </div>
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

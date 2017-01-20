@@ -1,0 +1,55 @@
+<div class="dashboard">
+  <section class="content-header">
+    <h1> Dashboard </h1>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="box box-widget">
+          <div class="box-header with-border">
+            <h3 class="box-title">Activity</h3>
+          </div>
+          <div class="box-body box-comments">
+            <div class="box-comment" *ngFor="let log of logs;">
+              <img src="{{'/api/users/avatar/'+log.UserId}}" class="img-circle img-sm">
+              <div class="comment-text">
+                <span class="username">
+                  {{ log.FullName || log.UserId }}
+                  <span class="text-muted pull-right">{{ log.InDate | relativeTime }}</span>
+                </span>
+                {{ log.Content | upperFirstWord }}
+              </div>
+            </div>
+            <div class="box-comment">
+              <img src="/api/users/avatar/logo" class="img-circle img-sm">
+              <div class="comment-text">
+                <span class="username">
+                  Humpback Group
+                  <span class="text-muted pull-right">now</span>
+                </span>
+                Welcome to use humpback.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4" *ngIf="mostUsedServers && mostUsedServers.length > 0">
+        <div class="box box-widget">
+          <div class="box-header with-border">
+            <h3 class="box-title">Favorites</h3>
+          </div>
+          <div class="box-body">
+            <div *ngFor="let item of mostUsedServers | orderBy:['ip']">
+              <a [routerLink]="['/group', item.groupId, item.ip, 'overview']">{{ item.ip }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--<div class="footer">
+    <span>Quickly Ship and Run Distributed Applications with Docker</span>
+    <div class="dividing"></div>
+    <span class="pull-right">Copyright &copy; 2016 BTS. All rights reserved.</span>
+  </div>-->
+</div>

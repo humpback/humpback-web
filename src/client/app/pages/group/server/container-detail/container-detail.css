@@ -1,0 +1,56 @@
+.btn-panel {
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-panel .btn-group {
+  margin-right: initial;
+}
+
+.btn-panel button, .btn-panel > a.btn {
+  margin: 0 5px 5px 5px;
+  width: 100px;
+}
+
+.btn-panel .btn>i.fa {
+  margin-right: 5px;
+}
+
+.btn-panel a {
+  color: black;
+}
+
+.btn-panel a.disable, .btn-panel a.disable:hover {
+  color: rgba(119, 119, 119, .7);
+  background: transparent;
+}
+
+.timeline .timeline-header {
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+div.timeline-body li>i.fa {
+  margin: 0 5px;
+}
+
+.basic-info-title {
+  text-align: center;
+  max-width: 100px;
+  word-wrap: break-word;
+  background: rgba(0, 0, 0, .1);
+  padding: 5px;
+  font-weight: bolder;
+}
+
+li.custom-list::before {
+  content: attr(value);
+  color: rgba(0, 0, 0, .87);
+  user-select: none;
+  pointer-events: none;
+  counter-increment: ordered;
+  vertical-align: middle;
+  opacity: 0.8;
+  font-weight: bolder;
+  margin-right: 5px;
+  align-self: flex-start;
+}

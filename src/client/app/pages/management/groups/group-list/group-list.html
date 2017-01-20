@@ -1,0 +1,75 @@
+<section class="content-header">
+  <h1> Manage Groups </h1>
+</section>
+<section class="content">
+  <div class="box no-border">
+    <div class="box-body">
+      <div class="flex-display margin-bottom-10">
+        <form class="flex-1" novalidate (ngSubmit)="search(filterCondition.value)">
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" #filterCondition>
+            <span class="input-group-btn">
+            <button type="submit" class="btn btn-flat">
+              <i class="fa fa-search"></i> Search
+            </button>
+          </span>
+          </div>
+        </form>
+        <div class="form-group">
+          <a [routerLink]="['/manage', 'groups', 'add-group']" *ngIf="isAdmin" class="btn btn-sm btn-flat bg-olive">
+            <i class="fa fa-plus"></i>
+            Add Group
+          </a>
+        </div>
+      </div>
+      <div class="well well-sm" *ngIf="filterGroups.length == 0">
+        No groups found.
+      </div>
+      <table class="table table-hover" *ngIf="filterGroups.length > 0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>LastEditUser</th>
+            <th>LastEditDate</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of currentGroups;">
+            <td>{{ item.Name }}</td>
+            <td class="description">{{ item.Description }}</td>
+            <td>{{ item.EditUser }}</td>
+            <td>{{ item.EditDate | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td class="text-center">
+              <a [routerLink]="['/manage', 'groups', item.ID, 'edit']" class="margin-right-10">
+                <i class="fa fa-pencil"></i>
+              </a>
+              <a href="javascript:void(0)" (click)="showDeleteModal(item)" *ngIf="isAdmin">
+                <i class="fa fa-close text-danger"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box-footer" *ngIf="filterGroups.length > 0">
+      <hb-pagination [totalCount]="filterGroups.length" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)">
+      </hb-pagination>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Define Begin -->
+
+<hb-modal [options]="deleteGroupModalOptions">
+  <div class="description" *ngIf="delTarget">
+    Are you sure you want to delete <strong class="important-text">{{ delTarget?.Name }}</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="deleteGroupModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="delGroup()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<!-- Modal Define End -->

@@ -1,0 +1,27 @@
+.equal-fields {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.equal-fields .form-group {
+  flex: 1;
+  margin-right: 10px;
+  min-width: 200px;
+}
+
+.equal-fields .form-group:last-child {
+  margin-right: 0;
+}
+
+.box-body .well.well-sm, .box-body .equal-fields .form-group {
+  margin-bottom: 5px;
+}
+
+.box-body .equal-fields:last-child .form-group {
+  margin-bottom: 0;
+}
+
+.box-body .equal-fields .form-group:last-child {
+  min-width: unset;
+  flex: unset;
+}

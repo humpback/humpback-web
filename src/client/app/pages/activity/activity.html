@@ -1,0 +1,54 @@
+<section class="content-header">
+  <h1> Activity </h1>
+</section>
+<section class="content">
+  <div class="flex-display flex-wrapper margin-bottom-10">
+    <div class="from-group flex-1">
+      <select class="form-control" [ngModel]="selectedGroupId" (ngModelChange)="selectedGroupChange($event)">
+        <option value="" disabled>-- Select Group --</option>
+        <option value="{{item.ID}}" *ngFor="let item of groups">{{ item.Name }}</option>
+      </select>
+    </div>
+    <div class="from-group flex-1">
+      <select class="form-control" [ngModel]="selectedServer" (ngModelChange)="selectedServerChange($event)">
+        <option value="" disabled>-- Select Server --</option>
+        <option value="{{item}}" *ngFor="let item of servers">{{ item }}</option>
+      </select>
+    </div>
+    <div class="from-group flex-1">
+      <select class="form-control" [ngModel]="selectedType" (ngModelChange)="selectedTypeChange($event)">
+        <option value="" disabled>-- Select Type --</option>
+        <option value="All">All</option>
+        <option value="Container">Container</option>
+        <option value="Image">Image</option>
+        <option value="Hub">Hub</option>
+      </select>
+    </div>
+    <div class="from-group">
+      <button type="button" class="btn bg-olive btn-flat" (click)="search()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+  </div>
+  <div class="box" *ngIf="logs.length > 0">
+    <div class="box-body box-comments">
+      <div class="box-comment" *ngFor="let log of logs;">
+        <img src="{{'/api/users/avatar/'+log.UserId}}" class="img-circle img-sm">
+        <div class="comment-text">
+          <span class="username">
+          {{ log.FullName || log.UserId }}
+          <span class="text-muted pull-right">{{ log.InDate | date:'yyyy/MM/dd HH:mm:ss' }}</span>
+          </span>
+          {{ log.Content | upperFirstWord }}
+        </div>
+      </div>
+      <div class="box-footer clearfix">
+        <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)">
+        </hb-pagination>
+      </div>
+    </div>
+  </div>
+  <div class="well well-sm" *ngIf="!logs || logs.length == 0">
+    <span>No logs found.</span>
+  </div>
+</section>

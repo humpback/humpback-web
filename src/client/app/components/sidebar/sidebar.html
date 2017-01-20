@@ -1,0 +1,73 @@
+<aside class="main-sidebar" #mainSidebar>
+  <section class="sidebar">
+    <ul class="sidebar-menu">
+      <li class="header">BASIC NAVIGATION</li>
+      <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a [routerLink]="['/']">
+          <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+        </a>
+      </li>
+      <li routerLinkActive="active">
+        <a [routerLink]="['/group']">
+          <i class="fa fa-object-group"></i> <span>Group</span>
+        </a>
+      </li>
+      <li routerLinkActive="active">
+        <a [routerLink]="['/hub']">
+          <i class="fa fa-archive"></i> <span>Hub</span>
+        </a>
+      </li>
+      <!--<li routerLinkActive="active">
+        <a [routerLink]="['/build-image']">
+          <i class="fa fa-building"></i> <span>Build Image</span>
+        </a>
+      </li>-->
+      <li routerLinkActive="active">
+        <a [routerLink]="['/activity']">
+          <i class="fa fa-rss"></i> <span>Activity</span>
+        </a>
+      </li>
+      <li class="header">MANAGEMENT NAVIGATION</li>
+      <li class="treeview" routerLinkActive="active" #accountMenu>
+        <a href="javascript:void(0)" (click)="toggleSubMenu(accountMenu)">
+          <i class="fa fa-user"></i> <span>Account</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu" routerLinkActive="menu-open">
+          <li routerLinkActive="active">
+            <a [routerLink]="['/account', 'profile']">
+              <i class="fa fa-circle-o"></i> Profile
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a [routerLink]="['/account', 'change-password']">
+              <i class="fa fa-lock"></i> Change Password
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="treeview" routerLinkActive="active" #advanceMenu>
+        <a href="javascript:void(0)" (click)="toggleSubMenu(advanceMenu)">
+          <i class="fa fa-gear"></i> <span>Advance</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu" routerLinkActive="menu-open">
+          <li routerLinkActive="active">
+            <a [routerLink]="['/manage', 'groups']">
+              <i class="fa fa-circle-o"></i> Group Management
+            </a>
+          </li>
+          <li routerLinkActive="active" *ngIf="userInfo?.IsAdmin">
+            <a [routerLink]="['/manage', 'users']">
+              <i class="fa fa-users"></i> User Management
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+</aside>

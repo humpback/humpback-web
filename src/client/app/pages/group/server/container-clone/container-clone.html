@@ -1,0 +1,296 @@
+<section class="content-header">
+  <h1> Container Clone <small>{{ containerId }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li>
+      <a [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId]"> Detail</a>
+    </li>
+    <li class="active">Clone</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="form-group">
+        <label>Group</label>
+        <select class="form-control" (ngModelChange)="selectedGroupChanged($event)" [ngModel]="selectedGroupId">
+          <option value="" disabled>-- Select Group --</option>
+          <option value="{{item.ID}}" *ngFor="let item of groups;">{{ item.Name }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="form-group">
+        <label>Servers</label>
+        <div>
+          <select2 [data]="servers" (valueChanged)="refreshSelectedServer($event)" [cssImport]="false" [width]="'100%'" [options]="serversSelect2Options"></select2>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+    <div class="form-group" [class.has-error]="submitted && form.controls.Name.invalid">
+      <label>Name</label>
+      <input type="text" class="form-control" formControlName="Name" maxlength="30" required pattern="^[0-9a-zA-Z-_.]*$">
+      <div *ngIf="submitted && form.controls.Name.invalid">
+        <span class="help-block" *ngIf="form.controls.Name.errors.required">Name is required.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.maxlength">Name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.pattern">Name cannot contain special characters.</span>
+      </div>
+    </div>
+
+    <div class="form-group" [class.has-error]="submitted && form.controls.Image.invalid">
+      <label>Image</label>
+      <input type="text" class="form-control" formControlName="Image" maxlength="100" required pattern="^[0-9a-zA-Z\/\:_.-]*$">
+      <div *ngIf="submitted && form.controls.Image.invalid">
+        <span class="help-block" *ngIf="form.controls.Image.errors.required">Image is required.</span>
+        <span class="help-block" *ngIf="form.controls.Image.errors.maxlength">Image cannot more than 100 characters.</span>
+        <span class="help-block" *ngIf="form.controls.Image.errors.pattern">Image cannot contain special characters.</span>
+      </div>
+    </div>
+
+    <div class="form-group" [class.has-error]="submitted && form.controls.Command.invalid">
+      <label>Command</label>
+      <textarea class="form-control" rows="3" formControlName="Command" maxlength="300"></textarea>
+      <div *ngIf="submitted && form.controls.Command.invalid">
+        <span class="help-block" *ngIf="form.controls.Command.errors.maxlength">Command cannot more than 300 characters.</span>
+      </div>
+    </div>
+
+    <div class="equal-fields">
+      <div class="form-group" [class.has-error]="submitted && form.controls.NetworkMode.invalid">
+        <label>Network Mode</label>
+        <select class="form-control" formControlName="NetworkMode">
+          <option value="host">Host</option>
+          <option value="bridge">Bridge</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="form-group" *ngIf="form.controls.NetworkMode.value == 'custom'" [class.has-error]="submitted && form.controls.NetworkName.invalid">
+        <label>Network Name</label>
+        <input type="text" class="form-control" formControlName="NetworkName" maxlength="20" required pattern="^[0-9a-zA-Z_-]*$">
+        <div *ngIf="submitted && form.controls.NetworkName.invalid">
+          <span class="help-block" *ngIf="form.controls.NetworkName.errors.required">Network name cannot be empty.</span>
+          <span class="help-block" *ngIf="form.controls.NetworkName.errors.maxlength">Network cannot more than 20 characters.</span>
+          <span class="help-block" *ngIf="form.controls.NetworkName.errors.pattern">Network name must match ^[0-9a-zA-Z]*$..</span>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="form.controls.NetworkMode.value != 'host'" [class.has-error]="submitted && form.controls.HostName.invalid">
+        <label>HostName</label>
+        <input type="text" class="form-control" formControlName="HostName" maxlength="50" pattern="^[0-9a-zA-Z_-]*$">
+        <div *ngIf="submitted && form.controls.HostName.invalid">
+          <span class="help-block" *ngIf="form.controls.HostName.errors.maxlength">HostName cannot more than 50 characters.</span>
+          <span class="help-block" *ngIf="form.controls.HostName.errors.pattern">HostName must match ^[0-9a-zA-Z]*$..</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="equal-fields">
+      <div class="form-group" [class.has-error]="submitted && form.controls.RestartPolicy.invalid">
+        <label>Restart Policy</label>
+        <select class="form-control" formControlName="RestartPolicy" required>
+          <option value="no">No</option>
+          <option value="always">Always</option>
+          <option value="on-failure">On-Failure</option>
+        </select>
+        <div *ngIf="submitted && form.controls.RestartPolicy.invalid">
+          <span class="help-block" *ngIf="form.controls.RestartPolicy.errors.required">Restart policy is required.</span>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="form.controls.RestartPolicy.value == 'on-failure'" [class.has-error]="submitted && form.controls.RestartRetryCount.invalid">
+        <label>Max Retry Count</label>
+        <input type="number" class="form-control" formControlName="RestartRetryCount" min="1" max="100" required validateInteger
+          validateRange>
+        <div *ngIf="submitted && form.controls.RestartRetryCount.invalid">
+          <span class="help-block" *ngIf="form.controls.RestartRetryCount.errors.required">Value is required.</span>
+          <span class="help-block" *ngIf="form.controls.RestartRetryCount.errors.numberRange">Value must between 1 and 100.</span>
+          <span class="help-block" *ngIf="form.controls.RestartRetryCount.errors.integer">Value must be an integer.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>DNS</label>
+      <hb-tags-input formControlName="Dns" [validatePattern]="'^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[0-9])\\.){3}((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[1-9]))$'"></hb-tags-input>
+    </div>
+
+    <div class="equal-fields">
+      <div class="form-group" [class.has-error]="submitted && form.controls.CPUShares.invalid">
+        <label>CPU Shares</label>
+        <input type="number" class="form-control" formControlName="CPUShares" placeholder="Unlimited" min="1" max="1024" validateInteger
+          validateRange>
+        <div *ngIf="submitted && form.controls.CPUShares.invalid">
+          <span class="help-block" *ngIf="form.controls.CPUShares.errors.numberRange">CPUShares must between 1 and 1024.</span>
+          <span class="help-block" *ngIf="form.controls.CPUShares.errors.integer">CPUShares must be an integer.</span>
+        </div>
+      </div>
+      <div class="form-group" [class.has-error]="submitted && form.controls.Memory.invalid">
+        <label>Memory Limit (MB)</label>
+        <input type="number" class="form-control" formControlName="Memory" placeholder="Unlimited" min="10" max="102400" validateInteger
+          validateRange>
+        <div *ngIf="submitted && form.controls.Memory.invalid">
+          <span class="help-block" *ngIf="form.controls.Memory.errors.numberRange">Memory must between 10 and 102400.</span>
+          <span class="help-block" *ngIf="form.controls.Memory.errors.integer">Memory must be an integer.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box" *ngIf="form.controls.NetworkMode.value != 'host'">
+      <div class="box-header with-border">Ports Binding</div>
+      <div class="box-body" formArrayName="Ports">
+        <p class="text-info">Tips: Empty public port is meaning auto assign host port.</p>
+        <div class="equal-fields" *ngFor="let port of form.controls.Ports.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && port.controls.PrivatePort.invalid">
+            <input type="number" class="form-control" placeholder="Container Port" required min="1" max="65535" formControlName="PrivatePort"
+              validateInteger validateRange>
+            <div *ngIf="submitted && port.controls.PrivatePort.invalid">
+              <span class="help-block" *ngIf="port.controls.PrivatePort.errors.required">Private port is required.</span>
+              <span class="help-block" *ngIf="port.controls.PrivatePort.errors.numberRange">Port must be between 1 and 65535.</span>
+              <span class="help-block" *ngIf="port.controls.PrivatePort.errors.integer">Port must be an integer.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <select class="form-control">
+              <option value="tcp">TCP</option>
+              <option value="udp">UDP</option>
+            </select>
+          </div>
+          <div class="form-group" [class.has-error]="submitted && port.controls.PublicPort.invalid">
+            <input type="number" class="form-control" placeholder="Host Port" min="1" max="65535" formControlName="PublicPort" validateInteger
+              validateRange>
+            <div *ngIf="submitted && port.controls.PublicPort.invalid">
+              <span class="help-block" *ngIf="port.controls.PublicPort.errors.numberRange">Port must be between 1 and 65535.</span>
+              <span class="help-block" *ngIf="port.controls.PublicPort.errors.integer">Port must be an integer.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removePortBinding(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addPortBinding()">
+            <i class="fa fa-plus"></i> Add Port
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Volumes Binding</div>
+      <div class="box-body" formArrayName="Volumes">
+        <div class="equal-fields" *ngFor="let volume of form.controls.Volumes.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && volume.controls.ContainerVolume.invalid">
+            <input type="text" class="form-control" placeholder="Container volume" required maxlength="200" formControlName="ContainerVolume">
+            <div *ngIf="submitted && volume.controls.ContainerVolume.invalid">
+              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.required">Container volume port is required.</span>
+              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.maxlength">Container volume cannot more than 20 characters.</span>
+            </div>
+          </div>
+          <div class="form-group" [class.has-error]="submitted && volume.controls.HostVolume.invalid">
+            <input type="text" class="form-control" placeholder="Container volume" required maxlength="200" formControlName="HostVolume">
+            <div *ngIf="submitted && volume.controls.HostVolume.invalid">
+              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.required">Host volume is required.</span>
+              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.maxlength">Host volume cannot more than 20 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeVolumeBinding(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addVolumeBinding()">
+            <i class="fa fa-plus"></i> Add Volume
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Links</div>
+      <div class="box-body" formArrayName="Links">
+        <div class="equal-fields" *ngFor="let link of form.controls.Links.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && link.controls.Value.invalid">
+            <input type="text" class="form-control" placeholder="e.g. container_name:alias" required maxlength="100" formControlName="Value">
+            <div *ngIf="submitted && link.controls.Value.invalid">
+              <span class="help-block" *ngIf="link.controls.Value.errors.required">Link is required.</span>
+              <span class="help-block" *ngIf="link.controls.Value.errors.maxlength">Link cannot more than 100 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeLink(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLink()">
+            <i class="fa fa-plus"></i> Add Link
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-tabs-custom" *ngIf="selectedServers && selectedServers.length > 0">
+      <ul class="nav nav-tabs">
+        <li *ngFor="let item of selectedServers; let i = index;" [class.active]="item == currentEditEnvServer">
+          <a href="{{'#env_server_' + i}}" data-toggle="tab">{{ item }}</a>
+        </li>
+      </ul>
+      <div class="tab-content" formGroupName="ServerEnvs">
+        <div class="tab-pane" [class.active]="item == currentEditEnvServer" [attr.id]="'env_server_' + i" *ngFor="let item of selectedServers; let i = index;"
+          [formArrayName]="item">
+          <div class="equal-fields" *ngFor="let env of form.controls.ServerEnvs.controls[item]?.controls; let controlIndex = index;"
+            [formGroupName]="controlIndex">
+            <div class="form-group" [class.has-error]="submitted && env.controls.Value.invalid">
+              <input type="text" class="form-control" placeholder="e.g. APP_VERION=1.0.0" required maxlength="500" formControlName="Value">
+              <div *ngIf="submitted && env.controls.Value.invalid">
+                <span class="help-block" *ngIf="env.controls.Value.errors.required">Value is required.</span>
+                <span class="help-block" *ngIf="env.controls.Value.errors.maxlength">Value cannot more than 500 characters.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-default btn-flat" (click)="removeEnv(item, controlIndex)">
+              <i class="fa fa-close"></i>
+            </button>
+            </div>
+          </div>
+          <div class="form-group no-margin">
+            <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addEnv(item)">
+              <i class="fa fa-plus"></i> Add Environment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn bg-olive btn-flat">Save</button>
+    </div>
+  </form>
+</section>
+
+<!-- Modal Define Begin -->
+
+<hb-modal [options]="cloneProcessModalOptions">
+  <hb-modal-header>
+    Processing
+    <i class="fa fa-spinner fa-spin" *ngIf="isCloneDone?.length !== selectedServers?.length"></i>
+  </hb-modal-header>
+  <p *ngFor="let item of cloneProcessMsg">
+    <span class="text-info">[{{ item.time | date:'MM/dd HH:mm:ss' }}]</span>
+    <span class="text-warning">{{ item.server }}</span>
+    <span class="margin-left-10">{{ item.msg }}</span>
+    <span class="text-danger">{{ item.image }}</span>
+  </p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-success btn-flat" [disabled]="isCloneDone?.length !== selectedServers?.length" (click)="closeUpgradeProgressModal();">OK</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<!-- Modal Define End -->

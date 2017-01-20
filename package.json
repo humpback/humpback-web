@@ -1,0 +1,72 @@
+{
+  "name": "humpback-web",
+  "version": "1.0.0",
+  "description": "humpback management website",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "gulp dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/humpback/humpback-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/humpback/humpback-web/issues"
+  },
+  "homepage": "https://github.com/humpback/humpback-web#readme",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "console-stamp": "^0.2.5",
+    "cookie-parser": "^1.4.3",
+    "errorhandler": "^1.5.0",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "nedb": "^1.8.0",
+    "nedb-session-store": "^1.1.1",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "@angular/common": "^2.4.4",
+    "@angular/compiler": "^2.4.4",
+    "@angular/core": "^2.4.4",
+    "@angular/forms": "^2.4.4",
+    "@angular/http": "^2.4.4",
+    "@angular/platform-browser": "^2.4.4",
+    "@angular/platform-browser-dynamic": "^2.4.4",
+    "@angular/router": "^3.4.4",
+    "@angularclass/resolve-angular-routes": "^1.0.9",
+    "@types/core-js": "^0.9.35",
+    "@types/jasmine": "^2.5.41",
+    "@types/node": "^7.0.0",
+    "@types/request": "0.0.39",
+    "angular2-template-loader": "^0.6.0",
+    "awesome-typescript-loader": "^3.0.0-beta.18",
+    "copy-webpack-plugin": "^4.0.1",
+    "core-js": "^2.4.1",
+    "css-loader": "^0.26.1",
+    "del": "^2.2.2",
+    "extract-text-webpack-plugin": "^2.0.0-beta.5",
+    "file-loader": "^0.9.0",
+    "gulp": "^3.9.1",
+    "gulp-develop-server": "^0.5.2",
+    "gulp-util": "^3.0.8",
+    "html-loader": "^0.4.4",
+    "html-webpack-plugin": "^2.26.0",
+    "jasmine-core": "^2.5.2",
+    "light-reload": "^0.2.0",
+    "ng2-select2": "^1.0.0-beta.6",
+    "node-notifier": "^4.6.1",
+    "raw-loader": "^0.5.1",
+    "reflect-metadata": "^0.1.9",
+    "run-sequence": "^1.2.2",
+    "rxjs": "^5.0.3",
+    "style-loader": "^0.13.1",
+    "typescript": "^2.1.5",
+    "webpack": "^2.2.0",
+    "webpack-merge": "^2.4.0",
+    "zone.js": "^0.7.6"
+  }
+}

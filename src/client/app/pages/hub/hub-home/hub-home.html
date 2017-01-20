@@ -1,0 +1,28 @@
+<section class="content-header">
+  <h1> Explore Private Repositories </h1>
+</section>
+<section class="content">
+  <form novalidate class="flex-display" (ngSubmit)="search()" *ngIf="images?.length > 0">
+    <div class="form-group flex-1">
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}">
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-flat bg-olive">Search</button>
+    </div>
+  </form>
+  <div class="items">
+    <a class="item" [routerLink]="['/hub', '_' , item, 'overview']" *ngFor="let item of currentImages;">
+      <div class="image-avatar">{{ item.substring(0,1) | uppercase }}</div>
+      <div class="image-name">{{ item }}</div>
+      <div class="detail-btn">
+        <i class="fa fa-chevron-right"></i> View Detail
+      </div>
+    </a>
+  </div>
+  <div class="well well-sm" *ngIf="!filterImages || filterImages.length == 0">
+    <p>No images found.</p>
+  </div>
+  <div class="height-30" *ngIf="filterImages?.length > 0">
+    <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)"></hb-pagination>
+  </div>
+</section>
