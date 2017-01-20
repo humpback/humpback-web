@@ -1,0 +1,17 @@
+.img-sm, .box-comments .box-comment img, .user-block.user-block-sm img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.box-comments .comment-text {
+  margin-left: 50px;
+}
+
+.box-comment:hover {
+  padding: 8px;
+  background-color: rgba(0, 0, 0, .05);
+}
+
+.box-comment:first-child:hover {
+  padding-top: 0;
+}

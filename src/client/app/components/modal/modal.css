@@ -1,0 +1,15 @@
+.show.modal {
+  overflow-y: auto;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-header {
+  border-bottom-color: #e5e5e5;
+}
+
+.modal-footer {
+  border-top-color: #e5e5e5;
+}

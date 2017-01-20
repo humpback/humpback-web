@@ -1,0 +1,74 @@
+div.activity .ui.grid {
+  margin: 0;
+}
+
+div.activity .ui.segment, div.activity .ui.segment .ui.dimmer {
+  background-color: rgba(26, 27, 28, 0.3);
+}
+
+div.logPanel {
+  text-align: left;
+  color: white;
+}
+
+div.logPanel .ui.list {
+  margin-top: 10px;
+}
+
+div.logPanel div.item {
+  display: flex;
+  align-items: flex-start;
+}
+
+div.logPanel div.item .content {
+  flex: 1;
+}
+
+div.logPanel div.item .content .header {
+  font-size: 15px;
+  font-weight: 100;
+}
+
+div.logPanel div.item .content .header .name {
+  color: lightblue;
+  margin-right: 5px;
+}
+
+div.logPanel div.item .content .description {
+  font-size: 13px;
+}
+
+.logPanel .panelHeader, .most-used-panel .panelHeader {
+  font-size: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .2);
+  padding-bottom: 5px;
+}
+
+.most-used-panel .empty {
+  margin-top: 10px;
+}
+
+.most-used-panel .empty i {
+  font-size: 3em;
+}
+
+.most-used-panel a.item {
+  font-size: 16px;
+}
+
+.footer {
+  padding: 0 14px;
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+}
+
+.footer span {
+  color: gray;
+}
+
+.footer .dividing {
+  height: 1px;
+  background: gray;
+  margin: 5px 0;
+}

@@ -1,0 +1,35 @@
+<ul class="pagination pagination-sm no-margin">
+  <li>
+    <a href="javascript:void(0)" *ngIf="options.boundaryLinks" (click)="setPage(1)" [class.disabled]="currentPage == 1">
+      {{ options.firstText || "First" }}
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" *ngIf="options.directionLinks" (click)="pageUp()" [class.disabled]="currentPage == 1">
+      {{ options.prevText || "«" }}
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" *ngIf="showPrevMoreBtn" (click)="prevMore()">
+      <i class="fa fa-ellipsis-h"></i>
+    </a>
+  </li>
+  <li *ngFor="let pageIndex of pages" [class.active]="pageIndex == currentPage">
+    <a href="javascript:void(0)" (click)="setPage(pageIndex)">{{ pageIndex }}</a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" class="ui icon button" *ngIf="showNextMoreBtn" (click)="nextMore()">
+      <i class="fa fa-ellipsis-h"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" *ngIf="options.directionLinks" (click)="pageDown()" [class.disabled]="currentPage == totalPages">
+      {{ options.nextText || "»" }}
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" *ngIf="options.boundaryLinks" (click)="setPage(totalPages)" [class.disabled]="currentPage == totalPages">
+      {{ options.lastText || "Last" }} 
+    </a>
+  </li>
+</ul>

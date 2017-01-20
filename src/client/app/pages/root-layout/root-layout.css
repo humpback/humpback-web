@@ -1,0 +1,7 @@
+.wrapper {
+    height: auto;
+}
+
+.content-wrapper {
+    min-height: 100vh;
+}

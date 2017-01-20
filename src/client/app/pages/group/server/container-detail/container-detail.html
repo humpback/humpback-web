@@ -1,0 +1,248 @@
+<section class="content-header">
+  <h1> Container Detail <small>{{ container?.Name?.substr(1) }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li class="active">Detail</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="btn-panel flex-display">
+    <div class="btn-group">
+      <button type="button" class="btn bg-olive btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> 
+        Operate&nbsp;&nbsp;
+        <span class="fa fa-caret-down"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" [class.disable]="!(container.State?.Running && !container.State?.Paused)" (click)="operate('pause', $event)">Pause</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" [class.disable]="!container.State?.Paused" (click)="operate('unpause', $event)">Unpause</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" [class.disable]="container.State?.Running" (click)="operate('start', $event)">Start</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" [class.disable]="!(container.State?.Running && !container.State?.Paused)" (click)="operate('stop', $event)">Stop</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" [class.disable]="!(container.State?.Running && !container.State?.Paused)" (click)="operate('restart', $event)">Restart</a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="javascript:void(0)" [class.disable]="container.State?.Running" (click)="showDeleteModal($event)">
+            <i class="fa fa-warning text-danger"></i> Delete
+          </a>
+        </li>
+      </ul>
+    </div>
+    <button type="button" class="btn btn-default btn-flat" (click)="showRenameModal()">
+      <i class="fa fa-exchange"></i>
+      Rename
+    </button>
+    <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
+      <i class="fa fa-arrow-circle-up"></i>
+      Upgrade
+    </button>
+    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'clone']">
+      <i class="fa fa-clone"></i> Clone
+    </a>
+    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'monitor']">
+      <i class="fa fa-line-chart"></i> Monitor
+    </a>
+    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'logs']">
+      <i class="fa fa-file-text-o"></i> Logs
+    </a>
+  </div>
+  <ul class="timeline">
+    <li>
+      <i class="fa fa-cog"></i>
+      <div class="timeline-item">
+        <div class="timeline-header flex-display">
+          <span>Basic Info</span>
+          <span class="label" [ngClass]="{
+            'label-success': container.State?.StateText == 'Running', 
+            'label-warning': container.State?.Paused || container.State?.Restarting, 
+            'label-danger': container.State?.Dead || !container.State?.Running }">
+            {{ container.State?.StateText }}
+          </span>
+        </div>
+        <div class="timeline-body container-basic-info">
+          <table class="table table-bordered">
+            <tbody>
+              <template ngFor let-item let-i="index" let-isEven="even" [ngForOf]="containerBasicInfo">
+                <tr *ngIf="isEven">
+                  <td class="basic-info-title">{{ containerBasicInfo[i].title }}</td>
+                  <td>
+                    {{ containerBasicInfo[i].content }}
+                    <small class="text-info" *ngIf="containerBasicInfo[i].title == 'Restart Policy' && containerBasicInfo[i].content == 'on-failure'">
+                      with {{ container.HostConfig?.RestartPolicy?.MaximumRetryCount }} retry count
+                    </small>
+                  </td>
+                  <td class="basic-info-title">{{ containerBasicInfo[i+1]?.title }}</td>
+                  <td>
+                    {{ containerBasicInfo[i+1]?.content }}
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </li>
+    <li>
+      <i class="fa fa-internet-explorer"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          <span>Ports Binding</span>
+        </div>
+        <div class="timeline-body">
+          <ul class="list-unstyled" *ngIf="container.formettedPortsBindings | isEmptyObj">
+            <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let entry of container.formettedPortsBindings | objLoop">
+              <span class="no-margin" *ngFor="let item of entry.value">
+                {{ (item.HostIp || '0.0.0.0') + ":" + item.HostPort }}
+              </span>
+              <i class="fa fa-long-arrow-right"></i> {{ entry.key }}
+            </li>
+          </ul>
+          <span *ngIf="!(container.formettedPortsBindings | isEmptyObj)">
+            No port binding defined.
+          </span>
+        </div>
+      </div>
+    </li>
+    <li *ngIf="container.HostConfig?.Dns?.length > 0">
+      <div class="timeline-item">
+        <div class="timeline-header">
+          <span>DNS</span>
+        </div>
+        <div class="timeline-body">
+          <ul class="list-unstyled">
+            <li value="-" class="flex-display custom-list" *ngFor="let item of container.HostConfig.Dns">
+              <span class="break-word">{{ item }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
+    <li>
+      <i class="fa fa-hdd-o"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          <span>Volumes Binding</span>
+        </div>
+        <div class="timeline-body">
+          <ul class="list-unstyled" *ngIf="container.Mounts?.length > 0">
+            <li value="-" class="flex-display flex-align-center custom-list break-word" *ngFor="let item of container.Mounts">
+              {{ item.Source }} <i class="fa fa-long-arrow-right"></i> {{ item.Destination }}
+            </li>
+          </ul>
+          <span *ngIf="!container.Mounts?.length">
+            No volumne binding defined.
+          </span>
+        </div>
+      </div>
+    </li>
+    <li>
+      <i class="fa fa-envira"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          <span>Environment</span>
+        </div>
+        <div class="timeline-body">
+          <ul class="list-unstyled" *ngIf="container.Config?.Env | isEmptyObj">
+            <li value="-" class="flex-display custom-list" *ngFor="let item of container.Config.Env">
+              <span class="break-word">{{ item }}</span>
+            </li>
+          </ul>
+          <span *ngIf="!(container.Config?.Env | isEmptyObj)">
+            No environment variable defined.
+          </span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- Modal Define Begin -->
+<hb-modal [options]="deleteContainerModalOptions">
+  <p>Are you sure you want to delete {{ container?.Name?.substr(1) }}?</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="deleteContainerModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="deleteContainer()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="renameContainerModalOptions">
+  <form novalidate #renameForm="ngForm" (ngSubmit)="rename(renameForm)">
+    <div class="form-group" [ngClass]="{'has-error': renameContainerModalOptions.formSubmitted && newNameInput.invalid}">
+      <input type="hidden" name="oldContainerName" [(ngModel)]="containerId">
+      <input type="text" class="form-control" name="newName" placeholder="Docker image name" [(ngModel)]="newName" autocomplete="off"
+        #newNameInput="ngModel" required maxlength="30" pattern="^[0-9a-zA-Z_-]*$" validateNotEqual="oldContainerName">
+      <div [hidden]="newNameInput.valid || !renameContainerModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="newNameInput.errors?.required">Name cannot be empty.</span>
+        <span class="help-block" *ngIf="newNameInput.errors?.maxlength">Name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="newNameInput.errors?.pattern">Name must match ^[0-9a-zA-Z_-]*$.</span>
+        <span class="help-block" *ngIf="newNameInput.errors?.validateNotEqual">New name must be different with the old name.</span>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="renameContainerModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Confirm</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="upgradeContainerModalOptions">
+  <form novalidate #upgradeForm="ngForm" (ngSubmit)="upgrade(upgradeForm)">
+    <div class="form-group">
+      <label class="control-label">Image</label>
+      <input type="text" class="form-control" value="{{ container?.Config?.Image | imageNameFmt:'name' }}" readonly>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Current Tag</label>
+      <input type="text" class="form-control" name="currentTag" value="{{ container?.Config?.Image | imageNameFmt:'Tag' }}" readonly>
+    </div>
+    <div class="form-group" [ngClass]="{'has-error': upgradeContainerModalOptions.formSubmitted && newTagInput.invalid}">
+      <label class="control-label">New Tag</label>
+      <input type="text" autocomplete="off" class="form-control" name="newTag" [(ngModel)]="newTag" #newTagInput="ngModel" required
+        maxlength="10" pattern="^[0-9a-z._-]*$" [validateNotEqual]="container?.Config?.Image | imageNameFmt:'Tag'">
+      <div [hidden]="newTagInput.valid || !upgradeContainerModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="newTagInput.errors?.required">Tag cannot be empty.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.maxlength">Tag cannot more than 10 characters.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.pattern">Tag must match ^[0-9a-z._-]*$.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.validateNotEqual">New tag must be different with the old tag.</span>
+      </div>
+    </div>
+    <div class="form-group" [ngClass]="{'has-error': !selectedServers.length && upgradeContainerModalOptions.formSubmitted}">
+      <label>Servers</label>
+      <div>
+        <select2 [data]="servers" (valueChanged)="refreshSelectedServer($event)" [cssImport]="false" [width]="'100%'" [options]="serversSelect2Options"></select2>
+      </div>
+      <span class="help-block" *ngIf="!selectedServers.length && upgradeContainerModalOptions.formSubmitted">Servers cannot be empty.</span>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="upgradeContainerModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Confirm</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="upgradeProgressModalOptions">
+  <hb-modal-header>
+    Processing
+    <i class="fa fa-spinner fa-spin" *ngIf="isUpgradeDone.length !== selectedServers.length"></i>
+  </hb-modal-header>
+  <p *ngFor="let item of upgradeProcessMsg">
+    <span class="text-info">[{{ item.time | date:'MM/dd HH:mm:ss' }}]</span>
+    <span class="text-warning">{{ item.server }}</span>
+    <span class="margin-left-10">{{ item.msg }}</span>
+    <span class="text-danger">{{ item.image }}</span>
+  </p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-success btn-flat" [disabled]="isUpgradeDone.length !== selectedServers.length" (click)="closeUpgradeProgressModal();">OK</button>
+  </hb-modal-footer>
+</hb-modal>
+<!-- Modal Define End -->

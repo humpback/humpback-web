@@ -1,0 +1,4 @@
+.treeview.ignore-active.active>a {
+  background: transparent;
+  border-left-color: transparent;
+}

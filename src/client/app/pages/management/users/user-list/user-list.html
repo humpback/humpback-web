@@ -1,0 +1,91 @@
+<section class="content-header">
+  <h1> Manage Users </h1>
+</section>
+<section class="content">
+  <div class="box no-border">
+    <div class="box-body">
+      <div class="flex-display">
+        <form class="flex-1" novalidate (ngSubmit)="search(filterCondition.value)">
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" #filterCondition>
+            <span class="input-group-btn">
+            <button type="submit" class="btn btn-flat">
+              <i class="fa fa-search"></i> Search
+            </button>
+          </span>
+          </div>
+        </form>
+        <div class="form-group">
+          <a [routerLink]="['/manage', 'users', 'add-user']" class="btn btn-sm btn-flat bg-olive">
+            <i class="fa fa-plus"></i> Add User
+          </a>
+        </div>
+      </div>
+      <div class="well well-sm" *ngIf="users?.length == 0">
+        No users found.
+      </div>
+      <table class="table table-hover" *ngIf="users?.length > 0">
+        <thead>
+          <tr>
+            <th>UserID</th>
+            <th>FullName</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>LastEditUser</th>
+            <th>LastEditDate</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of users;">
+            <td>{{ item.UserID }}</td>
+            <td>{{ item.FullName }}</td>
+            <td>{{ item.Department }}</td>
+            <td>{{ item.Email }}</td>
+            <td>{{ item.EditUser }}</td>
+            <td>{{ item.EditDate | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td class="text-center">
+              <a [routerLink]="['/manage', 'users', item.UserID, 'edit']" title="edit user" class="margin-right-10">
+                <i class="fa fa-pencil"></i>
+              </a>
+              <a href="javascript:void(0)" title="reset password" class="margin-right-10" (click)="showResetPasswordModal(item)">
+                <i class="fa fa-refresh text-warning"></i>
+              </a>
+              <a href="javascript:void(0)" title="delete user" (click)="showDeleteModal(item)">
+                <i class="fa fa-close text-danger"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box-footer" *ngIf="users?.length > 0">
+      <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)">
+      </hb-pagination>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Define Begin -->
+
+<hb-modal [options]="deleteUserModalOptions">
+  <div class="description" *ngIf="delTarget">
+    Are you sure you want to delete <strong class="important-text">{{ delTarget?.UserID }} ({{delTarget?.FullName}})</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="deleteUserModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="delUser()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+
+<hb-modal [options]="resetPasswordModalOptions">
+  <div class="description" *ngIf="resetTarget">
+    Are you sure you want to reset <strong class="important-text">{{ resetTarget?.UserID }}'s ({{resetTarget?.FullName}})</strong> password to '123456' ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="resetPasswordModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="resetPassword()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+<!-- Modal Define End -->

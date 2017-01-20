@@ -1,0 +1,215 @@
+<section class="content-header">
+  <h1> Server Overview <small>{{ ip }}</small></h1>
+</section>
+<section class="content">
+  <div class="nav-tabs-custom">
+    <ul class="nav nav-tabs pull-right">
+      <li class="pull-left header">
+        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : 'Docker Images' }}
+      </li>
+      <li [ngClass]="{'active': activedTab == 'images'}">
+        <a href="javascript:void(0)" (click)="changeTab('images')">Docker Images</a>
+      </li>
+      <li [ngClass]="{'active': activedTab == 'containers'}">
+        <a href="javascript:void(0)" (click)="changeTab('containers')">Containers</a>
+      </li>
+    </ul>
+    <div class="tab-content no-padding">
+      <div class="tab-pane" [ngClass]="{'active': activedTab == 'containers'}">
+        <div class="box no-border">
+          <div class="box-body">
+            <div class="flex-display margin-bottom-10">
+              <form class="flex-1" novalidate (ngSubmit)="filterContainer()">
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [(ngModel)]="containerFilter">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-flat">
+                      <i class="fa fa-search"></i> Search
+                    </button>
+                  </span>
+                </div>
+              </form>
+              <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
+                <i class="fa fa-refresh"></i> Refresh
+              </button>
+              <a [routerLink]="['/group', groupInfo.ID, ip, 'new-container']" class="btn btn-sm bg-olive btn-flat">
+                <i class="fa fa-plus"></i> Add Container
+              </a>
+            </div>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Image</th>
+                  <th class="command">Command</th>
+                  <th class="status">Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of currentContainers; let last = last;">
+                  <td class="container-name">
+                    <a [routerLink]="['/group', groupInfo.ID, ip, 'containers', item.Names[0].substring(1)]">
+                      {{ item.Names[0].substring(1) }}
+                    </a>
+                  </td>
+                  <td class="image-name" [attr.title]="item.Image">
+                    {{ item.Image }}
+                  </td>
+                  <td class="command" [attr.title]="item.Command">
+                    {{ item.Command }}
+                  </td>
+                  <td class="status" [attr.title]="item.Status">
+                    <i class="fa fa-circle text-{{getStatsCls(item.Status)}}"></i>
+                    <span class="label label-{{getStatsCls(item.Status)}}">
+                      {{ item.Status }}
+                    </span>
+                  </td>
+                  <td class="operate">
+                    <div class="btn-group operate" [class.dropup]="last">
+                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">    
+                        <i class="fa fa-wrench"></i>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li>
+                          <a href="javascript:void(0)" (click)="operate(item, 'restart')">
+                            <i class="fa fa-refresh text-success"></i> Restart
+                          </a>
+                        </li>
+                        <li *ngIf="item.Status.indexOf('Up') != -1">
+                          <a href="javascript:void(0)" (click)="operate(item, 'stop')">
+                            <i class="fa fa-stop"></i> Stop
+                          </a>
+                        </li>
+                        <li *ngIf="item.Status.indexOf('Up') == -1 && item.Status.indexOf('Restarting') == -1">
+                          <a href="javascript:void(0)" (click)="operate(item, 'start')">
+                            <i class="fa fa-play text-success"></i> Start
+                          </a>
+                        </li>
+                        <li *ngIf="item.Status.indexOf('Exited') != -1 || item.Status == 'Created'">
+                          <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
+                            <i class="fa fa-trash"></i> Delete
+                          </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                          <a [routerLink]="['/group', groupInfo.ID, ip, 'containers', item.Names[0].substring(1), 'monitor']">
+                            <i class="fa fa-line-chart"></i> Monitor
+                          </a>
+                        </li>
+                        <li>
+                          <a [routerLink]="['/group', groupInfo.ID, ip, 'containers', item.Names[0].substring(1), 'logs']">
+                            <i class="fa fa-file-text-o"></i> Logs
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box-footer clearfix">
+            <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
+              (onSelectPage)="setContainerPage($event)">
+            </hb-pagination>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" [ngClass]="{'active': activedTab == 'images'}">
+        <div class="box no-border">
+          <div class="box-body">
+            <div class="flex-display margin-bottom-10">
+              <form class="flex-1" novalidate (ngSubmit)="filterImage()">
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [(ngModel)]="imageFilter">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-flat">
+                      <i class="fa fa-search"></i> Search
+                    </button>
+                  </span>
+                </div>
+              </form>
+              <button class="btn bg-olive btn-sm btn-flat" (click)="showPullImageModal()">
+                <i class="fa fa-download"></i> Pull Docker Image
+              </button>
+            </div>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Tag</th>
+                  <th>Virual Size</th>
+                  <th>Created</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of currentImages;">
+                  <td>{{ item.Name }}</td>
+                  <td>{{ item.Tag }}</td>
+                  <td>{{ item.VirtualSize }} MB</td>
+                  <td>{{ item.Created | date:'yyyy-MM-dd HH:mm' }}</td>
+                  <td>
+                    <div class="operate">
+                      <button type="button" class="btn btn-sm btn-default" (click)="showRmImageModal(item)">    
+                        <i class="fa fa-close text-danger"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box-footer clearfix">
+            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)">
+            </hb-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Define Begin -->
+
+<hb-modal [options]="rmContainerModalOptions">
+  <div class="description" *ngIf="rmContainerTarget?.Names">
+    Are you sure you want to delete
+    <strong class="important-text">{{ rmContainerTarget?.Names[0].substring(1) }}</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="rmContainerModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="rmContainer()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="pullImageModalOptions">
+  <form novalidate #pullForm="ngForm" (ngSubmit)="pullImage(pullForm)">
+    <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
+      <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
+        autocomplete="off" #imageName="ngModel" required maxlength="30" pattern="^[0-9a-z.\/:_-]*$">
+      <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
+        <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="pullImageModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Pull</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="rmImageModalOptions">
+  <div class="description" *ngIf="rmImageTarget?._repo">
+    Are you sure you want to delete <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="rmImageModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="rmImage()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<!-- Modal Define End -->

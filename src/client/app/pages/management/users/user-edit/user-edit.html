@@ -1,0 +1,73 @@
+<section class="content-header">
+  <h1>{{ isNew ? 'Add' : 'Edit' }} User <small *ngIf="!isNew">{{ userInfo.UserID }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/manage', 'users']"><i class="fa fa-users"></i> Users </a>
+    </li>
+    <li class="active">{{ isNew ? 'Add' : 'Edit' }}</li>
+  </ol>
+</section>
+<section class="content">
+  <form novalidate #form="ngForm" (ngSubmit)="save(form)">
+    <div class="form-group" [class.has-error]="form.submitted && userIdInput.invalid">
+      <label>UserID</label>
+      <input type="text" name="userId" class="form-control" #userIdInput="ngModel" [(ngModel)]="userInfo.UserID" [attr.disabled]="isNew ? null : 'disabled'"
+        minlength="4" maxlength="6" required pattern="^[0-9a-zA-Z]*$" autocomplete="off">
+      <div *ngIf="form.submitted && userIdInput.invalid">
+        <span class="help-block" *ngIf="userIdInput.errors.required">UserID cannot be empty.</span>
+        <span class="help-block" *ngIf="userIdInput.errors.minlength">UserID's length must be between 4 and 6.</span>
+        <span class="help-block" *ngIf="userIdInput.errors.maxlength">UserID's length must be between 4 and 6.</span>
+        <span class="help-block" *ngIf="userIdInput.errors.pattern">UserID must be match ^[0-9a-zA-Z]*$.</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && fullnameInput.invalid">
+      <label>FullName</label>
+      <input type="text" name="fullname" class="form-control" #fullnameInput="ngModel" [(ngModel)]="userInfo.FullName" maxlength="10"
+        required pattern="^[0-9a-zA-Z. ]*$" autocomplete="off">
+      <div *ngIf="form.submitted && fullnameInput.invalid">
+        <span class="help-block" *ngIf="fullnameInput.errors.required">FullName cannot be empty.</span>
+        <span class="help-block" *ngIf="fullnameInput.errors.maxlength">FullName cannot more than 10 characters.</span>
+        <span class="help-block" *ngIf="fullnameInput.errors.pattern">FullName must be match ^[0-9a-zA-Z. ]*$.</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && password.invalid" *ngIf="isNew">
+      <label>Password</label>
+      <input type="password" placeholder="Default is 123456" class="form-control" #password="ngModel" name="Password" [(ngModel)]="userInfo.Password" minlength="5"
+        maxlength="20" pattern="^[0-9A-Za-z]*$">
+      <div *ngIf="form.submitted && password.invalid">
+        <span class="help-block" *ngIf="password.errors.minlength">Password cannot less than 5 characters.</span>
+        <span class="help-block" *ngIf="password.errors.maxlength">Password cannot more than 20 characters.</span>
+        <span class="help-block" *ngIf="password.errors.pattern">Password cannot contain any special symbol.</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && departmentInput.invalid">
+      <label>Department</label>
+      <input type="text" name="department" class="form-control" autocomplete="off" #departmentInput="ngModel" [(ngModel)]="userInfo.Department"
+        maxlength="50">
+      <div *ngIf="form.submitted && departmentInput.invalid">
+        <span class="help-block" *ngIf="departmentInput.errors.maxlength">Department cannot more than 50 characters.</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && emailInput.invalid">
+      <label>Email</label>
+      <input type="email" name="email" class="form-control" #emailInput="ngModel" [(ngModel)]="userInfo.Email" maxlength="100"
+        pattern="^(\w)+(\.\w+)*@(\w)+((\.\w{2,3}){1,3})$" autocomplete="off">
+      <div *ngIf="form.submitted && emailInput.invalid">
+        <span class="help-block" *ngIf="emailInput.errors.maxlength">Email cannot more than 100 characters.</span>
+        <span class="help-block" *ngIf="emailInput.errors.pattern">Invalid email address.</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="isAdmin" [(ngModel)]="userInfo.IsAdmin">Own administrator privileges
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-flat bg-olive">
+        <i class="fa fa-save"></i> Save
+      </button>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,51 @@
+<section class="content-header">
+  <h1>{{ isNew ? 'Add' : 'Edit' }} Group <small *ngIf="!isNew">{{ groupInfo.Name }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/manage', 'groups']"><i class="fa fa-archive"></i> Groups </a>
+    </li>
+    <li class="active">{{ isNew ? 'Add' : 'Edit' }}</li>
+  </ol>
+</section>
+<section class="content">
+  <form novalidate #form="ngForm" (ngSubmit)="save(form)">
+    <div class="form-group" [class.has-error]="form.submitted && groupNameInput.invalid">
+      <label>Name</label>
+      <input type="text" class="form-control" name="groupName" autocomplete="off" #groupNameInput="ngModel" [(ngModel)]="groupInfo.Name"
+        required maxlength="20" pattern="^[0-9a-zA-Z-_.]*$">
+      <div *ngIf="groupNameInput.invalid && form.submitted">
+        <span class="help-block" *ngIf="groupNameInput.errors?.required">Name cannot be empty.</span>
+        <span class="help-block" *ngIf="groupNameInput.errors?.maxlength">Name cannot more than 20 characters.</span>
+        <span class="help-block" *ngIf="groupNameInput.errors?.pattern">Name cannot contain any special symbol.</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && descriptionInput.invalid">
+      <label>Description</label>
+      <textarea class="form-control" name="description" rows="3" maxlength="500" required #descriptionInput="ngModel" [(ngModel)]="groupInfo.Description"></textarea>
+      <div *ngIf="descriptionInput.invalid && form.submitted">
+        <span class="help-block" *ngIf="descriptionInput.errors?.required">Description cannot be empty.</span>
+        <span class="help-block" *ngIf="descriptionInput.errors?.maxlength">Description cannot more than 500 characters.</span>
+      </div>
+    </div>
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="opentoPublic" [(ngModel)]="groupInfo.OpenToPublic"> <strong>Open to public</strong>
+      </label>
+    </div>
+    <div class="form-group" [class.has-error]="form.submitted && !groupInfo.Owners?.length">
+      <label>Owners</label>
+      <select2 [data]="groupInfo.Owners" [value]="groupInfo.Owners" (valueChanged)="refreshSelectedUser($event)" [cssImport]="false" [width]="'100%'" [options]="ownerSelect2Options"></select2>
+      <span class="help-block" *ngIf="form.submitted && !groupInfo.Owners?.length">Owners cannot be empty.</span>
+    </div>
+    <div class="form-group">
+      <label>Servers (IP)</label>
+      <hb-tags-input name="servers" [(ngModel)]="groupInfo.Servers" [validatePattern]="'^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[0-9])\\.){3}((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[1-9]))$'"></hb-tags-input>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-flat bg-olive">
+        <i class="fa fa-save"></i> Save
+      </button>
+      <a class="btn btn-flat btn-danger" [routerLink]="['/manage', 'groups']">Cancel</a>
+    </div>
+  </form>
+</section>

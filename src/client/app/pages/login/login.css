@@ -1,0 +1,9 @@
+.container {
+  width: 100%;
+  min-height: 100%;
+  background: #d2d6de;
+}
+
+.login-box {
+  margin: 100px auto;  
+}

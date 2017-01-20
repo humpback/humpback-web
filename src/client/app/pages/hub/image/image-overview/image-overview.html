@@ -1,0 +1,113 @@
+<section class="content-header">
+  <h1>Image Overview</h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/hub']"><i class="fa fa-archive"></i> Explore</a>
+    </li>
+    <li class="active">Image Detail</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="title-panel">
+    <div class="image-title">{{ image?.Name }}</div>
+    <div class="edit-info">
+      <span class="text-info" *ngIf="!image?.NotFoundInDB">
+        Last Edit by {{ image?.EditUser }} on {{ image?.EditDate | date:'yyyy-MM-dd HH:mm' }}
+      </span>
+      <span class="text-info" *ngIf="image?.NotFoundInDB">
+        No one has edited this page. To be the first!  
+      </span>
+    </div>
+  </div>
+  <div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+      <li [class.active]="activedTab == 'description'" (click)="setTab('description')">
+        <a href="#description" data-toggle="tab">Description</a>
+      </li>
+      <li [class.active]="activedTab == 'tags'" (click)="setTab('tags')">
+        <a href="#tags" data-toggle="tab">Tags</a>
+      </li>
+      <li [class.active]="activedTab == 'dockerfile'" (click)="setTab('dockerfile')">
+        <a href="#dockerfile" data-toggle="tab">Dockerfile</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane" id="description" [class.active]="activedTab == 'description'">
+        <div *ngIf="!image.Description">
+          <div class="well well-sm">
+            No description.
+          </div>
+        </div>
+        <a [routerLink]="['/hub', '_', imageId, 'edit', 'description']" class="btn btn-flat btn-sm bg-olive">
+          <i class="fa fa-pencil"></i> Edit
+        </a>
+        <div *ngIf="image.Description">
+          <div [innerHtml]="imageDescroption"></div>
+        </div>
+      </div>
+      <div class="tab-pane" id="tags" [class.active]="activedTab == 'tags'">
+        <div class="row">
+          <div class="col-md-8">
+            <table class="table table-hover">
+              <tbody>
+                <tr *ngFor="let tag of tags;">
+                  <td>{{ tag }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-4">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">Docker Pull Command</h3>
+                <span class="pull-right copy-command-btn" (click)="commandText.select()">
+                  <i class="fa fa-clipboard"></i>
+                </span>
+              </div>
+              <div class="box-body">
+                <input type="text" readonly class="command no-border" value="{{ 'docker pull ' + privateRegistryAddress + '/' + imageId }}"
+                  #commandText />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="dockerfile" [class.active]="activedTab == 'dockerfile'">
+        <div class="well well-sm" *ngIf="!imageDockerfile">
+          No dockerfile.
+        </div>
+
+        <a href="javascript:void(0)" (click)="showDockerfileModal()" class="btn btn-flat btn-sm bg-olive">
+          <i class="fa fa-pencil"></i> Edit
+        </a>
+        <pre *ngIf="imageDockerfile"><code class="hljs dockerfile" [innerHtml]="imageDockerfile"></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Define Begin -->
+
+<hb-modal [options]="editDockerfileModal">
+  <form novalidate #form="ngForm" (ngSubmit)="updateDockerfile(form)">
+    <div class="form-group" [class.has-error]="editDockerfileModal.submitted && dockerfileInput.invalid">
+      <textarea name="dockerfile" rows="10" class="form-control" placeholder="FROM ..." #dockerfileInput="ngModel" [(ngModel)]="image.Dockerfile" required
+        maxlength="2000"></textarea>
+      <div *ngIf="dockerfileInput.invalid && editDockerfileModal.submitted">
+        <span class="help-block" *ngIf="dockerfileInput.errors?.required">Dockerfile cannot be empty.</span>
+        <span class="help-block" *ngIf="dockerfileInput.errors?.maxlength">Dockerfile cannot more than 2000 characters.</span>
+      </div>
+    </div>
+    <input type="file" class="hidden" #fileInput (change)="fileChangeEvent($event)">
+
+    <div class="form-group text-right">
+      <button type="button" (click)="fileInput.click()" class="btn btn-defualt btn-flat pull-left">
+        <i class="fa fa-upload"></i> Import from file
+      </button>
+      <button type="button" class="btn btn-default btn-flat" (click)="editDockerfileModal.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Save</button>
+    </div>
+  </form>
+</hb-modal>
+
+<!-- Modal Define End -->

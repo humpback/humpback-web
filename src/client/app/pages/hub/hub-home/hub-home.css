@@ -1,0 +1,60 @@
+.items .item {
+  border: 1px solid #c4cdda;
+  border-radius: 3px;
+  color: #3f5167;
+  font-weight: 500;
+  height: 80px;
+  line-height: 80px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.items .item:hover {
+  border-color: tomato;
+}
+
+.items .item:hover .detail-btn {
+  background: tomato;
+  color: white;
+}
+
+.items .item .image-avatar {
+  background-color: rgba(0, 0, 0, .15);
+  color: #555;
+  font-weight: bolder;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  margin: 0 10px;
+}
+
+.items .item .image-name {
+  flex: 1;
+  padding: 0 10px 0 0;
+  font-size: larger;
+}
+
+.items .item .detail-btn {
+  background: #c4cdda;
+  width: 100px;
+  text-align: center;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  line-height: initial;
+  align-items: center;
+}
+
+.items .item .detail-btn>i {
+  font-size: 20px;
+  align-self: center;
+}
+
+.height-30 {
+  height: 30px;
+}

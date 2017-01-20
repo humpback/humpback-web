@@ -1,0 +1,42 @@
+<div class="group-wrapper" [class.hidden]="!groups?.length">
+  <div class="group-tree-panel" *ngIf="groups?.length > 0">
+    <div #groupTreePanel>
+      <ul class="group-tree">
+        <li class="treeview" *ngFor="let group of groups;" [class.active]="group.ID == selectedGroupId">
+          <a (click)="toggleMenus(group.ID)">
+            <span>{{ group.Name }}</span>
+            <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+          </a>
+          <ul class="treeview-menu menu-open" [@groupMenuState]="group.ID == selectedGroupId ? 'active' : 'inactive'">
+            <li routerLinkActive="active">
+              <a [routerLink]="['/group', group.ID, 'overview']">
+                Overview
+              </a>
+            </li>
+            <li [hb-router-active]="{'url':'/group/'+group.ID+'/'+server, 'cls': 'active'}" *ngFor="let server of group.Servers">
+              <a [routerLink]="['/group', group.ID, server, 'overview']" (click)="addToMostUsed(group.ID, server)">
+                <i class="fa fa-circle-o"></i>{{ server }}
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="routerOutlet">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+<section class="content" *ngIf="!groups?.length">
+  <div class="error-page flex-display flex-align-center">
+    <h2 class="headline text-yellow">
+      <i class="fa fa-warning"></i>
+    </h2>
+    <div class="error-content">
+      <h3>You don't have any group's privilege.</h3>
+    </div>
+  </div>
+</section>

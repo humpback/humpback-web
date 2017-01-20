@@ -1,0 +1,16 @@
+.dropdown-menu {
+  border: none;
+}
+
+.user-footer {
+  border: 1px solid lightgray;
+}
+
+@media(max-width: 767px) {
+  .main-header .logo, .main-header .navbar {
+    width: 100%;
+  }
+  .main-header .navbar {
+    margin-left: 0;
+  }
+}

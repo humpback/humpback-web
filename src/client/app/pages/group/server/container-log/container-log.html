@@ -1,0 +1,40 @@
+<section class="content-header">
+  <h1> Container Logs <small>{{ containerId }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/group', groupId, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li>
+      <a [routerLink]="['/group', groupId, ip, 'containers', containerId ]"> Detail </a>
+    </li>
+    <li class="active">Logs</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="btn-panel flex-display">
+    <div class="tail-select-panel">
+      <div class="input-group">
+        <span class="input-group-addon">Tail</span>
+        <select class="form-control" [ngModel]="tailNum" (ngModelChange)="tailNumChanged($event)">
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+          <option value="2000">2000</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <button type="button" class="btn btn-default btn-flat" (click)="getLogs()">
+        <i class="fa fa-refresh"></i>
+      </button>
+    </div>
+  </div>
+  <div class="logs-panel" #logPanel [attr.data-has-log]="logs.length || null">
+    <p *ngFor="let item of logs">{{ item }}</p>
+  </div>
+  <div class="well well-sm" *ngIf="!logs.length">
+    This container does not contain any logs.
+  </div>
+</section>

@@ -1,0 +1,52 @@
+<header class="main-header">
+  <a [routerLink]="['/']" class="logo">
+    <span class="logo-mini"><b>HB</b></span>
+    <span class="logo-lg"><b>Humpback</b></span>
+  </a>
+  <nav class="navbar navbar-static-top">
+    <a href="javascript:void(0)" class="sidebar-toggle" data-toggle="offcanvas" role="button" (click)="toggleSidebar()">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </a>
+
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li class="dropdown user user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img src="{{'/api/users/avatar/'+userInfo.UserID}}" class="user-image" alt="User Image">
+            <span class="hidden-xs">{{userInfo.FullName}}</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="user-header">
+              <img src="{{'/api/users/avatar/'+userInfo.UserID}}" class="img-circle" alt="User Image">
+              <p>
+                {{userInfo.FullName}} - {{ userInfo.IsAdmin ? 'Administrator' : 'User' }}
+                <small>Member since Nov. 2012</small>
+              </p>
+            </li>
+            <li class="user-footer">
+              <div class="pull-left">
+                <a [routerLink]="['/account', 'profile']" class="btn btn-default btn-flat">Profile</a>
+              </div>
+              <div class="pull-right">
+                <a href="javascript:void(0)" class="btn btn-default btn-flat"  (click)="showLogoutModal()">Sign out</a>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<hb-modal [options]="logoutModalOptions">
+  <div class="description">
+    Are you sure you want to log out?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="logoutModalOptions.show = fasle">No</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="logout()">Yes</button>
+  </hb-modal-footer>
+</hb-modal>
