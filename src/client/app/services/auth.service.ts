@@ -18,7 +18,7 @@ export class AuthService {
 
   login(userInfo: IUserLogin): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/login`;
+      let url = `/api/users/login`;
       this.http.post(url, userInfo)
         .then(res => {
           this.userInfo = res.json();
@@ -33,7 +33,7 @@ export class AuthService {
 
   isLogin(): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/islogin`;
+      let url = `/api/users/islogin`;
       if (this.userInfo) {
         return resolve(this.userInfo);
       }
@@ -55,7 +55,7 @@ export class AuthService {
 
   logout(): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/logout`;
+      let url = `/api/users/logout`;
       this.http.get(url)
         .then(res => {
           this.clearUserInfo();

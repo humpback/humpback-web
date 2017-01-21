@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { AppConfig } from './../app.config';
 import { AuthService } from './auth.service';
 import { CusHttpService } from './custom-http.service';
 import { GroupService } from './group.service';
@@ -30,7 +29,7 @@ export class ImageService {
         'x-proxy-ip': ip
       };
     }
-    let url: string = `${AppConfig.DockerAPIFormatter(ip)}`;
+    let url: string = `http://${ip}:8500/v1`;
     let req = {
       url: url,
       options: options
@@ -84,7 +83,7 @@ export class ImageService {
   }
 
   getImageInfoFromDB(name: string): Promise<any> {
-    let url = `${AppConfig.HumpbackAPI}/api/images/${encodeURIComponent(name)}`;
+    let url = `/api/images/${encodeURIComponent(name)}`;
     return new Promise((resolve, reject) => {
       this.http.get(url, { headers: this.headers })
         .then(res => {
@@ -98,7 +97,7 @@ export class ImageService {
   }
 
   saveImageInfoToDB(info: any): Promise<any> {
-    let url = `${AppConfig.HumpbackAPI}/api/images`;
+    let url = `/api/images`;
     return new Promise((resolve, reject) => {
       this.http.post(url, info, { headers: this.headers })
         .then(res => {

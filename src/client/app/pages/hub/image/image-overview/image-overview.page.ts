@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
-import { AppConfig } from './../../../../app.config';
-import { ImageService, HubService } from './../../../../services';
+import { ImageService, HubService, SystemConfigService } from './../../../../services';
 
 declare let _: any;
 declare let hljs: any;
@@ -34,7 +33,8 @@ export class ImageOverviewPage {
     private _router: Router,
     private sanitizer: DomSanitizer,
     private _imageService: ImageService,
-    private _hubService: HubService) {
+    private _hubService: HubService,
+    private _systemConfigService: SystemConfigService) {
 
   }
 
@@ -46,7 +46,8 @@ export class ImageOverviewPage {
       closable: false,
       hideFooter: true
     };
-    let tempUrl = new URL(AppConfig.PrivateRegistryAddress);
+    let config = this._systemConfigService.Config;
+    let tempUrl = new URL(`http://${config.PrivateRegistry}`);
     this.privateRegistryAddress = tempUrl.host;
     if (tempUrl.port) {
       this.privateRegistryAddress += `:${tempUrl.port}`;

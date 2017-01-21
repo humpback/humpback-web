@@ -15,6 +15,9 @@ export class LoginPage {
 
   private user: IUserLogin;
   private isLogin: boolean;
+  private returnUrl: string;
+
+  private subscribers: Array<any> = [];
 
   constructor(
     private _route: ActivatedRoute,
@@ -29,6 +32,13 @@ export class LoginPage {
       Password: '',
       RememberMe: false
     };
+    let paramSub = this._route.params.subscribe(param => {
+      this.returnUrl = param['returnUrl'] || '/';
+    });
+  }
+
+  ngOnDestroy() {
+    this.subscribers.forEach((item: any) => item.unsubscribe());
   }
 
   private login(form: any) {
@@ -37,21 +47,11 @@ export class LoginPage {
     this._authService.login(this.user)
       .then(data => {
         messager.success("Login succeed!");
-        this.redirect();
+        this._router.navigateByUrl(this.returnUrl);
       })
       .catch(err => {
         this.isLogin = false;
         messager.error(err);
       });
-  }
-
-  private redirect() {
-    let returnUrl = "/";
-    if (sessionStorage.getItem('hb_returnUrl')) {
-      returnUrl = sessionStorage.getItem('hb_returnUrl');
-      sessionStorage.removeItem('hb_returnUrl');
-      returnUrl = returnUrl.replace('/#', '');
-    }
-    this._router.navigateByUrl(returnUrl);
   }
 }

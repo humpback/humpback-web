@@ -17,6 +17,7 @@ exports.get = (req, res, next) => {
 
 exports.save = (req, res, next) => {
   let clientConfig = req.body;
+  clientConfig.ID = 1;
   db.update({ ID: 1 }, clientConfig, { upsert: true }, (err, numReplaced, upsert) => {
     if (err) return next(err);
     res.send({

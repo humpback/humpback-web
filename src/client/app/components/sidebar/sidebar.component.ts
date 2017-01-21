@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef, Renderer } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConfig } from './../../app.config';
-import { AuthService, EventNotifyService } from './../../services';
+import { AuthService, EventNotifyService, SystemConfigService } from './../../services';
 
 declare let $: any;
 declare let messager: any;
@@ -20,17 +20,28 @@ export class SideBarComponent {
 
   private groups: Array<Object>;
   private userInfo: any;
+  private config: any;
 
   private activeSubMenu: string = '';
+
+  private subscribers: Array<any> = [];
 
   constructor(
     private _router: Router,
     private _renderer: Renderer,
     private _authService: AuthService,
-    private _eventNotifyService: EventNotifyService) {
+    private _eventNotifyService: EventNotifyService,
+    private _systemConfigService: SystemConfigService) {
+
   }
 
   ngOnInit() {
+    this.config = {};
+    let configSubscriber = this._systemConfigService.ConfigSubject.subscribe(data => {
+      this.config = data;
+    });
+    this.subscribers.push(configSubscriber);
+
     this.userInfo = this._authService.getUserInfoFromCache();
     this._eventNotifyService.subscribe(AppConfig.EventName.SidebarMini, (state: any) => {
       if (window.innerWidth < 767) {
@@ -49,6 +60,10 @@ export class SideBarComponent {
     } else if (currentUrl.startsWith('/manage')) {
       this.activeSubMenu = 'manage';
     }
+  }
+
+  ngOnDestroy() {
+    this.subscribers.forEach((item: any) => item.unsubscribe());
   }
 
   ngAfterViewInit() {
