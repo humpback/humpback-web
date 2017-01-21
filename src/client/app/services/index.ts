@@ -11,6 +11,7 @@ import { LogService } from './log.service';
 import { MostUsedService } from './most-used.service';
 import { EventNotifyService } from './event-notify.service';
 import { UserService } from './user.service';
+import { SystemConfigService } from './system-config.service';
 
 export * from './auth-guard.service';
 export * from './auth.service';
@@ -25,6 +26,7 @@ export * from './log.service';
 export * from './most-used.service';
 export * from './event-notify.service';
 export * from './user.service';
+export * from './system-config.service';
 
 let Services: Array<any> = [
   IsLogin,
@@ -40,7 +42,8 @@ let Services: Array<any> = [
   LogService,
   MostUsedService,
   EventNotifyService,
-  UserService
+  UserService,
+  SystemConfigService
 ]
 
 export const SERVICES = Services;

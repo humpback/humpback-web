@@ -1,7 +1,7 @@
 import { Routes, RouterModule } from '@angular/router';
 
 import { IsLogin, IsGroupOwner } from './services';
-import { GroupResolve } from './resolves';
+import { GroupResolve, SystemConfigResolve } from './resolves';
 import { RootLayoutPage } from './pages';
 import { DashboardPage } from './pages';
 import { LoginPage } from './pages';
@@ -13,12 +13,16 @@ import { HubHomePage, ImageOverviewPage, EditImageDescriptionPage } from './page
 import { ActivityPage } from './pages';
 import { ManageGroupListPage, ManageGroupEditPage, ManageUserListPage, ManageUserEditPage } from './pages';
 import { UserProfilePage, ChangePasswordPage } from './pages';
+import { SystemConfigPage } from './pages';
 import { NotFoundPage } from './pages';
 
 let routes: Routes = [
   { path: 'login', component: LoginPage },
   {
     path: '', component: RootLayoutPage, canActivate: [IsLogin], canActivateChild: [IsLogin],
+    resolve: {
+      config: SystemConfigResolve
+    },
     children: [
       { path: '', component: DashboardPage },
       { path: 'dashboard', redirectTo: '/' },
@@ -50,6 +54,7 @@ let routes: Routes = [
       { path: 'manage/users', component: ManageUserListPage, data: { Admin: true } },
       { path: 'manage/users/add-user', component: ManageUserEditPage, data: { Admin: true } },
       { path: 'manage/users/:userId/edit', component: ManageUserEditPage, data: { Admin: true } },
+      { path: 'manage/system-config', component: SystemConfigPage, data: { Admin: true } },
 
       { path: 'account/profile', component: UserProfilePage },
       { path: 'account/change-password', component: ChangePasswordPage },

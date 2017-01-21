@@ -1,25 +1,26 @@
 import { Injectable } from '@angular/core';
-import { AppConfig } from './../app.config';
 import { Observable } from 'rxjs/Observable';
 import { CusHttpService } from './custom-http.service';
+import { SystemConfigService } from './system-config.service';
 
 @Injectable()
 export class HubService {
 
   constructor(
-    private http: CusHttpService) {
+    private _http: CusHttpService,
+    private _systemConfigService: SystemConfigService) {
 
   }
 
   private genURL(location?: string) {
-    return `${AppConfig.PrivateRegistryAddress}/v2`;
+    return `http://${this._systemConfigService.Config.PrivateRegistry}/v2`;
   }
 
   getImages(location: string): Promise<any> {
     let url = this.genURL(location);
     url = `${url}/_catalog?n=1000`;
     return new Promise((resolve, reject) => {
-      this.http.get(url)
+      this._http.get(url)
         .then(res => {
           let resBody = res.json ? res.json() : {};
           let result = location === 'gdev' ? resBody.repositories : resBody.data.repositories;
@@ -35,7 +36,7 @@ export class HubService {
     let url = this.genURL(location);
     url = `${url}/${imageName}/tags/list`;
     return new Promise((resolve, reject) => {
-      this.http
+      this._http
         .get(url, { disableLoading: hidenLoading })
         .then(res => {
           let tags: Array<any> = [];

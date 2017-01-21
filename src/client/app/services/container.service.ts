@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { AppConfig } from './../app.config';
 import { CusHttpService } from './custom-http.service';
 import { GroupService } from './group.service';
 
@@ -23,7 +22,7 @@ export class ContainerService {
         'x-proxy-ip': ip
       };
     }
-    let url: string = `${AppConfig.DockerAPIFormatter(ip)}`;
+    let url: string = `http://${ip}:8500/v1`;
     let req = {
       url: url,
       options: options

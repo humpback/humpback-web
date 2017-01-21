@@ -1,23 +1,17 @@
 import { Injectable } from '@angular/core';
-import { AppConfig } from './../app.config';
 import { AuthService } from './auth.service';
 import { CusHttpService } from './custom-http.service';
 
 @Injectable()
 export class LogService {
 
-  private url: string;
-  private headers: any;
+  private baseUrl: string;
 
   constructor(
     private http: CusHttpService,
     private authService: AuthService
   ) {
-    this.url = `${AppConfig.HumpbackAPI}/api/logs`;
-    this.headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    };
+    this.baseUrl = '/api/logs';
   }
 
   public addLog(content: string, type: string, group: string = "", server: string = ""): void {
@@ -27,17 +21,20 @@ export class LogService {
       Type: type,
       Content: content
     };
-    this.http.post(this.url, log, {
-      headers: this.headers,
-      disableLoading: true
-    })
+    this.http.post(this.baseUrl, log, { disableLoading: true })
+      .then(res => {
+
+      })
+      .catch(err => {
+        console.log('Add log error', err);
+      });
   }
 
   public getLog(type: string, pageSize: number, pageIndex: number, group: string = "", server: string = ""): Promise<any> {
     let query = `pageSize=${pageSize}&pageIndex=${pageIndex}&Type=${type}&Group=${group}&Server=${server}&t=${Date.now()}`;
-    let url = `${this.url}?${query}`;
+    let url = `${this.baseUrl}?${query}`;
     return new Promise((resolve, reject) => {
-      this.http.get(url, { headers: this.headers })
+      this.http.get(url)
         .then(res => {
           var logs = res.json();
           resolve(logs);

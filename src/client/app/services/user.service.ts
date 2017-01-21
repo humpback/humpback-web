@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { CusHttpService } from './custom-http.service';
-import { AppConfig } from './../app.config';
 
 @Injectable()
 export class UserService {
 
+  private baseUrl: string;
+
   constructor(
     private _http: CusHttpService) {
-
+    this.baseUrl = '/api/users';
   }
 
   getCurrentUser(): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/current-user`;
+      let url = `${this.baseUrl}/current-user`;
       this._http.get(url)
         .then(res => {
           resolve(res.json());
@@ -25,7 +26,7 @@ export class UserService {
 
   getAll(pageIndex: number, pageSize: number = 10, search?: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users?pageIndex=${pageIndex}&pageSize=${pageSize}&t=${new Date().valueOf()}`;
+      let url = `${this.baseUrl}?pageIndex=${pageIndex}&pageSize=${pageSize}&t=${new Date().valueOf()}`;
       if (search) {
         url = `${url}&q=${search}`;
       }
@@ -41,7 +42,7 @@ export class UserService {
 
   getById(userId: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/${userId}`;
+      let url = `${this.baseUrl}/${userId}`;
       this._http.get(url)
         .then(res => {
           resolve(res.json());
@@ -54,7 +55,7 @@ export class UserService {
 
   registry(userInfo: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/register`;
+      let url = `${this.baseUrl}/register`;
       this._http.post(url, userInfo)
         .then(res => {
           resolve(res.json());
@@ -67,7 +68,7 @@ export class UserService {
 
   updateProfile(profile: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/${profile.UserID}`;
+      let url = `${this.baseUrl}/${profile.UserID}`;
       this._http.put(url, profile)
         .then(res => {
           resolve(res.json());
@@ -85,7 +86,7 @@ export class UserService {
         OldPassword: oldPassword,
         NewPassword: newPassword
       }
-      let url = `${AppConfig.HumpbackAPI}/api/users/change-password`;
+      let url = `${this.baseUrl}/change-password`;
       this._http.put(url, body)
         .then(res => {
           resolve(res.json());
@@ -101,7 +102,7 @@ export class UserService {
       let body = {
         UserID: userId
       }
-      let url = `${AppConfig.HumpbackAPI}/api/users/reset-password`;
+      let url = `${this.baseUrl}/reset-password`;
       this._http.put(url, body)
         .then(res => {
           resolve(res.json());
@@ -114,7 +115,7 @@ export class UserService {
 
   remove(userId: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = `${AppConfig.HumpbackAPI}/api/users/${userId}`;
+      let url = `${this.baseUrl}/${userId}`;
       this._http.delete(url)
         .then(res => {
           resolve(res.json());

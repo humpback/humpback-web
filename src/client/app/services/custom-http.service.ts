@@ -3,7 +3,6 @@ import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { GlobalLoadingService } from './global-loading.service';
-import { AppConfig } from './../app.config';
 
 @Injectable()
 export class CusHttpService {

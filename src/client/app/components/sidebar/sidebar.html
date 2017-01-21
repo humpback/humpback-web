@@ -12,7 +12,7 @@
           <i class="fa fa-object-group"></i> <span>Group</span>
         </a>
       </li>
-      <li routerLinkActive="active">
+      <li routerLinkActive="active" *ngIf="config.EnablePrivateRegistry">
         <a [routerLink]="['/hub']">
           <i class="fa fa-archive"></i> <span>Hub</span>
         </a>
@@ -50,7 +50,7 @@
       </li>
       <li class="treeview hide-border" routerLinkActive="show-border" #manageMenu [class.active]="activeSubMenu == 'manage'">
         <a href="javascript:void(0)" (click)="toggleSubMenu(manageMenu, 'manage')">
-          <i class="fa fa-gear"></i> <span>Manage</span>
+          <i class="fa fa-cube"></i> <span>Manage</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
           </span>
@@ -64,6 +64,11 @@
           <li routerLinkActive="active" *ngIf="userInfo?.IsAdmin">
             <a [routerLink]="['/manage', 'users']">
               <i class="fa fa-users"></i> Users
+            </a>
+          </li>
+          <li routerLinkActive="active" *ngIf="userInfo?.IsAdmin">
+            <a [routerLink]="['/manage', 'system-config']">
+              <i class="fa fa-gear"></i> <span>System Config</span>
             </a>
           </li>
         </ul>

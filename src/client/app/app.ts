@@ -14,9 +14,6 @@ export class HumpbackApp {
   }
 
   ngOnInit() {
-    let returnUrl = location.pathname;
-    if (!sessionStorage.getItem('hb_returnUrl') && returnUrl.indexOf('/login') === -1) {
-      sessionStorage.setItem('hb_returnUrl', returnUrl);
-    }
+    
   }
 }

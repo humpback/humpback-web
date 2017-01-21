@@ -16,10 +16,10 @@
       <input type="email" class="form-control" #emailInput="ngModel" name="email" [(ngModel)]="userInfo.Email" pattern="^(\w)+(\.\w+)*@(\w)+((\.\w{2,3}){1,3})$" autocomplete="off">
       <span class="help-block" *ngIf="form.submitted && emailInput.errors?.pattern">Invaliid email address.</span>
     </div>
-    <div class="form-group">
+    <!--<div class="form-group">
       <label>Avatar</label>
       <input type="file" class="form-control">
-    </div>
+    </div>-->
     <div class="form-group">
       <button type="submit" class="btn btn-flat bg-olive">Save</button>
     </div>

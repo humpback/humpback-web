@@ -1,5 +1,4 @@
 import { Injectable, Inject } from '@angular/core';
-import { AppConfig } from './../app.config';
 import { AuthService } from './auth.service';
 import { CusHttpService } from './custom-http.service';
 
@@ -9,19 +8,19 @@ declare let _: any;
 export class GroupService {
 
   private groups: Array<any>;
-  private url: string;
+  private baseUrl: string;
 
   constructor(
     private http: CusHttpService,
     private authService: AuthService) {
-    this.url = `${AppConfig.HumpbackAPI}/api/groups`;
+    this.baseUrl = '/api/groups';
   }
 
   get(nocache: boolean = false): Promise<any> {
     if (this.groups && this.groups.length !== 0 && !nocache) {
       return Promise.resolve(this.groups);
     }
-    let url = this.url;
+    let url = this.baseUrl;
     return new Promise((resolve, reject) => {
       this.http.get(url)
         .then(res => {
@@ -35,7 +34,7 @@ export class GroupService {
   }
 
   getForManage(): Promise<any> {
-    let url = `${this.url}?formanage=1`;
+    let url = `${this.baseUrl}?formanage=1`;
     return new Promise((resolve, reject) => {
       this.http.get(url)
         .then(res => {
@@ -49,7 +48,7 @@ export class GroupService {
   }
 
   getById(id: string): Promise<any> {
-    let url = `${this.url}/${id}`;
+    let url = `${this.baseUrl}/${id}`;
     return new Promise((resolve, reject) => {
       this.http.get(url)
         .then(res => {
@@ -63,7 +62,7 @@ export class GroupService {
   }
 
   create(group: any): Promise<any> {
-    let url = this.url;
+    let url = this.baseUrl;
     return new Promise((resolve, reject) => {
       this.http.post(url, group)
         .then(res => {
@@ -77,7 +76,7 @@ export class GroupService {
 
   add(group: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.post(this.url, group)
+      this.http.post(this.baseUrl, group)
         .then(res => {
           resolve(res.json ? res.json() : res.text());
         })
@@ -89,7 +88,7 @@ export class GroupService {
 
   update(group: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.put(this.url, group)
+      this.http.put(this.baseUrl, group)
         .then(res => {
           resolve(res.json ? res.json() : res.text());
         })
@@ -100,7 +99,7 @@ export class GroupService {
   }
 
   remove(id: string): Promise<any> {
-    let url = `${this.url}/${id}`;
+    let url = `${this.baseUrl}/${id}`;
     return new Promise((resolve, reject) => {
       this.http.delete(url)
         .then(res => {
