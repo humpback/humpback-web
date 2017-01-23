@@ -1,4 +1,5 @@
 const path = require('path');
+const compression = require('compression');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -31,6 +32,7 @@ app.use(session({
     filename: path.join(__dirname, `./db/${config.sessionCollection}.db`),
   })
 }));
+app.use(compression());
 
 app.use((req, res, next) => {
   let ext = path.extname(req.url);
