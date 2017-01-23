@@ -4,7 +4,8 @@
   "description": "humpback management website",
   "main": "src/server/index.js",
   "scripts": {
-    "start": "gulp dev"
+    "start": "gulp dev",
+    "build": "gulp release"
   },
   "repository": {
     "type": "git",
@@ -52,7 +53,11 @@
     "extract-text-webpack-plugin": "^2.0.0-beta.5",
     "file-loader": "^0.9.0",
     "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.3.2",
     "gulp-develop-server": "^0.5.2",
+    "gulp-if": "^2.0.2",
+    "gulp-uglify": "^2.0.0",
+    "gulp-useref": "^3.1.2",
     "gulp-util": "^3.0.8",
     "html-loader": "^0.4.4",
     "html-webpack-plugin": "^2.26.0",
