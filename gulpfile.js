@@ -6,8 +6,10 @@ const server = require('gulp-develop-server');
 const notifier = require('node-notifier');
 const runSequence = require('run-sequence');
 const lightReload = require('light-reload');
-
-let wss;
+const useref = require('gulp-useref');
+const gulpif = require('gulp-if');
+const uglify = require('gulp-uglify');
+const minifyCss = require('gulp-clean-css');
 
 gulp.task('client:prd-build', (callback) => {
   let config = require('./config/webpack.prod.js');
@@ -69,6 +71,26 @@ gulp.task('server:watch', () => {
   return gulp.watch(['src/server/**/*.js'], ['server:reload']);
 });
 
+gulp.task('release:html', () => {
+  return gulp.src('dist/client/index.html')
+    .pipe(useref())
+    .pipe(gulpif('*.js', uglify()))
+    .pipe(gulpif('*.css', minifyCss()))
+    .pipe(gulp.dest('dist/client'));
+});
+
+gulp.task('release:clean-unused-file', () => {
+  let rootPath = 'dist/client/static';
+  return del([
+    `${rootPath}/**/*.css`,
+    `${rootPath}/**/*.js`,
+    `!${rootPath}/vendor/css/vendor.min.css`,
+    `!${rootPath}/vendor/js/vendor.min.js`,
+    `!${rootPath}/css/site.min.css`,
+    `!${rootPath}/js/site.min.js`
+  ], { force: true });
+});
+
 gulp.task('dev', (callback) => {
   runSequence(
     'clean',
@@ -79,13 +101,15 @@ gulp.task('dev', (callback) => {
     callback);
 });
 
-gulp.task('release', (callback)=>{
+gulp.task('release', (callback) => {
   runSequence(
     'clean',
     'server:copy',
     'client:prd-build',
+    'release:html',
+    'release:clean-unused-file',
     callback);
-})
+});
 
 let showWebpackError = (err, stats) => {
   if (err) {

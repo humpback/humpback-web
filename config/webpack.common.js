@@ -6,8 +6,7 @@ const helpers = require('./helpers');
 
 module.exports = {
   entry: {
-    'polyfills': './src/client/polyfills.ts',
-    'vendor': './src/client/vendor.ts',
+    'angular2': './src/client/angular2.ts',
     'app': './src/client/main.ts'
   },
 
@@ -60,15 +59,14 @@ module.exports = {
       {}
     ),
     new webpack.optimize.CommonsChunkPlugin({
-      name: ['app', 'vendor', 'polyfills']
+      name: ['app', 'angular2']
     }),
     new HtmlWebpackPlugin({
       template: 'src/client/index.html'
     }),
     new CopyWebpackPlugin([
       {
-        from: 'src/client/static',
-        ignore: ['css/*', 'js/*'],
+        from: 'src/client/static',        
         to: 'static'
       },
       {
