@@ -1,7 +1,6 @@
 import { Component, ViewChild, ElementRef, Renderer } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppConfig } from './../../app.config';
-import { AuthService, EventNotifyService, SystemConfigService } from './../../services';
+import { AuthService, EventNotifyService, SystemConfigService, EventType } from './../../services';
 
 declare let $: any;
 declare let messager: any;
@@ -43,7 +42,7 @@ export class SideBarComponent {
     this.subscribers.push(configSubscriber);
 
     this.userInfo = this._authService.getUserInfoFromCache();
-    this._eventNotifyService.subscribe(AppConfig.EventName.SidebarMini, (state: any) => {
+    this._eventNotifyService.subscribe(EventType.SidebarMini, (state: any) => {
       if (window.innerWidth < 767) {
         state = !state;
       }
