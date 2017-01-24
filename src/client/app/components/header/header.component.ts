@@ -1,7 +1,6 @@
 import { Component, Renderer } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppConfig } from './../../app.config';
-import { AuthService, EventNotifyService } from './../../services';
+import { AuthService, EventNotifyService, EventType } from './../../services';
 
 declare let messager: any;
 
@@ -37,7 +36,7 @@ export class HeaderComponent {
     let isMini = bodyEle.classList.contains('sidebar-collapse');
     this._renderer.setElementClass(bodyEle, 'sidebar-collapse', !isMini);
     this._renderer.setElementClass(bodyEle, 'sidebar-open', !isMini);
-    this._eventNotifyService.notifyDataChanged(AppConfig.EventName.SidebarMini, !isMini);
+    this._eventNotifyService.notifyDataChanged(EventType.SidebarMini, !isMini);
   }
 
   private showLogoutModal() {

@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
+export enum EventType {
+  UserInfoChanged,
+  GroupInfoChanged,
+  SidebarMini
+}
+
 @Injectable()
 export class EventNotifyService {
   private _data = new Subject<Object>();
@@ -12,23 +18,24 @@ export class EventNotifyService {
     this._dataStream$.subscribe((data) => this._onEvent(data));
   }
 
-  notifyDataChanged(event: any, value: any) {
-    let current = this._data[event];
+  notifyDataChanged(event: EventType, value: any) {
+    let eventName = EventType[event];
+    let current = this._data[eventName];
     if (current != value) {
-      this._data[event] = value;
-
+      this._data[eventName] = value;
       this._data.next({
-        event: event,
-        data: this._data[event]
+        event: eventName,
+        data: this._data[eventName]
       })
     }
   }
 
-  subscribe(event: string, callback: Function) {
-    let subscribers = this._subscriptions.get(event) || [];
+  subscribe(event: EventType, callback: Function) {
+    let eventName = EventType[event];
+    let subscribers = this._subscriptions.get(eventName) || [];
     subscribers.push(callback);
 
-    this._subscriptions.set(event, subscribers);
+    this._subscriptions.set(eventName, subscribers);
   }
 
   _onEvent(data: any) {

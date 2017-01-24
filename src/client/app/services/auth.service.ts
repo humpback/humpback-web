@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { AppConfig } from './../app.config';
-import { EventNotifyService } from './event-notify.service';
+import { EventNotifyService, EventType } from './event-notify.service';
 import { CusHttpService } from './custom-http.service';
 import { IUserLogin } from './../interfaces';
 
@@ -22,7 +21,7 @@ export class AuthService {
       this.http.post(url, userInfo)
         .then(res => {
           this.userInfo = res.json();
-          this.eventNotify.notifyDataChanged(AppConfig.EventName.UserInfoChanged, this.userInfo);
+          this.eventNotify.notifyDataChanged(EventType.UserInfoChanged, this.userInfo);
           resolve(this.userInfo);
         })
         .catch(err => {
@@ -44,7 +43,7 @@ export class AuthService {
             return resolve(this.userInfo);
           }
           this.userInfo = result.UserInfo;
-          this.eventNotify.notifyDataChanged(AppConfig.EventName.UserInfoChanged, this.userInfo);
+          this.eventNotify.notifyDataChanged(EventType.UserInfoChanged, this.userInfo);
           resolve(this.userInfo);
         })
         .catch(err => {
@@ -73,6 +72,6 @@ export class AuthService {
 
   clearUserInfo() {
     this.userInfo = null;
-    this.eventNotify.notifyDataChanged(AppConfig.EventName.UserInfoChanged, this.userInfo);
+    this.eventNotify.notifyDataChanged(EventType.UserInfoChanged, this.userInfo);
   }
 }

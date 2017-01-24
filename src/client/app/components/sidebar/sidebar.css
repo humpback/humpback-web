@@ -8,6 +8,10 @@
   border-left-color: #00a65a;
 }
 
+.sidebar-menu {
+  margin-bottom: 65px;
+}
+
 .bottom-logo {
   position: absolute;
   bottom: 0;
