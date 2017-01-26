@@ -26,7 +26,7 @@ Password: `123456`
 - manage private registry
 - etc.
 
-# Simple Page
+# Sample Page
 #### Login Page
 ![image](https://cloud.githubusercontent.com/assets/9428909/22197325/73c2aba4-e18c-11e6-9c9a-c00318abf6f5.png)
 
