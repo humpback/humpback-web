@@ -32,7 +32,7 @@ gulp.task('client:dev-build', () => {
 });
 
 gulp.task('clean', () => {
-  return del(['dist/*', '!dist/db'], { force: true });
+  return del(['dist/*', '!dist/dbFiles'], { force: true });
 });
 
 gulp.task('server:clean', (callback) => {

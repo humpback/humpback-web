@@ -29,7 +29,7 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   store: new NedbStore({
-    filename: path.join(__dirname, `./db/${config.sessionCollection}.db`),
+    filename: path.join(__dirname, `./dbFiles/${config.dbConfigs.sessionCollection.name}.db`),
   })
 }));
 app.use(compression());
@@ -70,7 +70,7 @@ app.all('/api/*', (req, res, next) => {
   if (req.session.currentUser && req.session.currentUser.UserID) {
     if (req.session.cookie.originalMaxAge && req.session.cookie.originalMaxAge < (20 * 60 * 1000)) {
       req.session.cookie.maxAge = 20 * 60 * 1000;
-    }    
+    }
     return next();
   } else {
     error = new Error('UnAuthorization. Not login.');
