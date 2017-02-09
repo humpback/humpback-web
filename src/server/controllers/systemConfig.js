@@ -1,12 +1,8 @@
-const path = require('path');
 const uuid = require('uuid');
-const Datastore = require('nedb');
+const dbFactory = require('./../db/dbFactory').factory;
 const config = require('./../config');
 
-let db = new Datastore({
-  filename: path.join(__dirname, `./../db/${config.systemConfigCollection}.db`),
-  autoload: true
-});
+let db = dbFactory.getCollection(config.dbConfigs.systemConfigCollection.name);
 
 exports.get = (req, res, next) => {
   db.findOne({ ID: 1 }, (err, doc) => {

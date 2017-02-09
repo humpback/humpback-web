@@ -4,12 +4,14 @@ let getConfig = () => {
     version: '1.0.0',
     isDebugMode: true,
     listenPort: process.env.HUMPBACK_LISTEN_PORT || 80,
-    groupCollection: 'GroupInfo',
-    imageCollection: 'ImageInfo',
-    userCollection: 'UserInfo',
-    logCollection: 'LogInfo',
-    sessionCollection: 'SessionInfo',
-    systemConfigCollection: 'SystemConfig',
+    dbConfigs: {
+      groupCollection: { name: 'GroupInfo' },
+      imageCollection: { name: 'ImageInfo' },
+      userCollection: { name: 'UserInfo' },
+      logCollection: { name: 'LogInfo', ttl: 7 * 24 * 60 * 60 },
+      sessionCollection: { name: 'SessionInfo', ignoreLoad: true },
+      systemConfigCollection: { name: 'SystemConfig' }
+    },
     encryptKey: 'humpback@123'
   };
   return configInfo;

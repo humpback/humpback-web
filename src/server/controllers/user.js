@@ -1,14 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 const uuid = require('uuid');
-const Datastore = require('nedb');
+const dbFactory = require('./../db/dbFactory').factory;
 const config = require('./../config');
 const util = require('./../common/util');
 
-let db = new Datastore({
-  filename: path.join(__dirname, `./../db/${config.userCollection}.db`),
-  autoload: true
-});
+let db = dbFactory.getCollection(config.dbConfigs.userCollection.name);
 
 /*
 UserInfo {
@@ -59,7 +56,7 @@ exports.getAll = (req, res, next) => {
   });
 }
 
-exports.getById = (req, res, next) => {  
+exports.getById = (req, res, next) => {
   db.findOne({ _id: req.params.userId.toLowerCase() }, { Password: -1 }, (err, doc) => {
     if (err) return next(err);
     if (doc) {
