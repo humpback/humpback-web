@@ -8,7 +8,7 @@ let getConfig = () => {
       groupCollection: { name: 'GroupInfo' },
       imageCollection: { name: 'ImageInfo' },
       userCollection: { name: 'UserInfo' },
-      logCollection: { name: 'LogInfo', ttl: 7 * 24 * 60 * 60 },
+      logCollection: { name: 'LogInfo', ttl: 30 * 24 * 60 * 60 },
       sessionCollection: { name: 'SessionInfo', ignoreLoad: true },
       systemConfigCollection: { name: 'SystemConfig' }
     },
