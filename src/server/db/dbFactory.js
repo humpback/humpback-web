@@ -38,6 +38,7 @@ class DBFactory {
           if (err) console.log(err);
         });
       }
+      db.persistence.setAutocompactionInterval(1 * 60 * 60 * 1000);
       this.dbs[item.name] = db;
     }
   }
