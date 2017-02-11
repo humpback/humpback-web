@@ -36,8 +36,8 @@ exports.add = (req, res, next) => {
 }
 
 exports.get = (req, res, next) => {
-  let pageSize = req.query.pageSize || 10;
-  let pageIndex = req.query.pageIndex || 1;
+  let pageSize = +(req.query.pageSize || 10);
+  let pageIndex = +(req.query.pageIndex || 1);
   let sortField = "InDate";
   let queryOption = {};
   if (req.query.Group) {
