@@ -89,9 +89,12 @@ export class ContainerListPage {
   private init() {
     this.containers = [];
     this.filterContainers = [];
+    this.currentContainers = [];
     this.images = [];
+    this.filterImages = [];
+    this.currentImages = [];
     this.activedTab = 'containers';
-    this.getContainers();    
+    this.getContainers();
   }
 
   private changeTab(tab: string) {
@@ -245,7 +248,7 @@ export class ContainerListPage {
     this.pullImageModalOptions.show = false;
     this._imageService.pullImage(this.ip, imageName)
       .then(data => {
-        messager.success('succeed');        
+        messager.success('succeed');
         this._logService.addLog(`Pulled image ${imageName} on ${this.ip}`, 'Image', this.groupInfo.ID, this.ip);
         this.pullImageModalOptions.show = false;
         this.getImages();
