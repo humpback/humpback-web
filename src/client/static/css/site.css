@@ -95,12 +95,19 @@ body {
     margin-left: 50px;
 }
 
+.sidebar-mini.sidebar-collapse .bottom-logo > .text-panel {
+    display: none;
+}
+
 @media(max-width: 767px) {
     .sidebar-mini.sidebar-collapse header.main-header .logo {
         width: 100%;
     }
     .main-header .navbar, .content-wrapper, .right-side, .main-footer, .sidebar-mini.sidebar-collapse header.main-header .navbar {
         margin-left: 0;
+    }
+    .sidebar-mini.sidebar-collapse .bottom-logo > .text-panel {
+        display: block;
     }
 }
 
