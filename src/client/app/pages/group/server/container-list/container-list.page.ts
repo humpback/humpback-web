@@ -16,12 +16,14 @@ export class ContainerListPage {
   private ip: any;
   private containers: Array<any> = [];
   private filterContainers: Array<any> = [];
+  private filterContainerDone: boolean;
   private containerFilter: string;
   private currentContainers: Array<any> = [];
   private containerPageIndex: number = 1;
 
   private images: Array<any> = [];
   private filterImages: Array<any> = [];
+  private filterImageDone: boolean;
   private imageFilter: string;
   private currentImages: Array<any> = [];
   private imagePageIndex: number = 1;
@@ -89,9 +91,11 @@ export class ContainerListPage {
   private init() {
     this.containers = [];
     this.filterContainers = [];
+    this.filterContainerDone = false;
     this.currentContainers = [];
     this.images = [];
     this.filterImages = [];
+    this.filterImageDone = false;
     this.currentImages = [];
     this.activedTab = 'containers';
     this.getContainers();
@@ -115,16 +119,25 @@ export class ContainerListPage {
       });
   }
 
-  private filterContainer() {
-    let filterCondition = this.containerFilter;
-    if (!filterCondition) {
-      this.filterContainers = this.containers;
-    } else {
-      this.filterContainers = this.containers.filter(item => {
-        return item.Names[0].indexOf(filterCondition) !== -1;
-      })
+  private filterContainerTimeout: any;
+  private filterContainer(value?: any) {
+    this.containerFilter = value || '';
+    if (this.filterContainerTimeout) {
+      clearTimeout(this.filterContainerTimeout);
     }
-    this.setContainerPage(this.containerPageIndex);
+    this.filterContainerTimeout = setTimeout(() => {
+      let keyWord = this.containerFilter;
+      if (!keyWord) {
+        this.filterContainers = this.containers;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterContainers = this.containers.filter(item => {
+          return regex.test(item.Names[0]);
+        })
+      }
+      this.setContainerPage(this.containerPageIndex);
+      this.filterContainerDone = true;
+    }, 100);
   }
 
   private setContainerPage(pageIndex: number) {
@@ -207,16 +220,25 @@ export class ContainerListPage {
       });
   }
 
-  private filterImage() {
-    let filterCondition = this.imageFilter;
-    if (!filterCondition) {
-      this.filterImages = this.images;
-    } else {
-      this.filterImages = this.images.filter(item => {
-        return item.Name.indexOf(filterCondition) !== -1;
-      })
+  private filterImageTimeout: any;
+  private filterImage(value?: any) {
+    this.imageFilter = value || '';
+    if (this.filterImageTimeout) {
+      clearTimeout(this.filterImageTimeout);
     }
-    this.setImagePage(this.imagePageIndex);
+    this.filterImageTimeout = setTimeout(() => {
+      let keyWord = this.imageFilter;
+      if (!keyWord) {
+        this.filterImages = this.images;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterImages = this.images.filter(item => {
+          return regex.test(item.Name);
+        })
+      }
+      this.setImagePage(this.imagePageIndex);
+      this.filterImageDone = true;
+    }, 100);
   }
 
   private setImagePage(pageIndex: number) {

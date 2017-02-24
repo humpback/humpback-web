@@ -21,8 +21,9 @@
           </a>
         </div>
       </div>
-      <div class="well well-sm" *ngIf="users?.length == 0">
-        No users found.
+      <div class="alert alert-info" *ngIf="users?.length == 0">
+        <i class="fa-fw fa fa-info"></i>
+        <span>No users found</span>
       </div>
       <table class="table table-hover" *ngIf="users?.length > 0">
         <thead>

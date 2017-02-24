@@ -48,7 +48,8 @@
       </hb-pagination>
     </div>
   </div>
-  <div class="well well-sm" *ngIf="!logs || logs.length == 0">
+  <div class="alert alert-info" *ngIf="!logs || logs.length == 0">
+    <i class="fa-fw fa fa-info"></i>
     <span>No logs found.</span>
   </div>
 </section>

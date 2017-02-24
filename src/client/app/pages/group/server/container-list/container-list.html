@@ -18,25 +18,27 @@
       <div class="tab-pane" [ngClass]="{'active': activedTab == 'containers'}">
         <div class="box no-border">
           <div class="box-body">
-            <div class="flex-display margin-bottom-10">
-              <form class="flex-1" novalidate (ngSubmit)="filterContainer()">
-                <div class="input-group input-group-sm">
-                  <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [(ngModel)]="containerFilter">
-                  <span class="input-group-btn">
-                    <button type="submit" class="btn btn-flat">
-                      <i class="fa fa-search"></i> Search
-                    </button>
-                  </span>
-                </div>
-              </form>
-              <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
-                <i class="fa fa-refresh"></i> Refresh
-              </button>
-              <a [routerLink]="['/group', groupInfo.ID, ip, 'new-container']" class="btn btn-sm bg-olive btn-flat">
-                <i class="fa fa-plus"></i> Add Container
-              </a>
+            <div class="flex-display">
+              <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
+                <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [ngModel]="containerFilter"
+                  (ngModelChange)="filterContainer($event)">
+                  <span class="fa fa-search form-control-feedback"></span>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
+                  <i class="fa fa-refresh"></i> Refresh
+                </button>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <a [routerLink]="['/group', groupInfo.ID, ip, 'new-container']" class="btn btn-sm bg-olive btn-flat">
+                  <i class="fa fa-plus"></i> Add Container
+                </a>
+              </div>
             </div>
-            <table class="table table-hover table-bordered">
+            <div class="alert alert-info" *ngIf="!filterContainers?.length && filterContainerDone">
+              <i class="fa-fw fa fa-info"></i> No containers found
+            </div>
+            <table class="table table-hover table-bordered" *ngIf="filterContainers?.length > 0">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -112,7 +114,7 @@
           <div class="box-footer clearfix">
             <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
               (onSelectPage)="setContainerPage($event)">
-            </hb-pagination>
+              </hb-pagination>
           </div>
         </div>
       </div>
@@ -120,21 +122,21 @@
         <div class="box no-border">
           <div class="box-body">
             <div class="flex-display margin-bottom-10">
-              <form class="flex-1" novalidate (ngSubmit)="filterImage()">
-                <div class="input-group input-group-sm">
-                  <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [(ngModel)]="imageFilter">
-                  <span class="input-group-btn">
-                    <button type="submit" class="btn btn-flat">
-                      <i class="fa fa-search"></i> Search
-                    </button>
-                  </span>
-                </div>
-              </form>
-              <button class="btn bg-olive btn-sm btn-flat" (click)="showPullImageModal()">
-                <i class="fa fa-download"></i> Pull Docker Image
-              </button>
+              <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
+                <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [ngModel]="imageFilter"
+                  (ngModelChange)="filterImage($event)">
+                  <span class="fa fa-search form-control-feedback"></span>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <button class="btn bg-olive btn-sm btn-flat" (click)="showPullImageModal()">
+                  <i class="fa fa-download"></i> Pull Docker Image
+                </button>
+              </div>
             </div>
-            <table class="table table-hover table-bordered">
+            <div class="alert alert-info" *ngIf="!filterImages?.length && filterImageDone">
+              <i class="fa-fw fa fa-info"></i> No docker images found
+            </div>
+            <table class="table table-hover table-bordered" *ngIf="filterImages?.length > 0">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -189,11 +191,11 @@
     <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
       <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
         autocomplete="off" #imageName="ngModel" required maxlength="30" pattern="^[0-9a-z.\/:_-]*$">
-      <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
-        <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
-        <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
-        <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
-      </div>
+        <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
+          <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
+          <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
+          <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
+        </div>
     </div>
     <div class="form-group text-right">
       <button type="button" class="btn btn-default btn-flat" (click)="pullImageModalOptions.show = fasle">Cancel</button>

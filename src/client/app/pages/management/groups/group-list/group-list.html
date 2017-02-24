@@ -4,26 +4,21 @@
 <section class="content">
   <div class="box no-border">
     <div class="box-body">
-      <div class="flex-display margin-bottom-10">
-        <form class="flex-1" novalidate (ngSubmit)="search(filterCondition.value)">
-          <div class="input-group input-group-sm">
-            <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" #filterCondition>
-            <span class="input-group-btn">
-            <button type="submit" class="btn btn-flat">
-              <i class="fa fa-search"></i> Search
-            </button>
-          </span>
-          </div>
-        </form>
+      <div class="flex-display">
+        <div class="form-group form-group-sm has-feedback flex-1">
+          <input type="text" class="form-control" name="filterCondition" autocomplete="off" placeholder="Enter key word" [ngModel]="filterCondition"
+            (ngModelChange)="search($event)">
+          <span class="fa fa-search form-control-feedback"></span>
+        </div>
         <div class="form-group">
           <a [routerLink]="['/manage', 'groups', 'add-group']" *ngIf="isAdmin" class="btn btn-sm btn-flat bg-olive">
-            <i class="fa fa-plus"></i>
-            Add Group
+            <i class="fa fa-plus"></i> Add Group
           </a>
         </div>
       </div>
-      <div class="well well-sm" *ngIf="filterGroups.length == 0">
-        No groups found.
+      <div class="alert alert-info" *ngIf="!filterGroups?.length">
+        <i class="fa-fw fa fa-info"></i>
+        <span>No groups found</span>
       </div>
       <table class="table table-hover" *ngIf="filterGroups.length > 0">
         <thead>

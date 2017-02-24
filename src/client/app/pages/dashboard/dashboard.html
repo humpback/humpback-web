@@ -20,14 +20,14 @@
                 {{ log.Content | upperFirstWord }}
               </div>
             </div>
-            <div class="box-comment">
+            <div class="box-comment" *ngIf="systemConfig?.TopNews">
               <img src="/api/users/avatar/logo" class="img-circle img-sm">
               <div class="comment-text">
                 <span class="username">
                   Humpback Group
                   <span class="text-muted pull-right">now</span>
                 </span>
-                Welcome to use humpback.
+                <span [innerHtml]="systemConfig?.TopNews"></span>
               </div>
             </div>
           </div>
@@ -47,9 +47,4 @@
       </div>
     </div>
   </section>
-  <!--<div class="footer">
-    <span>Quickly Ship and Run Distributed Applications with Docker</span>
-    <div class="dividing"></div>
-    <span class="pull-right">Copyright &copy; 2016 BTS. All rights reserved.</span>
-  </div>-->
 </div>
