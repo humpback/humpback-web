@@ -5,7 +5,8 @@
 
 </div>
 <section class="content">
-  <div class="well well-sm" *ngIf="!groupInfo?.Servers?.length">
-    No servers.
+  <div class="alert alert-info" *ngIf="!groupInfo?.Servers?.length">
+    <i class="fa-fw fa fa-info"></i>
+    <span>No servers.</span>
   </div>
 </section>

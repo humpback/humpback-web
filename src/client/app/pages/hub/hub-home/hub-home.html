@@ -19,8 +19,9 @@
       </div>
     </a>
   </div>
-  <div class="well well-sm" *ngIf="!filterImages || filterImages.length == 0">
-    <p>No images found.</p>
+  <div class="alert alert-info" *ngIf="!filterImages || filterImages.length == 0">
+    <i class="fa-fw fa fa-info"></i>
+    <span>No images found.</span>
   </div>
   <div class="height-30" *ngIf="filterImages?.length > 0">
     <hb-pagination [totalCount]="totalCount" [pageSize]="pageSize" [maxSize]="10" [options]="pageOptions" (onSelectPage)="setPage($event)"></hb-pagination>

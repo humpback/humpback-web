@@ -34,7 +34,8 @@
   <div class="logs-panel" #logPanel [attr.data-has-log]="logs.length || null">
     <p *ngFor="let item of logs">{{ item }}</p>
   </div>
-  <div class="well well-sm" *ngIf="!logs.length">
-    This container does not contain any logs.
+  <div class="alert alert-info" *ngIf="!logs?.length">
+    <i class="fa-fw fa fa-info"></i>
+    <span>This container does not contain any logs.</span>
   </div>
 </section>

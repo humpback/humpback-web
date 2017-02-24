@@ -95,8 +95,43 @@ body {
     margin-left: 50px;
 }
 
-.sidebar-mini.sidebar-collapse .bottom-logo > .text-panel {
+.sidebar-mini.sidebar-collapse.sidebar-open .bottom-logo>.text-panel {
     display: none;
+}
+
+.alert {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left-width: 5px;
+    border-radius: 0;
+}
+
+.alert.alert-info {
+    border-color: #9cb4c5;
+    color: #305d8c !important;
+    background-color: #d6dde7 !important;
+}
+
+.alert.alert-warning {
+    border-color: #dfb56c;
+    color: #826430 !important;
+    background-color: #efe1b3 !important;
+}
+
+.alert.alert-success {
+    border-color: #8ac38b;
+    color: #356635 !important;
+    background-color: #cde0c4 !important;
+}
+
+.alert.alert-danger {
+    border-color: #953b39;
+    color: #fff !important;
+    background-color: #c26565 !important;
+    text-shadow: none;
 }
 
 @media(max-width: 767px) {
@@ -106,7 +141,7 @@ body {
     .main-header .navbar, .content-wrapper, .right-side, .main-footer, .sidebar-mini.sidebar-collapse header.main-header .navbar {
         margin-left: 0;
     }
-    .sidebar-mini.sidebar-collapse .bottom-logo > .text-panel {
+    .sidebar-mini.sidebar-collapse.sidebar-open .bottom-logo>.text-panel {
         display: block;
     }
 }
@@ -171,6 +206,18 @@ body {
 
 
 /* Overide select2 CSS End */
+
+
+/* Overide tags input */
+
+.bootstrap-tagsinput {
+    border-color: #d2d6de;
+    border-radius: 0;
+    width: 100%;
+}
+
+
+/* Overide tags input */
 
 
 /* Font Face Begin */

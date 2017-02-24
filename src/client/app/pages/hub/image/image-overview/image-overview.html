@@ -34,8 +34,9 @@
     <div class="tab-content">
       <div class="tab-pane" id="description" [class.active]="activedTab == 'description'">
         <div *ngIf="!image.Description">
-          <div class="well well-sm">
-            No description.
+          <div class="alert alert-info">
+            <i class="fa-fw fa fa-info"></i>
+            <span>No description</span>
           </div>
         </div>
         <a [routerLink]="['/hub', '_', imageId, 'edit', 'description']" class="btn btn-flat btn-sm bg-olive">
@@ -73,8 +74,9 @@
         </div>
       </div>
       <div class="tab-pane" id="dockerfile" [class.active]="activedTab == 'dockerfile'">
-        <div class="well well-sm" *ngIf="!imageDockerfile">
-          No dockerfile.
+        <div class="alert alert-info" *ngIf="!imageDockerfile">
+          <i class="fa-fw fa fa-info"></i>
+          <span>No dockerfile</span>
         </div>
 
         <a href="javascript:void(0)" (click)="showDockerfileModal()" class="btn btn-flat btn-sm bg-olive">

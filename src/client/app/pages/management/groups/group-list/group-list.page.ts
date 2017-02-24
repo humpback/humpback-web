@@ -59,16 +59,24 @@ export class ManageGroupListPage {
       });
   }
 
-  private search(keyWord: string) {
-    this.filterCondition = keyWord;
-    if (!keyWord) {
-      this.filterGroups = this.groups;
-    } else {
-      this.filterGroups = this.groups.filter(item => {
-        return item.Name.indexOf(keyWord) !== -1;
-      });
+  private searchTimeout: any;
+  private search(value?: any) {
+    this.filterCondition = value || '';
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
     }
-    this.setPage(1);
+    this.searchTimeout = setTimeout(() => {
+      let keyWord = this.filterCondition;
+      if (!keyWord) {
+        this.filterGroups = this.groups;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterGroups = this.groups.filter(item => {
+          return regex.test(item.Name);
+        });
+      }
+      this.setPage(1);
+    }, 100);
   }
 
   private setPage(pageIndex: number) {
