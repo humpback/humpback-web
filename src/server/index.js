@@ -36,6 +36,7 @@ app.use(compression());
 
 app.use((req, res, next) => {
   let ext = path.extname(req.url);
+  if (ext && ext.length > 6) ext = null;
   if (req.method === 'GET' && !req.url.startsWith('/api') && !ext) {
     req.url = '/index.html';
   }
