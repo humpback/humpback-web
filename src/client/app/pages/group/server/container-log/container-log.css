@@ -18,4 +18,8 @@
 
 .logs-panel >p {
   margin-bottom: 5px;
+  word-break: break-all;
+  word-wrap: break-word;
+  padding-left: 1em;
+  text-indent: -1em;
 }

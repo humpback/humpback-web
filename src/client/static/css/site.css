@@ -72,6 +72,14 @@ body {
     border: none;
 }
 
+hb-container-log .logs-panel {
+    width: calc(100vw - 410px) !important;
+}
+
+.sidebar-mini.sidebar-collapse.sidebar-open hb-container-log .logs-panel {
+    width: calc(100vw - 280px) !important;
+}
+
 
 /* Overide Admin LTE CSS Begin */
 
@@ -162,6 +170,9 @@ body {
         -o-transform: translate(-180px, 0);
         transform: translate(-180px, 0);
     }
+    .control-sidebar-open .content-wrapper, .control-sidebar-open .right-side, .control-sidebar-open .main-footer {
+        margin-right: 180px;
+    }
 }
 
 @media (max-width: 767px) {
@@ -174,11 +185,8 @@ body {
     .description-editor .CodeMirror {
         height: calc(100vh - 325px);
     }
-}
-
-@media (min-width: 768px) {
-    .control-sidebar-open .content-wrapper, .control-sidebar-open .right-side, .control-sidebar-open .main-footer {
-        margin-right: 180px;
+    hb-container-log .logs-panel {
+        width: calc(100vw - 230px) !important;
     }
 }
 
