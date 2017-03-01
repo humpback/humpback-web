@@ -15,7 +15,8 @@ export class ContainerService {
   private buildReq(ip: string, hidenLoading: boolean = false): any {
     let useProxy: boolean = this.groupService.isIPEnableProxy(ip);
     let options: any = {
-      disableLoading: hidenLoading
+      disableLoading: hidenLoading,
+      timeout: 1 * 60 * 1000
     };
     if (useProxy) {
       options.headers = {
@@ -153,6 +154,7 @@ export class ContainerService {
       container: id,
       imagetag: imageTag
     };
+    reqConfig.options.timeout = null;
     return new Promise((resolve, reject) => {
       this.http.put(url, data, reqConfig.options)
         .then(res => {

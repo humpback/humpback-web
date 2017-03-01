@@ -9,8 +9,7 @@ export class CusHttpService {
   constructor(
     private _router: Router,
     private _http: Http,
-    private _globalLoading: GlobalLoadingService
-  ) {
+    private _globalLoading: GlobalLoadingService) {
 
   }
 
@@ -66,6 +65,9 @@ export class CusHttpService {
       default:
         throw new Error('Not Supported Method');
     }
+    if (options.timeout) {
+      p = p.timeout(options.timeout);
+    }
     return new Promise((resolve, reject) => {
       if (!options.disableLoading) {
         this._globalLoading.add();
@@ -85,7 +87,7 @@ export class CusHttpService {
           }
           resolve(res);
         })
-        .catch((err) => {
+        .catch(err => {
           if (!options.disableLoading) {
             this._globalLoading.sub();
           }
