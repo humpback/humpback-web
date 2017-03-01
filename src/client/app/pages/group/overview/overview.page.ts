@@ -145,13 +145,20 @@ export class GroupOverviewPage {
       grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '70',
         containLabel: true
       },
       xAxis: {
         type: 'category',
         data: chartData.xAxis,
-        triggerEvent: true
+        triggerEvent: true,
+        axisLabel: {
+          rotate: 60,
+          interval: 0
+        },
+        axisTick: {
+          alignWithLabel: true
+        }
       },
       yAxis: {
         type: 'value',

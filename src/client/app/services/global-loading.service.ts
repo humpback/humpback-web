@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 export class GlobalLoadingService {
   private loadingEl: HTMLDivElement;
   private count: number = 0;
+  private timmer: any;
 
   constructor() {
     this.loadingEl = <HTMLDivElement>document.getElementById('globalLoading');
@@ -11,7 +12,7 @@ export class GlobalLoadingService {
 
   add() {
     this.count++;
-    if (this.count === 1) {
+    if (this.count > 0) {
       this.show();
     }
   }
@@ -20,7 +21,8 @@ export class GlobalLoadingService {
     this.count--;
     if (this.count <= 0) {
       this.count = 0;
-      this.hide();
+      if (this.timmer) clearTimeout(this.timmer);
+      this.timmer = setTimeout(() => this.hide(), 0);
     }
   }
 
@@ -31,6 +33,7 @@ export class GlobalLoadingService {
 
   hide() {
     setTimeout(() => {
+      if (this.count > 0) return;
       this.loadingEl.classList.remove('showLoading');
       document.body.style.overflowY = 'auto';
     }, 300);
