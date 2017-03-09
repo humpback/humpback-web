@@ -236,8 +236,9 @@ export class ContainerClonePage {
 
   private removeEnv(server: string, i: number) {
     let control = <FormGroup>this.form.controls['ServerEnvs'];
-    let envCtrl = <FormArray>control.controls[server];
+    let envCtrl = _.cloneDeep(<FormArray>control.controls[server]);
     envCtrl.removeAt(i);
+    control.controls[server] = envCtrl;
   }
 
   private addLink() {
