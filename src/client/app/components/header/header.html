@@ -22,8 +22,8 @@
             <li class="user-header">
               <img src="{{'/api/users/avatar/'+userInfo.UserID}}" class="img-circle" alt="User Image">
               <p>
-                {{userInfo.FullName}} - {{ userInfo.IsAdmin ? 'Administrator' : 'User' }}
-                <small>Member since Nov. 2012</small>
+                {{userInfo.FullName}}
+                <small>{{ userInfo.IsAdmin ? 'Administrator' : 'User' }}</small>
               </p>
             </li>
             <li class="user-footer">
