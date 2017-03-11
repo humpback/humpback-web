@@ -1,11 +1,6 @@
-.treeview.active.hide-border>a {
+.sidebar-menu>li.active.hide-border>a {
   background: transparent;
   border-left-color: transparent;
-}
-
-.treeview.active.hide-border.show-border>a, .treeview.active.hide-border:hover>a {
-  background: #1e282c;
-  border-left-color: #00a65a;
 }
 
 .sidebar-menu {
@@ -16,7 +11,7 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  padding: 10px 2.5px;
+  padding: 10px 5px;
   background: #222d32;
   align-items: center;
   color: white;
@@ -25,14 +20,14 @@
 .bottom-logo > img {
   width: 40px;
   height: 40px;
-  margin-right: 0;
-}
-
-.bottom-logo > .text-panel {
-  margin-left: 10px;
+  margin-right: initial;
 }
 
 .bottom-logo p {
   white-space: nowrap;
   margin: 0;
+}
+
+.bottom-logo .text-panel {
+  margin-left: 10px;
 }
