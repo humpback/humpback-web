@@ -147,11 +147,11 @@ export class PaginationComponent {
 
   private prevMore(): void {
     let pageIndex = this.pages[0] - 1;
-    this.setPage(pageIndex, false);
+    this.setPage(pageIndex);
   }
 
   private nextMore(): void {
     let pageIndex = this.pages[this.pages.length - 1] + 1
-    this.setPage(pageIndex, false);
+    this.setPage(pageIndex);
   }
 }

@@ -2,18 +2,18 @@
   <section class="sidebar">
     <ul class="sidebar-menu">
       <li class="header">BASIC NAVIGATION</li>
-      <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <a [routerLink]="['/']">
+      <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"  [class.hide-border]="activeSubMenu">
+        <a [routerLink]="['/']" (click)="activeSubMenu = ''">
           <i class="fa fa-dashboard"></i> <span>Dashboard</span>
         </a>
       </li>
-      <li routerLinkActive="active">
-        <a [routerLink]="['/group']">
+      <li routerLinkActive="active" [class.hide-border]="activeSubMenu">
+        <a [routerLink]="['/group']" (click)="activeSubMenu = ''">
           <i class="fa fa-object-group"></i> <span>Group</span>
         </a>
       </li>
-      <li routerLinkActive="active" *ngIf="config.EnablePrivateRegistry">
-        <a [routerLink]="['/hub']">
+      <li routerLinkActive="active" *ngIf="config.EnablePrivateRegistry" [class.hide-border]="activeSubMenu">
+        <a [routerLink]="['/hub']" (click)="activeSubMenu = ''">
           <i class="fa fa-archive"></i> <span>Hub</span>
         </a>
       </li>
@@ -22,13 +22,13 @@
           <i class="fa fa-building"></i> <span>Build Image</span>
         </a>
       </li>-->
-      <li routerLinkActive="active">
-        <a [routerLink]="['/activity']">
+      <li routerLinkActive="active" [class.hide-border]="activeSubMenu">
+        <a [routerLink]="['/activity']" (click)="activeSubMenu = ''">
           <i class="fa fa-rss"></i> <span>Activity</span>
         </a>
       </li>
       <li class="header">ADVANCE NAVIGATION</li>
-      <li class="treeview hide-border" routerLinkActive="show-border" #accountMenu [class.active]="activeSubMenu == 'account'">
+      <li class="treeview" #accountMenu [class.active]="activeSubMenu == 'account'">
         <a href="javascript:void(0)" (click)="toggleSubMenu(accountMenu, 'account')">
           <i class="fa fa-user"></i> <span>Account</span>
           <span class="pull-right-container">
@@ -48,7 +48,7 @@
           </li>
         </ul>
       </li>
-      <li class="treeview hide-border" routerLinkActive="show-border" #manageMenu [class.active]="activeSubMenu == 'manage'">
+      <li class="treeview" #manageMenu [class.active]="activeSubMenu == 'manage'">
         <a href="javascript:void(0)" (click)="toggleSubMenu(manageMenu, 'manage')">
           <i class="fa fa-cube"></i> <span>Manage</span>
           <span class="pull-right-container">
