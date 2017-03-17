@@ -20,6 +20,7 @@ export class ContainerClonePage {
   private groupInfo: any;
   private ip: string;
   private containerId: string;
+  private containerInfo: any;
 
   private selectedGroupId: string = '';
   private serversSelect2Options: any;
@@ -65,6 +66,7 @@ export class ContainerClonePage {
       this.containerId = params["containerId"];
 
       this.groupInfo = { ID: groupId };
+      this.containerInfo = {};
       this._groupService.get()
         .then(data => {
           this.groupInfo = _.find(data, (item: any) => {
@@ -77,6 +79,7 @@ export class ContainerClonePage {
           return this._containerService.getById(this.ip, this.containerId, true);
         })
         .then(containerInfo => {
+          this.containerInfo = containerInfo;
           this.buildForm(containerInfo);
         })
         .catch(err => {
@@ -107,6 +110,7 @@ export class ContainerClonePage {
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
+      ServerEnvs: this._fb.group({})
     });
 
     if (data.RestartPolicy === 'on-failure') {
@@ -177,9 +181,6 @@ export class ContainerClonePage {
       return item.ID === value;
     });
     this.servers = selectedGroup.Servers || [];
-    if (this.form.controls['ServerEnvs']) {
-      this.form.removeControl('ServerEnvs')
-    }
   }
 
   private refreshSelectedServer(data: any) {
@@ -190,9 +191,19 @@ export class ContainerClonePage {
       control = this._fb.group({});
       this.form.addControl('ServerEnvs', control);
     }
+    let currentServers = Object.keys(control.value);
+    for (let item of currentServers) {
+      if (this.selectedServers.indexOf(item) !== -1) continue;
+      control.removeControl(item);
+    }
     for (let server of this.selectedServers) {
       if (!control.contains[server]) {
-        let tempControl = _.cloneDeep(this.form.controls['Envs']);
+        let tempControl = this._fb.array([]);
+        if (this.containerInfo && this.containerInfo.Env) {
+          this.containerInfo.Env.forEach((item: any) => {
+            tempControl.push(this._fb.group({ Value: item }));
+          });
+        }
         control.addControl(server, tempControl);
       }
     }
@@ -236,9 +247,8 @@ export class ContainerClonePage {
 
   private removeEnv(server: string, i: number) {
     let control = <FormGroup>this.form.controls['ServerEnvs'];
-    let envCtrl = _.cloneDeep(<FormArray>control.controls[server]);
+    let envCtrl = <FormArray>control.controls[server];
     envCtrl.removeAt(i);
-    control.controls[server] = envCtrl;
   }
 
   private addLink() {
