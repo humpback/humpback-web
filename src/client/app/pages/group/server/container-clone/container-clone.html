@@ -238,16 +238,14 @@
 
     <div class="nav-tabs-custom" *ngIf="selectedServers && selectedServers.length > 0">
       <ul class="nav nav-tabs">
-        <li *ngFor="let item of selectedServers; let i = index;" [class.active]="item == currentEditEnvServer">
-          <a href="{{'#env_server_' + i}}" data-toggle="tab">{{ item }}</a>
+        <li *ngFor="let item of selectedServers;" [class.active]="item == currentEditEnvServer">
+          <a href="javascript:void(0)" (click)="currentEditEnvServer = item">{{ item }}</a>
         </li>
       </ul>
       <div class="tab-content" formGroupName="ServerEnvs">
-        <div class="tab-pane" [class.active]="item == currentEditEnvServer" [attr.id]="'env_server_' + i" *ngFor="let item of selectedServers; let i = index;"
-          [formArrayName]="item">
-          <div class="equal-fields" *ngFor="let env of form.controls.ServerEnvs.controls[item]?.controls; let controlIndex = index;"
-            [formGroupName]="controlIndex">
-            <div class="form-group" [class.has-error]="submitted && env.controls.Value.invalid">
+        <div class="tab-pane" [class.active]="item == currentEditEnvServer" *ngFor="let item of selectedServers;" [formArrayName]="item">
+          <div class="equal-fields" *ngFor="let env of form.controls.ServerEnvs.controls[item]?.controls; let ei = index;">
+            <div class="form-group" [class.has-error]="submitted && env.controls.Value.invalid" [formGroupName]="ei">
               <input type="text" class="form-control" placeholder="e.g. APP_VERION=1.0.0" required maxlength="500" formControlName="Value">
               <div *ngIf="submitted && env.controls.Value.invalid">
                 <span class="help-block" *ngIf="env.controls.Value.errors.required">Value is required.</span>
@@ -255,7 +253,7 @@
               </div>
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-default btn-flat" (click)="removeEnv(item, controlIndex)">
+              <button type="button" class="btn btn-default btn-flat" (click)="removeEnv(item, ei)">
               <i class="fa fa-close"></i>
             </button>
             </div>
