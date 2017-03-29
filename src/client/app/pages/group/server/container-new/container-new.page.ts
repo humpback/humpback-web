@@ -163,14 +163,14 @@ export class ContainerNewPage {
       NetworkMode: formData.NetworkMode === 'custom' ? formData.NetworkName : formData.NetworkMode,
       RestartPolicy: formData.RestartPolicy,
       RestartRetryCount: formData.RestartRetryCount,
-      Ports: formData.Ports.map((item: any) => {
+      Ports: (formData.Ports || []).map((item: any) => {
         item.PublicPort = item.PublicPort || 0;
         return item;
       }),
       Volumes: formData.Volumes,
-      Env: formData.Envs.map((item: any) => item.Value),
+      Env: (formData.Envs || []).map((item: any) => item.Value),
       Dns: formData.Dns,
-      Links: formData.Links.map((item: any) => item.Value),
+      Links: (formData.Links || []).map((item: any) => item.Value),
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }
