@@ -191,7 +191,7 @@
             </div>
           </div>
           <div class="form-group" [class.has-error]="submitted && volume.controls.HostVolume.invalid">
-            <input type="text" class="form-control" placeholder="Container volume" required maxlength="200" formControlName="HostVolume">
+            <input type="text" class="form-control" placeholder="Host volume" required maxlength="200" formControlName="HostVolume">
             <div *ngIf="submitted && volume.controls.HostVolume.invalid">
               <span class="help-block" *ngIf="volume.controls.HostVolume.errors.required">Host volume is required.</span>
               <span class="help-block" *ngIf="volume.controls.HostVolume.errors.maxlength">Host volume cannot more than 20 characters.</span>

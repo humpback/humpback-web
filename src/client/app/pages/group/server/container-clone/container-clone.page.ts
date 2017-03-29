@@ -276,14 +276,14 @@ export class ContainerClonePage {
       NetworkMode: formData.NetworkMode === 'custom' ? formData.NetworkName : formData.NetworkMode,
       RestartPolicy: formData.RestartPolicy,
       RestartRetryCount: formData.RestartRetryCount,
-      Ports: formData.Ports.map((item: any) => {
+      Ports: (formData.Ports || []).map((item: any) => {
         item.PublicPort = item.PublicPort || 0;
         return item;
       }),
       Volumes: formData.Volumes,
       Env: [],
       Dns: formData.Dns,
-      Links: formData.Links.map((item: any) => item.Value),
+      Links: (formData.Links || []).map((item: any) => item.Value),
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }
@@ -295,7 +295,7 @@ export class ContainerClonePage {
     for (let server of this.selectedServers) {
       let containerConf = _.cloneDeep(config);
       (function (server: string, containerConf: IContainer) {
-        containerConf.Env = formData.ServerEnvs[server].map((item: any) => item.Value);
+        containerConf.Env = (formData.ServerEnvs[server] || []).map((item: any) => item.Value);
         self.addCloneMsg(server, "Begin to create container");
         self._containerService.create(server, containerConf, true)
           .then((data) => {
