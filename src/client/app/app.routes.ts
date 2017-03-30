@@ -2,35 +2,30 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IsLogin, IsGroupOwner } from './services';
 import { GroupResolve, SystemConfigResolve } from './resolves';
-import { RootLayoutPage } from './pages';
-import { DashboardPage } from './pages';
-import { LoginPage } from './pages';
 import {
-  GroupLayoutPage, GroupOverviewPage, ContainerListPage, ContainerDetailPage, ContainerNewPage, ContainerClonePage,
-  ContainerMonitorPage, ContainerLogPage
+  RootLayoutPage,
+  DashboardPage,
+  LoginPage,
+  GroupLayoutPage, GroupOverviewPage, ContainerListPage, ContainerDetailPage, ContainerNewPage, ContainerClonePage, ContainerMonitorPage, ContainerLogPage,
+  HubHomePage, ImageOverviewPage, EditImageDescriptionPage,
+  ActivityPage,
+  ManageGroupListPage, ManageGroupEditPage, ManageUserListPage, ManageUserEditPage,
+  UserProfilePage, ChangePasswordPage,
+  SystemConfigPage,
+  NotFoundPage
 } from './pages';
-import { HubHomePage, ImageOverviewPage, EditImageDescriptionPage } from './pages';
-import { ActivityPage } from './pages';
-import { ManageGroupListPage, ManageGroupEditPage, ManageUserListPage, ManageUserEditPage } from './pages';
-import { UserProfilePage, ChangePasswordPage } from './pages';
-import { SystemConfigPage } from './pages';
-import { NotFoundPage } from './pages';
 
 let routes: Routes = [
   { path: 'login', component: LoginPage },
   {
     path: '', component: RootLayoutPage, canActivate: [IsLogin], canActivateChild: [IsLogin],
-    resolve: {
-      config: SystemConfigResolve
-    },
+    resolve: { config: SystemConfigResolve },
     children: [
       { path: '', component: DashboardPage },
       { path: 'dashboard', redirectTo: '/' },
       {
         path: 'group', component: GroupLayoutPage, canActivateChild: [IsGroupOwner],
-        resolve: {
-          groups: GroupResolve
-        },
+        resolve: { groups: GroupResolve },
         children: [
           { path: ':groupId/overview', component: GroupOverviewPage },
           { path: ':groupId/:ip/overview', component: ContainerListPage },
