@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { animate, trigger, state, style, transition } from '@angular/core';
+import { animate, trigger, state, style, transition } from '@angular/animations';
 import { ActivatedRoute, Router, NavigationEnd, RoutesRecognized } from '@angular/router';
 import { GroupService, MostUsedService } from './../../../services';
 
