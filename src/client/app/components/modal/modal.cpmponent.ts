@@ -1,5 +1,5 @@
 import { Directive, Component, OnInit, Input, ContentChild, QueryList } from '@angular/core';
-import { trigger, state, style, transition, animate } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { GlobalLoadingService } from './../../services';
 import { IModalOptions } from './../../interfaces';
 
