@@ -118,6 +118,18 @@ export class ContainerClonePage {
       this.form.addControl('RestartRetryCount', tempCtrl);
     }
 
+    if (data.NetworkMode !== 'host' && data.Ports.length > 0) {
+      let portsCtrl = <FormArray>this.form.controls['Ports'];
+      data.Ports.forEach((item: any) => {
+        portsCtrl.push(this._fb.group({
+          PrivatePort: [item.PrivatePort],
+          Type: [item.Type || 'tcp'],
+          PublicPort: [item.PublicPort === 0 ? '' : item.PublicPort],
+          IP: [item.Ip]
+        }))
+      });
+    }
+
     if (data.Volumes) {
       let volumeCtrl = <FormArray>this.form.controls['Volumes'];
       data.Volumes.forEach((item: any) => {
