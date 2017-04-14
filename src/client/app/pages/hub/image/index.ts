@@ -1,8 +1,8 @@
-import { ImageOverviewPage } from './image-overview';
-import { EditImageDescriptionPage } from './edit-description';
+import { ImageOverviewPage } from './image-overview/image-overview.page';
+import { EditImageDescriptionPage } from './edit-description/edit-description.page';
 
-export * from './image-overview';
-export * from './edit-description';
+export * from './image-overview/image-overview.page';
+export * from './edit-description/edit-description.page';
 
 export const IMAGEPAGES: Array<any> = [
   ImageOverviewPage,

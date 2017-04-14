@@ -1,8 +1,8 @@
-import { ManageGroupListPage } from './group-list';
-import { ManageGroupEditPage } from './group-edit';
+import { ManageGroupListPage } from './group-list/group-list.page';
+import { ManageGroupEditPage } from './group-edit/group-edit.page';
 
-export * from './group-list';
-export * from './group-edit';
+export * from './group-list/group-list.page';
+export * from './group-edit/group-edit.page';
 
 export const MANAGEGROUPPAGES: Array<any> = [
   ManageGroupListPage,
