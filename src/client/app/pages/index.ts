@@ -1,23 +1,23 @@
 import { NgModule } from '@angular/core';
-import { RootLayoutPage } from './root-layout';
-import { DashboardPage } from './dashboard';
-import { LoginPage } from './login';
+import { RootLayoutPage } from './root-layout/root-layout.page';
+import { DashboardPage } from './dashboard/dashboard.page';
+import { LoginPage } from './login/login.page';
 import { GROUPPAGES } from './group'
 import { HUBPAGES } from './hub';
-import { ActivityPage } from './activity';
+import { ActivityPage } from './activity/activity.page';
 import { MANAGEPAGES } from './management';
 import { ACCOUNTPAGES } from './account';
-import { NotFoundPage } from './not-found';
+import { NotFoundPage } from './not-found/not-found.page';
 
-export * from './root-layout';
-export * from './dashboard';
-export * from './login';
+export * from './root-layout/root-layout.page';
+export * from './dashboard/dashboard.page';
+export * from './login/login.page';
 export * from './group';
 export * from './hub';
-export * from './activity';
+export * from './activity/activity.page';
 export * from './management';
 export * from './account';
-export * from './not-found';
+export * from './not-found/not-found.page';
 
 let Pages: Array<any> = [
   RootLayoutPage,

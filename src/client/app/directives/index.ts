@@ -1,8 +1,8 @@
-import { AutoScrollDirective } from './auto-scroll';
-import { RouterActiveDirective } from './router-active';
+import { AutoScrollDirective } from './auto-scroll/auto-scroll.directive';
+import { RouterActiveDirective } from './router-active/router-active.directive';
 
-export * from './auto-scroll';
-export * from './router-active';
+export * from './auto-scroll/auto-scroll.directive';
+export * from './router-active/router-active.directive';
 
 let Directives: Array<any> = [
   AutoScrollDirective,

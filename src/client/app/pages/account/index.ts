@@ -1,8 +1,8 @@
-import { UserProfilePage } from './profile';
-import { ChangePasswordPage } from './change-password';
+import { UserProfilePage } from './profile/profile.page';
+import { ChangePasswordPage } from './change-password/change-password.page';
 
-export * from './profile';
-export * from './change-password';
+export * from './profile/profile.page';
+export * from './change-password/change-password.page';
 
 export const ACCOUNTPAGES: Array<any> = [
   UserProfilePage,
