@@ -1,39 +1,47 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GroupService, AuthService } from './../../../../services';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { GroupService, AuthService, SystemConfigService } from './../../../../services';
 
 declare let messager: any;
 
 @Component({
   selector: 'hb-manage-group-edit',
-  templateUrl: './group-edit.html',
-  styleUrls: ['./group-edit.css']
+  templateUrl: './group-edit.html'
 })
 export class ManageGroupEditPage {
 
   private subscribers: Array<any> = [];
   private isNew: boolean = true;
+  private serverForm: FormGroup;
+  private submitted: boolean;
 
   private groupInfo: any = {
     Name: '',
     Description: '',
     OpenToPublic: false,
+    ContactInfo: '',
+    IsCluster: false,
     Owners: [],
     Servers: [],
   };
 
   private users: Array<string> = [];
   private ownerSelect2Options: any;
+  private systemConfig: any = {};
 
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
     private _groupService: GroupService,
-    private _authService: AuthService) {
+    private _authService: AuthService,
+    private _systemConfigService: SystemConfigService,
+    private _fb: FormBuilder) {
 
   }
 
   ngOnInit() {
+    this.systemConfig = this._systemConfigService.Config;
     this.ownerSelect2Options = {
       multiple: true,
       closeOnSelect: true,
@@ -72,6 +80,7 @@ export class ManageGroupEditPage {
         this._groupService.getById(groupId)
           .then(data => {
             this.groupInfo = data;
+            this.buildForm();
           })
           .catch(err => {
             messager.error(err);
@@ -90,14 +99,67 @@ export class ManageGroupEditPage {
     this.groupInfo.Owners = data.value || [];
   }
 
-  private save(form: any) {
+  private buildForm() {
+    this.submitted = false;
+    let data = this.groupInfo || {};
+    this.serverForm = this._fb.group({
+      Name: data.Name || '',
+      Description: data.Description || '',
+      OpenToPublic: data.OpenToPublic === true ? true : false,
+      IsCluster: data.IsCluster === true ? true : false,
+      Servers: this._fb.array([]),
+      ContactInfo: data.ContactInfo || ''
+    });
+    if (data.Servers && data.Servers.length > 0) {
+      for (let server of data.Servers) {
+        if (typeof server === 'string') {
+          this.addServer('', server)
+        } else {
+          this.addServer(server.Name, server.IP);
+        }
+      }
+    }
+  }
+
+  private addServer(name?: string, ip?: string) {
+    let control = <FormArray>this.serverForm.controls['Servers'];
+    let serverCtrl = this._fb.group({
+      "Name": name || '',
+      "IP": ip || ''
+    });
+    control.push(serverCtrl);
+  }
+
+  private removeServer(index: number) {
+    let control = <FormArray>this.serverForm.controls['Servers'];
+    control.removeAt(index);
+  }
+
+  private save() {
+    this.submitted = true;
+    let form = this.serverForm;
     if (form.invalid) return;
+    let groupInfo = form.value;
+    let invalidSrvers = groupInfo.Servers.filter((item: any) => {
+      return !item.Name && !item.IP;
+    });
+    if (invalidSrvers.length > 0) return;
     if (!this.groupInfo.Owners || this.groupInfo.Owners.length == 0) return;
     let promise: any;
+    let postData: any = {
+      Name: form.value.Name,
+      Description: form.value.Description,
+      OpenToPublic: !!form.value.OpenToPublic,
+      IsCluster: !!form.value.IsCluster,
+      Owners: this.groupInfo.Owners || [],
+      Servers: form.value.Servers,
+      ContactInfo: form.value.ContactInfo
+    };
     if (this.isNew) {
-      promise = this._groupService.add(this.groupInfo);
+      promise = this._groupService.add(postData);
     } else {
-      promise = this._groupService.update(this.groupInfo);
+      postData.ID = this.groupInfo.ID;
+      promise = this._groupService.update(postData);
     }
     promise
       .then((res: any) => {

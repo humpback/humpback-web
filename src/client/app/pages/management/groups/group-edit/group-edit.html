@@ -8,38 +8,103 @@
   </ol>
 </section>
 <section class="content">
-  <form novalidate #form="ngForm" (ngSubmit)="save(form)">
-    <div class="form-group" [class.has-error]="form.submitted && groupNameInput.invalid">
+  <form novalidate (ngSubmit)="save()" [formGroup]="serverForm" *ngIf="serverForm">
+    <div class="form-group" [class.has-error]="submitted && serverForm.controls.Name.invalid">
       <label>Name</label>
-      <input type="text" class="form-control" name="groupName" autocomplete="off" #groupNameInput="ngModel" [(ngModel)]="groupInfo.Name"
-        required maxlength="20" pattern="^[0-9a-zA-Z-_.]*$">
-      <div *ngIf="groupNameInput.invalid && form.submitted">
-        <span class="help-block" *ngIf="groupNameInput.errors?.required">Name cannot be empty.</span>
-        <span class="help-block" *ngIf="groupNameInput.errors?.maxlength">Name cannot more than 20 characters.</span>
-        <span class="help-block" *ngIf="groupNameInput.errors?.pattern">Name cannot contain any special symbol.</span>
+      <input type="text" class="form-control" name="groupName" autocomplete="off" formControlName="Name" required maxlength="20"
+        pattern="^[0-9a-zA-Z-_.]*$">
+      <div *ngIf="submitted && serverForm.controls.Name.invalid">
+        <span class="help-block" *ngIf="serverForm.controls.Name.errors?.required">Name cannot be empty.</span>
+        <span class="help-block" *ngIf="serverForm.controls.Name.errors?.maxlength">Name cannot more than 20 characters.</span>
+        <span class="help-block" *ngIf="serverForm.controls.Name.errors?.pattern">Name cannot contain any special symbol.</span>
       </div>
     </div>
-    <div class="form-group" [class.has-error]="form.submitted && descriptionInput.invalid">
+    <div class="form-group" [class.has-error]="submitted && serverForm.controls.Description.invalid">
       <label>Description</label>
-      <textarea class="form-control" name="description" rows="3" maxlength="500" required #descriptionInput="ngModel" [(ngModel)]="groupInfo.Description"></textarea>
-      <div *ngIf="descriptionInput.invalid && form.submitted">
-        <span class="help-block" *ngIf="descriptionInput.errors?.required">Description cannot be empty.</span>
-        <span class="help-block" *ngIf="descriptionInput.errors?.maxlength">Description cannot more than 500 characters.</span>
+      <textarea class="form-control" name="description" rows="3" maxlength="500" required formControlName="Description"></textarea>
+      <div *ngIf="submitted && serverForm.controls.Description.invalid">
+        <span class="help-block" *ngIf="serverForm.controls.Description.errors?.required">Description cannot be empty.</span>
+        <span class="help-block" *ngIf="serverForm.controls.Description.errors?.maxlength">Description cannot more than 500 characters.</span>
       </div>
     </div>
-    <div class="form-group checkbox">
-      <label>
-        <input type="checkbox" name="opentoPublic" [(ngModel)]="groupInfo.OpenToPublic"> <strong>Open to public</strong>
-      </label>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Open to public</label>
+          <select name="opentoPublic" class="form-control" formControlName="OpenToPublic">
+            <option [ngValue]="undefined" disabled>-- Enable / Disable --</option>
+            <option [ngValue]="true">Enable</option>
+            <option [ngValue]="false">Disable</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Cluster Mode</label>
+          <select name="isCluster" class="form-control" formControlName="IsCluster">            
+            <option [ngValue]="undefined" disabled>-- Enable / Disable --</option>
+            <option [ngValue]="true">Enable</option>
+            <option [ngValue]="false">Disable</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="form-group" [class.has-error]="form.submitted && !groupInfo.Owners?.length">
+    <div class="form-group" [class.has-error]="submitted && serverForm.controls.ContactInfo.invalid">
+      <label>Contact Info</label>
+      <input type="text" class="form-control" placeholder="Email address(es)" maxlength="500" required formControlName="ContactInfo"
+        multipleEmails>
+      <div *ngIf="submitted && serverForm.controls.ContactInfo.invalid">
+        <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.required">Contact info cannot be empty.</span>
+        <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.maxlength">Contact info cannot more than 500 characters.</span>
+        <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.multipleEmails">Invalid email address(es).</span>
+      </div>
+    </div>
+    <div class="form-group" [class.has-error]="submitted && !groupInfo.Owners?.length">
       <label>Owners</label>
-      <select2 [data]="groupInfo.Owners" [value]="groupInfo.Owners" (valueChanged)="refreshSelectedUser($event)" [cssImport]="false" [width]="'100%'" [options]="ownerSelect2Options"></select2>
-      <span class="help-block" *ngIf="form.submitted && !groupInfo.Owners?.length">Owners cannot be empty.</span>
+      <select2 [data]="groupInfo.Owners" [value]="groupInfo.Owners" (valueChanged)="refreshSelectedUser($event)" [cssImport]="false"
+        [width]="'100%'" [options]="ownerSelect2Options"></select2>
+      <span class="help-block" *ngIf="submitted && !groupInfo.Owners?.length">Owners cannot be empty.</span>
     </div>
-    <div class="form-group">
-      <label>Servers (IP)</label>
-      <hb-tags-input name="servers" [(ngModel)]="groupInfo.Servers" [validatePattern]="'^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[0-9])\\.){3}((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[[1-9][0-9]|[1-9]))$'"></hb-tags-input>
+
+    <div class="box">
+      <div class="box-header with-border">Servers</div>
+      <div class="box-body" formArrayName="Servers">
+        <div class="row" *ngIf="serverForm.controls.Servers.controls?.length > 0">
+          <div class="col-md-6" *ngFor="let serverCtrl of serverForm.controls.Servers.controls; let i = index;">
+            <div [formGroupName]="i" class="flex-display">
+              <div class="flex-1">
+                <div class="equal-fields">
+                  <div class="form-group" [class.has-error]="submitted && (serverCtrl.controls.Name.invalid || (!serverCtrl.controls.Name?.value && !serverCtrl.controls.IP?.value))">
+                    <input type="text" class="form-control" placeholder="Server Name" pattern="^[0-9a-zA-Z_.-]*$" maxlength="50" formControlName="Name">
+                    <div *ngIf="submitted && serverCtrl.controls.Name.invalid">
+                      <span class="help-block" *ngIf="serverCtrl.controls.Name.errors.pattern">Invalid server name.</span>
+                      <span class="help-block" *ngIf="serverCtrl.controls.Name.errors.maxlength">Server name cannot be more than 50 characters.</span>
+                    </div>
+                  </div>
+                  <div class="form-group" [class.has-error]="submitted && (serverCtrl.controls.IP.invalid || (!serverCtrl.controls.Name?.value && !serverCtrl.controls.IP?.value))">
+                    <input type="text" class="form-control" placeholder="IP" maxlength="15" formControlName="IP" validateIP>
+                    <div *ngIf="submitted && serverCtrl.controls.IP.invalid">
+                      <span class="help-block" *ngIf="serverCtrl.controls.IP.errors.ip">Invalide ip address.</span>
+                      <span class="help-block" *ngIf="serverCtrl.controls.IP.errors.maxlength">Invalide ip address.</span>
+                    </div>
+                  </div>
+                </div>
+                <span style="color: #dd4b39" class="help-block" *ngIf="submitted && (!serverCtrl.controls.Name?.value && !serverCtrl.controls.IP?.value)">ServerName or IP cannot be empty at the same time.</span>
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-default btn-flat" (click)="removeServer(i)">
+                  <i class="fa fa-close"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addServer()">
+            <i class="fa fa-plus"></i> Add Server
+          </button>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <button type="submit" class="btn btn-flat bg-olive">

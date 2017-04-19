@@ -10,6 +10,9 @@
             <h3 class="box-title">Activity</h3>
           </div>
           <div class="box-body box-comments">
+            <div class="alert alert-info" *ngIf="logs?.length == 0 && !systemConfig?.TopNews">
+              No activities.
+            </div>
             <div class="box-comment" *ngFor="let log of logs;">
               <img src="{{'/api/users/avatar/'+log.UserId}}" class="img-circle img-sm">
               <div class="comment-text">
