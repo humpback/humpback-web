@@ -80,6 +80,59 @@ hb-container-log .logs-panel {
     width: calc(100vw - 280px) !important;
 }
 
+.equal-fields {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.equal-fields .form-group {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.equal-fields .form-group:last-child {
+    margin-right: 0;
+}
+
+.box-body .well.well-sm, .box-body .equal-fields .form-group {
+    margin-bottom: 5px;
+}
+
+.form-control[disabled], fieldset[disabled] .bootstrap-tagsinput {
+    background-color: #eee;
+    cursor: not-allowed;
+}
+
+@-moz-document url-prefix() {
+    select {
+        -moz-appearance: none;
+        background-image: url('/static/images/menu-down.png') !important;
+        background-repeat: no-repeat;
+        background-position-x: 100%;
+        background-position-y: 6px;
+        background-size: 20px;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+    input[type=number]:hover, input[type=number]:focus {
+        -moz-appearance: initial;
+    }
+}
+
+body.hidenScrollY {
+    overflow-y: hidden !important;
+}
+
+.skin-blue hb-hub-home .items .item:hover {
+    border-color: #3c8dbc !important;
+}
+
+.skin-blue hb-hub-home .items .item:hover .image-avatar,
+.skin-blue hb-hub-home .items .item:hover .detail-btn {
+    background: #3c8dbc !important;
+}
+
 
 /* Overide Admin LTE CSS Begin */
 
@@ -192,6 +245,10 @@ hb-container-log .logs-panel {
 
 .box.no-border {
     border-top: none;
+}
+
+.box {
+    border-top-width: 2px;
 }
 
 

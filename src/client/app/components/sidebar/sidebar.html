@@ -2,26 +2,41 @@
   <section class="sidebar">
     <ul class="sidebar-menu">
       <li class="header">BASIC NAVIGATION</li>
-      <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"  [class.hide-border]="activeSubMenu">
+      <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" [class.hide-border]="activeSubMenu">
         <a [routerLink]="['/']" (click)="activeSubMenu = ''">
           <i class="fa fa-dashboard"></i> <span>Dashboard</span>
         </a>
       </li>
-      <li routerLinkActive="active" [class.hide-border]="activeSubMenu">
+      <li routerLinkActive="active" [class.hide-border]="activeSubMenu" *ngIf="!config.EnableClusterMode">
         <a [routerLink]="['/group']" (click)="activeSubMenu = ''">
           <i class="fa fa-object-group"></i> <span>Group</span>
         </a>
+      </li>
+      <li class="treeview" #groupMenu [class.active]="activeSubMenu == 'group'" *ngIf="config.EnableClusterMode">
+        <a href="javascript:void(0)" (click)="toggleSubMenu(groupMenu, 'group')">
+          <i class="fa fa-object-group"></i> <span>Groups</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu" routerLinkActive="menu-open">
+          <li routerLinkActive="active">
+            <a [routerLink]="['/group']">
+              <i class="fa fa-cog"></i> Single
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a [routerLink]="['/cluster']">
+              <i class="fa fa-cogs"></i> Cluster
+            </a>
+          </li>
+        </ul>
       </li>
       <li routerLinkActive="active" *ngIf="config.EnablePrivateRegistry" [class.hide-border]="activeSubMenu">
         <a [routerLink]="['/hub']" (click)="activeSubMenu = ''">
           <i class="fa fa-archive"></i> <span>Hub</span>
         </a>
       </li>
-      <!--<li routerLinkActive="active">
-        <a [routerLink]="['/build-image']">
-          <i class="fa fa-building"></i> <span>Build Image</span>
-        </a>
-      </li>-->
       <li routerLinkActive="active" [class.hide-border]="activeSubMenu">
         <a [routerLink]="['/activity']" (click)="activeSubMenu = ''">
           <i class="fa fa-rss"></i> <span>Activity</span>
