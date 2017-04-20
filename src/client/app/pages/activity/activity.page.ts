@@ -38,16 +38,7 @@ export class ActivityPage {
 
     this._groupService.get()
       .then(data => {
-        this.groups = JSON.parse(JSON.stringify(data));
-        let allGroup: any = {
-          ID: 'All',
-          Name: 'All',
-          Servers: []
-        };
-        this.groups.splice(0, 0, allGroup);
-        this.groups.forEach((group) => {
-          group.Servers.splice(0, 0, 'All');
-        });
+        this.groups = data;
       })
       .catch(err => {
         messager.error(err.message || 'Get group info failed.');
@@ -59,7 +50,7 @@ export class ActivityPage {
   private getLogs(pageIndex: number) {
     let group = this.selectedGroupId ? (this.selectedGroupId === 'All' ? '' : this.selectedGroupId) : '';
     let type = this.selectedType ? (this.selectedType === 'All' ? '' : this.selectedType) : '';
-    let server = this.selectedServer ? (this.selectedServer === 'All' ? '' : this.selectedServer) : '';
+    let server = '';
     this._logService.getLog(type, this.pageSize, pageIndex, group, server)
       .then(data => {
         this.totalCount = data.total_rows;
@@ -71,24 +62,12 @@ export class ActivityPage {
   }
 
   private selectedGroupChange(value: any) {
-    if (!value) return;
-    this.selectedGroupId = value;
-    let selectedGroup = _.find(this.groups, (item: any) => {
-      return item.ID === value;
-    });
-    this.servers = selectedGroup.Servers || [];
-    this.selectedServer = '';
-  }
-
-  private selectedServerChange(value: any) {
-    if (!value) return;
-    this.selectedServer = value;
+    this.selectedGroupId = value || '';
     this.setPage(1);
   }
 
   private selectedTypeChange(value: any) {
-    if (!value) return;
-    this.selectedType = value;
+    this.selectedType = value || '';
     this.setPage(1);
   }
 
@@ -97,10 +76,6 @@ export class ActivityPage {
   }
 
   private setPage(pageIndex: number) {
-
-    if (pageIndex === 6) {
-      console.trace();
-    }
     this.getLogs(pageIndex);
   }
 }

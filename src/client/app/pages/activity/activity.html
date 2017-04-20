@@ -5,22 +5,16 @@
   <div class="flex-display flex-wrapper margin-bottom-10">
     <div class="from-group flex-1">
       <select class="form-control" [ngModel]="selectedGroupId" (ngModelChange)="selectedGroupChange($event)">
-        <option value="" disabled>-- Select Group --</option>
+        <option value="">All</option>
         <option value="{{item.ID}}" *ngFor="let item of groups">{{ item.Name }}</option>
       </select>
     </div>
     <div class="from-group flex-1">
-      <select class="form-control" [ngModel]="selectedServer" (ngModelChange)="selectedServerChange($event)">
-        <option value="" disabled>-- Select Server --</option>
-        <option value="{{item}}" *ngFor="let item of servers">{{ item }}</option>
-      </select>
-    </div>
-    <div class="from-group flex-1">
       <select class="form-control" [ngModel]="selectedType" (ngModelChange)="selectedTypeChange($event)">
-        <option value="" disabled>-- Select Type --</option>
-        <option value="All">All</option>
+        <option value="">All</option>
         <option value="Container">Container</option>
         <option value="Image">Image</option>
+        <option value="Cluster">Cluster</option>
         <option value="Hub">Hub</option>
       </select>
     </div>
