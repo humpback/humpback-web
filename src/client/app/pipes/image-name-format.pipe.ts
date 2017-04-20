@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'imageNameFmt'  
+  name: 'imageNameFmt'
 })
 
 export class ImageNameFormatPipe implements PipeTransform {
@@ -14,7 +14,7 @@ export class ImageNameFormatPipe implements PipeTransform {
     if (type === 'name') {
       return arr[0];
     } else {
-      return arr[1] || "";
+      return arr[1] || "latest";
     }
   }
 }

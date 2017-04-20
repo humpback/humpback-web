@@ -12,7 +12,10 @@ export class NumberValidator {
   static Range(min: number, max: number): ValidatorFn {
     return (control: AbstractControl): IValidationResult => {
       let target = parseInt(control.value);
-      if (target < min || target > max) {
+      if (min && target < min) {
+        return { 'numberRange': true };
+      }
+      if (max && target > max) {
         return { 'numberRange': true };
       }
     }

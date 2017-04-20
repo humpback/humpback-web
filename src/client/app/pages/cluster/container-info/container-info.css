@@ -1,0 +1,123 @@
+.btn-panel {
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-panel .btn-group {
+  margin-right: initial;
+}
+
+.btn-panel button, .btn-panel > a.btn {
+  margin: 0 5px 5px 5px;
+  width: 100px;
+}
+
+.btn-panel .btn>i.fa {
+  margin-right: 5px;
+}
+
+.btn-panel a {
+  color: black;
+}
+
+.btn-panel a.disable, .btn-panel a.disable:hover {
+  color: rgba(119, 119, 119, .7);
+  background: transparent;
+}
+
+.timeline .timeline-header {
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+div.timeline-body li>i.fa {
+  margin: 0 5px;
+}
+
+.basic-info-title {
+  vertical-align: middle;
+  text-align: center;
+  max-width: 100px;
+  word-wrap: break-word;
+  background: rgba(0, 0, 0, .1);
+  padding: 5px;
+  font-weight: bolder;
+}
+
+li.custom-list::before {
+  content: attr(value);
+  color: rgba(0, 0, 0, .87);
+  user-select: none;
+  pointer-events: none;
+  counter-increment: ordered;
+  vertical-align: middle;
+  opacity: 0.8;
+  font-weight: bolder;
+  margin-right: 5px;
+  align-self: flex-start;
+}
+
+p.title {
+  margin-top: 20px;
+  border-bottom: 1px solid lightgray;
+}
+
+.nav-tabs-custom > .nav-tabs.nav-stacked > li {
+  margin-right: 0px;
+}
+
+.nav-tabs-custom > .nav-tabs.nav-stacked > li.active {
+  border-top: none;
+  border-left: 3px solid #3c8dbc;
+  border-right: 1px solid white;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+}
+
+.tab-content {
+  margin-left: -1px;
+  border-left: 1px solid lightgray;
+  padding-left: 15px;
+}
+
+.panel.box .box-header {
+  box-shadow: 0px 5px 10px lightgrey;
+}
+
+.tail-select-panel {
+  max-width: 200px;
+}
+
+.logs-panel {
+  background: rgba(34, 45, 50, .7);
+  color: lightsteelblue;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+}
+
+.logs-panel[data-has-log] {
+  padding: 10px;
+}
+
+.logs-panel >p {
+  margin-bottom: 5px;
+  word-break: break-all;
+  word-wrap: break-word;
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+.logs-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.logs-panel::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.logs-panel::-webkit-scrollbar-thumb {
+  margin-right: 2px;
+  border-radius: 10px;
+  background: rgb(255, 255, 255);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}

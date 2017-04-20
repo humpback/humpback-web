@@ -1,0 +1,341 @@
+<section class="content-header">
+  <h1> Container Info <small>{{ container?.Config?.Name }}</small></h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/cluster', groupInfo.ID, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li class="active">Detail</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="btn-panel flex-display">
+    <div class="btn-group">
+      <button type="button" class="btn bg-olive btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        Operate&nbsp;&nbsp;
+        <span class="fa fa-caret-down"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" (click)="operate('start', $event)">Start</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('stop', $event)">Stop</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('restart', $event)">Restart</a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="javascript:void(0)" (click)="showDeleteModal($event)">
+            <i class="fa fa-warning text-danger"></i> Delete
+          </a>
+        </li>
+      </ul>
+    </div>
+    <button type="button" class="btn btn-default btn-flat" (click)="showAdvanceSettingModal()" style="width: initial;">
+      <i class="fa fa-pencil"></i> Advance Setting
+    </button>
+    <a [routerLink]="['/cluster', groupInfo.ID, 'containers', metaId, 'clone']" class="btn btn-default btn-flat">
+      <i class="fa fa-copy"></i> Clone
+    </a>
+    <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
+      <i class="fa fa-arrow-circle-up"></i>
+      Upgrade
+    </button>
+    <!--<button type="button" class="btn btn-default btn-flat" (click)="showReAssignConfirm()">
+      <i class="fa fa-exchange"></i>
+      Reassign
+    </button>-->
+  </div>
+  <ul class="timeline" *ngIf="container">
+    <li>
+      <i class="fa fa-cog"></i>
+      <div class="timeline-item">
+        <div class="timeline-header flex-display">
+          <span>Infomation</span>
+        </div>
+        <div class="timeline-body container-basic-info">
+          <p class="text-info title" style="margin-top: initial"><strong>Basic</strong></p>
+          <table class="table table-bordered">
+            <tbody>
+              <ng-template ngFor let-item let-i="index" let-isEven="even" [ngForOf]="containerBasicInfo">
+                <tr *ngIf="isEven">
+                  <td class="basic-info-title">{{ containerBasicInfo[i].title }}</td>
+                  <td>
+                    {{ containerBasicInfo[i].content || 'N/A' }}
+                    <small class="text-info" *ngIf="containerBasicInfo[i].title == 'Restart Policy' && containerBasicInfo[i].content == 'on-failure'">
+                      with {{ container.Config?.RestartRetryCount }} retry count
+                    </small>
+                  </td>
+                  <td class="basic-info-title" *ngIf="containerBasicInfo[i+1]">{{ containerBasicInfo[i+1]?.title }}</td>
+                  <td *ngIf="containerBasicInfo[i+1]">
+                    {{ containerBasicInfo[i+1]?.content || 'N/A' }}
+                    <small class="text-info" *ngIf="containerBasicInfo[i+1].title == 'Restart Policy' && containerBasicInfo[i+1].content == 'on-failure'">
+                      with {{ container.Config?.RestartRetryCount }} retry count
+                    </small>
+                  </td>
+                </tr>
+              </ng-template>
+            </tbody>
+          </table>
+          <div *ngIf="container.Config?.Ports && container.Config?.Ports?.length > 0">
+            <p class="text-info title"><strong>Ports Binding</strong></p>
+            <ul class="list-unstyled">
+              <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let item of container.Config.Ports">
+                <span class="no-margin" *ngIf="item.PublicPort > 0">
+                  {{ (item.Ip || '0.0.0.0') + ":" + item.PublicPort }}
+                </span>
+                <span class="no-margin label label-warning" *ngIf="item.PublicPort == 0">
+                  Auto Assign
+                </span>
+                <i class="fa fa-long-arrow-right"></i> {{ item.PrivatePort }}
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="container.Config?.Dns?.length > 0">
+            <p class="text-info title"><strong>DNS</strong></p>
+            <ul class="list-unstyled">
+              <li value="-" class="flex-display custom-list" *ngFor="let item of container.Config.Dns">
+                <span class="break-word">{{ item }}</span>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="container.Config?.Volumes?.length > 0">
+            <p class="text-info title"><strong>Volumes Binding</strong></p>
+            <ul class="list-unstyled" *ngIf="container.Config?.Volumes?.length > 0">
+              <li value="-" class="flex-display flex-align-center custom-list break-word" *ngFor="let item of container.Config.Volumes">
+                {{ item.HostVolume }} <i class="fa fa-long-arrow-right"></i> {{ item.ContainerVolume }}
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="container.Config?.Env?.length > 0">
+            <p class="text-info title"><strong>Environment</strong></p>
+            <ul class="list-unstyled" *ngIf="container.Config?.Env">
+              <li value="-" class="flex-display custom-list" *ngFor="let item of container.Config.Env">
+                <span class="break-word">{{ item }}</span>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="container.WebHooks?.length > 0">
+            <p class="text-info title"><strong>WebHooks</strong></p>
+            <ul class="list-unstyled" *ngIf="container.WebHooks">
+              <li value="-" class="flex-display custom-list" *ngFor="let item of container.WebHooks">
+                <span class="break-word">
+                  <span class="text-danger">{{ item.Url }}</span>
+                <span *ngIf="item.SecretToken">with token
+                    <span class="text-danger">{{ item.SecretToken }}</span>
+                </span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li>
+      <i class="fa fa-gears"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          Instances (Expect: {{ container?.Instances }} / Running: {{ container?.Running }} / Stopped: {{ container?.Stopped }})
+        </div>
+        <div class="timeline-body">
+          <div class="nav-tabs-custom flex-display" *ngIf="instances | isEmptyObj">
+            <ul class="nav nav-tabs nav-stacked">
+              <li [ngClass]="{'active': activedTab == obj.key}" *ngFor="let obj of (instances | objLoop)">
+                <a href="javascript:void(0)" (click)="changeTab(obj.key)">
+                  {{ obj.key }} ({{obj.value.Running}}/{{obj.value.Running+obj.value.Stopped}})
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content flex-1" style="padding-top: initial">
+              <div class="tab-pane" [attr.id]="'ins_'+obji" [ngClass]="{'active': activedTab == obj.key}" *ngFor="let obj of (instances | objLoop); let obji = index;">
+                <div [attr.class]="'panel box box-'+getStatusCls(item.Status)" *ngFor="let item of obj.value.Containers; let i = index; let isFirst = first;" style="border-top-width: 2px;">
+                  <div class="box-header with-border">
+                    <h4 class="box-title">
+                      <a class="flex-display" data-toggle="collapse" [attr.data-parent]="'#ins_'+obji" [attr.href]="'#ins_'+obji+'_'+i" aria-expanded="false" [ngClass]="{'collapsed': !isFirst}">
+                        {{ item.Name?.substr(17) }}
+                        <span [attr.class]="'label label-'+getStatusCls(item.Status)" style="margin-left: 10px; font-size: 10px;">
+                          {{ getStatusText(item.Status) }}
+                        </span>
+                      </a>
+                    </h4>
+                  </div>
+                  <div [attr.id]="'ins_'+obji+'_'+i" class="panel-collapse collapse" [ngClass]="{'in': isFirst}" aria-expanded="false">
+                    <div class="box-body">
+                      <div>
+                        <p>
+                          <a href="javascript: void(0)" (click)="showLogsView(obj.key, item)">
+                            View Logs
+                          </a>
+                        </p>
+                        <p class="text-info title" style="margin-top: initial">
+                          <strong>Status</strong>
+                        </p>
+                        <ul class="list-unstyled">
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="item.NetworkMode == 'host'">
+                            HostName: {{ item.HostName }}
+                          </li>
+                          <li value="-" class="flex-display flex-align-center custom-list">
+                            Pid: {{ item.Status.Pid }}
+                          </li>
+                          <li value="-" class="flex-display flex-align-center custom-list">
+                            StartAt: {{ item.Status.StartedAt | date:'yyyy/MM/dd HH:mm' }}
+                          </li>
+                        </ul>
+                      </div>
+                      <div *ngIf="item.Ports?.length > 0">
+                        <p class="text-info title"><strong>Ports Binding</strong></p>
+                        <ul class="list-unstyled">
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let port of item.Ports">
+                            <span class="no-margin" *ngIf="port.PublicPort > 0">
+                              {{ (port.Ip || '0.0.0.0') + ":" + port.PublicPort }}
+                            </span>
+                            <i class="fa fa-long-arrow-right"></i> {{ port.PrivatePort }}
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info" *ngIf="!(instances | isEmptyObj)">
+            No instances.
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- Modal Define Begin -->
+<hb-modal [options]="deleteContainerModalOptions">
+  <p>Are you sure you want to delete <strong class="text-danger">{{ container?.Config?.Name }}</strong>?</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="deleteContainerModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="deleteContainer()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="reAssignConfirmModalOptions">
+  <p>Are you sure you want to reassign <strong class="text-danger">{{ container?.Config?.Name }}</strong>?</p>
+  <p>This may cause service interruption for a few seconds!</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="reAssignConfirmModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="reAssign()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="upgradeContainerModalOptions">
+  <form novalidate #upgradeForm="ngForm" (ngSubmit)="upgrade(upgradeForm)">
+    <div class="form-group">
+      <label class="control-label">Image</label>
+      <input type="text" class="form-control" value="{{ container?.Config?.Image | imageNameFmt:'name' }}" readonly>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Current Tag</label>
+      <input type="text" class="form-control" name="currentTag" value="{{ container?.Config?.Image | imageNameFmt:'Tag' }}" readonly>
+    </div>
+    <div class="form-group" [ngClass]="{'has-error': upgradeContainerModalOptions.formSubmitted && newTagInput.invalid}">
+      <label class="control-label">New Tag</label>
+      <input type="text" autocomplete="off" class="form-control" name="newTag" [(ngModel)]="newTag" #newTagInput="ngModel" required
+        maxlength="10" pattern="^[0-9a-z._-]*$" [validateNotEqual]="container?.Config?.Image | imageNameFmt:'Tag'">
+      <div [hidden]="newTagInput.valid || !upgradeContainerModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="newTagInput.errors?.required">Tag cannot be empty.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.maxlength">Tag cannot more than 10 characters.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.pattern">Tag must match ^[0-9a-z._-]*$.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.validateNotEqual">New tag must be different with the old tag.</span>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="upgradeContainerModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Confirm</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="advanceSettingModalOptions">
+  <form novalidate [formGroup]="advanceSettingForm" (ngSubmit)="updateAdvanceSetting()" *ngIf="advanceSettingForm">
+    <div class="form-group" [class.has-error]="advanceSettingModalOptions.submitted && advanceSettingForm.controls.Instances.invalid">
+      <label>Number of Instances (Server Num {{groupInfo.Servers.length}})</label>
+      <input type="number" #instancesNum class="form-control" formControlName="Instances" required min="1" validateInteger validateRange>
+      <div *ngIf="advanceSettingModalOptions.submitted && advanceSettingForm.controls.Instances.invalid">
+        <span class="help-block" *ngIf="advanceSettingForm.controls.Instances.errors.required">Instances cannot be empty.</span>
+        <span class="help-block" *ngIf="advanceSettingForm.controls.Instances.errors.numberRange">Instances must grather than 1.</span>
+        <span class="help-block" *ngIf="advanceSettingForm.controls.Instances.errors.integer">Instances must be an integer.</span>
+      </div>
+      <div class="alert alert-warning" style="margin-top: 5px; display: none;" [class.show]="instancesNum.value > groupInfo.Servers.length">
+        Instance num is more than server num. It's can be created but may cause some unpredictable errors.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Webhooks</label>
+      <div class="well well-sm" formArrayName="WebHooks">
+        <div class="equal-fields" *ngFor="let webhook of advanceSettingForm.controls.WebHooks.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="advanceSettingModalOptions.submitted && webhook.controls.Url.invalid">
+            <input type="text" class="form-control" placeholder="Url" required maxlength="200" formControlName="Url" pattern="https?://.+">
+            <div *ngIf="advanceSettingModalOptions.submitted && webhook.controls.Url.invalid">
+              <span class="help-block" *ngIf="webhook.controls.Url.errors.required">Url is required.</span>
+              <span class="help-block" *ngIf="webhook.controls.Url.errors.pattern">Invalid URL.</span>
+              <span class="help-block" *ngIf="webhook.controls.Url.errors.maxlength">Url cannot more than 200 characters.</span>
+            </div>
+          </div>
+          <div class="form-group" [class.has-error]="advanceSettingModalOptions.submitted && webhook.controls.SecretToken.invalid">
+            <input type="text" class="form-control" placeholder="Secret Token(It will be sent in the X-Humpback-Token HTTP header)" maxlength="200"
+              formControlName="SecretToken">
+            <div *ngIf="advanceSettingModalOptions.submitted && webhook.controls.SecretToken.invalid">
+              <span class="help-block" *ngIf="webhook.controls.SecretToken.errors.maxlength">Token cannot more than 200 characters.</span>
+            </div>
+          </div>
+          <div class="form-group" style="flex: unset;">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeWebhook(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addWebhook()">
+            <i class="fa fa-plus"></i> Add Hook
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="advanceSettingModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Confirm</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="logsViewModalOptions">
+  <div class="flex-display" style="margin-bottom: 10px;">
+    <div class="tail-select-panel">
+      <div class="input-group">
+        <span class="input-group-addon">Tail</span>
+        <select class="form-control" [ngModel]="logsViewModalOptions.tailNum" (ngModelChange)="tailNumChanged($event)">
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+          <option value="2000">2000</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <button type="button" class="btn btn-default btn-flat" (click)="getLogs()">
+        <i class="fa fa-refresh"></i>
+      </button>
+    </div>
+  </div>
+  <div class="logs-panel" #logPanel [attr.data-has-log]="logs?.length || null">
+    <p *ngFor="let item of logs">{{ item }}</p>
+  </div>
+  <div class="alert alert-info" *ngIf="!logs?.length">
+    <i class="fa-fw fa fa-info"></i>
+    <span>This container does not contain any logs.</span>
+  </div>
+</hb-modal>
+<!-- Modal Define End -->

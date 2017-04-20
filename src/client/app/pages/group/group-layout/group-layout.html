@@ -15,9 +15,9 @@
                 Overview
               </a>
             </li>
-            <li [hb-router-active]="{'url':'/group/'+group.ID+'/'+server, 'cls': 'active'}" *ngFor="let server of group.Servers">
-              <a [routerLink]="['/group', group.ID, server, 'overview']" (click)="addToMostUsed(group.ID, server)">
-                <i class="fa fa-circle-o"></i>{{ server }}
+            <li [hb-router-active]="{'url':'/group/'+group.ID+'/'+(server.IP || server.Name), 'cls': 'active'}" *ngFor="let server of group.Servers">
+              <a [routerLink]="['/group', group.ID, server.IP || server.Name, 'overview']" (click)="addToMostUsed(group.ID, server)">
+                <i class="fa fa-circle-o"></i>{{ server.Name || server.IP }}
               </a>
             </li>
           </ul>

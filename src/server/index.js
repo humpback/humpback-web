@@ -55,7 +55,10 @@ let ignoreAuthPaths = [
   '/api/users/login',
   '/api/users/logout',
   '/api/users/avatar',
-  '/api/system-config'
+  '/api/system-config',
+  '/api/groups/getclusters',
+  '/api/groups/getallservers',
+  '/api/dashboard'
 ];
 
 app.all('/api/*', (req, res, next) => {
@@ -85,6 +88,7 @@ app.use('/api/groups', require('./routers/group'));
 app.use('/api/images', require('./routers/imageInfo'));
 app.use('/api/logs', require('./routers/log'));
 app.use('/api/system-config', require('./routers/systemConfig'));
+app.use('/api/dashboard', require('./routers/dashboard'));
 
 errorHandler.title = `Humpback WebSite - ${config.version}`;
 app.use(errorHandler({ log: false }));

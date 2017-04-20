@@ -77,7 +77,18 @@ export class ContainerDetailPage {
       this._groupService.getById(groupId)
         .then(data => {
           this.groupInfo = data;
-          this.servers = data.Servers;
+          this.servers = [];
+          data.Servers.forEach((item: any) => {
+            let temp: any = { id: item.IP || item.Name, text: item.IP };
+            if (item.Name) {
+              temp.text = item.Name;
+              if (item.IP) temp.text = `${item.Name}(${item.IP})`;
+            }
+            this.servers.push({
+              id: item.IP || item.Name,
+              text: item.Name || item.IP
+            })
+          });
           this.getContainer();
         })
         .catch(err => {

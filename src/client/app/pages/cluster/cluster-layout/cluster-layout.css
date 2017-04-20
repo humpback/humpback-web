@@ -1,0 +1,83 @@
+.group-wrapper {
+  display: flex;
+  min-height: calc(100vh - 50px);
+}
+
+section.content {
+  position: relative;
+  min-height: calc(100vh - 50px);
+}
+
+section.content > .error-page {
+  position: absolute;
+  top: calc(50% - 100px);
+  left: 0;
+  right: 0;
+}
+
+.group-wrapper > div {
+  flex: 1;
+}
+
+.group-wrapper > .group-tree-panel {
+  position: fixed;
+  flex: initial;
+  width: 200px;
+  background: rgba(34, 45, 50, .9);
+  z-index: 1;
+  min-height: calc(100vh - 50px);
+}
+
+.group-wrapper > .routerOutlet {
+  margin-left: 200px;
+}
+
+.group-tree {
+  background: rgba(34, 45, 50, .5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.group-tree >li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+}
+
+.group-tree > li > a {
+  color: white;
+  position: relative;
+  padding: 12px 5px 12px 15px;
+  display: block;
+}
+
+.group-tree > li:hover > a, .group-tree > li.active > a {
+  color: white;
+  background: rgba(255, 255, 255, .2);
+}
+
+.env-flag {
+  height: 15px;
+  width: 15px;
+  line-height: 15px;
+  text-align: center;
+  background-color: lightslategrey;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 2px;
+  display: inline-block;
+}
+
+@media (max-width: 767px) {
+  .group-wrapper > .group-tree-panel, .group-wrapper, section.content {
+    min-height: calc(100vh - 100px);
+  }
+}
+
+.error-page .error-content {
+  margin-left: 20px;
+}

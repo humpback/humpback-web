@@ -8,6 +8,20 @@ router.get('/',
   groupCtrl.getByUser
 );
 
+router.get('/getallservers',
+  groupValidator.validateGetAllServers,
+  groupCtrl.getAllServers
+);
+
+router.get('/getclusters',
+  groupValidator.validateGetCluster,
+  groupCtrl.getClusters
+);
+
+router.get('/getbasicgroupsinfo',
+  groupCtrl.getBasicGroupsInfo
+)
+
 router.get('/:groupID',
   groupCtrl.getByID
 );

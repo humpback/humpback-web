@@ -79,6 +79,7 @@ export class GroupLayoutPage {
   }
 
   private addToMostUsed(groupId: any, server: any) {
+    let add = server.Name || server.IP;
     this._mostUsedService.add(server, groupId);
   }
 
