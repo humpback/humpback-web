@@ -1,6 +1,7 @@
 import { IsLogin, IsGroupOwner } from './auth-guard.service';
 import { AuthService } from './auth.service';
 import { GroupService } from './group.service';
+import { ClusterService } from './cluster.service';
 import { DashboardService } from './dashboard.service';
 import { ContainerService } from './container.service';
 import { ImageService } from './image.service';
@@ -16,6 +17,7 @@ import { SystemConfigService } from './system-config.service';
 export * from './auth-guard.service';
 export * from './auth.service';
 export * from './group.service';
+export * from './cluster.service';
 export * from './dashboard.service';
 export * from './container.service';
 export * from './image.service';
@@ -33,6 +35,7 @@ let Services: Array<any> = [
   IsGroupOwner,
   AuthService,
   GroupService,
+  ClusterService,
   DashboardService,
   ContainerService,
   ImageService,

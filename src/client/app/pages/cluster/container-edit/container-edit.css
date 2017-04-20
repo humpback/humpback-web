@@ -1,0 +1,21 @@
+.sub-panel> .title {
+  font-size: larger
+}
+
+.sub-panel>hr {
+  margin: 0 0 10px 0;
+  border-color: lightgray
+}
+
+.equal-fields .form-group {
+  min-width: 200px;
+}
+
+.box-body .equal-fields:last-child .form-group {
+  margin-bottom: 0;
+}
+
+.box-body .equal-fields .form-group:last-child {
+  min-width: unset;
+  flex: unset;
+}

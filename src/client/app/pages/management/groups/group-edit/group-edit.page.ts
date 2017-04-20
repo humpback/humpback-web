@@ -112,11 +112,7 @@ export class ManageGroupEditPage {
     });
     if (data.Servers && data.Servers.length > 0) {
       for (let server of data.Servers) {
-        if (typeof server === 'string') {
-          this.addServer('', server)
-        } else {
-          this.addServer(server.Name, server.IP);
-        }
+        this.addServer(server.Name, server.IP);
       }
     }
   }

@@ -10,7 +10,7 @@
 <section class="content">
   <div class="btn-panel flex-display">
     <div class="btn-group">
-      <button type="button" class="btn bg-olive btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> 
+      <button type="button" class="btn bg-olive btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
         Operate&nbsp;&nbsp;
         <span class="fa fa-caret-down"></span>
       </button>
@@ -63,8 +63,8 @@
         <div class="timeline-header flex-display">
           <span>Basic Info</span>
           <span class="label" [ngClass]="{
-            'label-success': container.State?.StateText == 'Running', 
-            'label-warning': container.State?.Paused || container.State?.Restarting, 
+            'label-success': container.State?.StateText == 'Running',
+            'label-warning': container.State?.Paused || container.State?.Restarting,
             'label-danger': container.State?.Dead || !container.State?.Running }">
             {{ container.State?.StateText }}
           </span>
@@ -72,7 +72,7 @@
         <div class="timeline-body container-basic-info">
           <table class="table table-bordered">
             <tbody>
-              <template ngFor let-item let-i="index" let-isEven="even" [ngForOf]="containerBasicInfo">
+              <ng-template ngFor let-item let-i="index" let-isEven="even" [ngForOf]="containerBasicInfo">
                 <tr *ngIf="isEven">
                   <td class="basic-info-title">{{ containerBasicInfo[i].title }}</td>
                   <td>
@@ -86,7 +86,7 @@
                     {{ containerBasicInfo[i+1]?.content }}
                   </td>
                 </tr>
-              </template>
+              </ng-template>
             </tbody>
           </table>
         </div>

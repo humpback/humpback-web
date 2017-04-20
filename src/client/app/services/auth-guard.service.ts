@@ -20,13 +20,13 @@ export class IsLogin implements CanActivate {
             return resolve(false);
           }
           if (route.data['Admin'] && !result.IsAdmin) {
-            this._router.navigate(['/dashboard']);
+            this._router.navigate(['/401']);
             return resolve(false);
           }
           resolve(true);
         })
         .catch(err => {
-          this._router.navigate(['/dashboard']);
+          this._router.navigate(['/401']);
           resolve(false);
         });
     });
@@ -41,13 +41,13 @@ export class IsLogin implements CanActivate {
             return resolve(false);
           }
           if (route.data['Admin'] && !result.IsAdmin) {
-            this._router.navigate(['/dashboard']);
+            this._router.navigate(['/401']);
             return resolve(false);
           }
           resolve(true);
         })
         .catch(err => {
-          this._router.navigate(['/dashboard']);
+          this._router.navigate(['/401']);
           resolve(false);
         });
     });
@@ -65,12 +65,13 @@ export class IsGroupOwner implements CanActivateChild {
   canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     let groupId = route.params['groupId'];
     return new Promise((resolve, reject) => {
-      this._groupService.get()
+      let type = route.data['GroupType'] || route.parent.data['GroupType'] || 'normal';
+      this._groupService.get(false, type)
         .then(data => {
           data = data || [];
           let groupIds = data.map((item: any) => item.ID);
           if (groupIds.indexOf(groupId) === -1) {
-            this._router.navigate(['/group']);
+            this._router.navigate(['/401']);
             resolve(false);
           } else {
             resolve(true);

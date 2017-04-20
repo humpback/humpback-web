@@ -7,12 +7,13 @@ import {
   DashboardPage,
   LoginPage,
   GroupLayoutPage, GroupOverviewPage, ContainerListPage, ContainerDetailPage, ContainerNewPage, ContainerClonePage, ContainerMonitorPage, ContainerLogPage,
+  ClusterLayoutPage, ClusterOverviewPage, ClusterContainerEditPage, ClusterContainerInfoPage,
   HubHomePage, ImageOverviewPage, EditImageDescriptionPage,
   ActivityPage,
   ManageGroupListPage, ManageGroupEditPage, ManageUserListPage, ManageUserEditPage,
   UserProfilePage, ChangePasswordPage,
   SystemConfigPage,
-  NotFoundPage
+  NotFoundPage, UnAuthorizedPage
 } from './pages';
 
 let routes: Routes = [
@@ -36,6 +37,15 @@ let routes: Routes = [
           { path: ':groupId/:ip/containers/:containerId/logs', component: ContainerLogPage }
         ]
       },
+      {
+        path: 'cluster', component: ClusterLayoutPage, canActivateChild: [IsGroupOwner], data: { GroupType: 'cluster' },
+        children: [
+          { path: ':groupId/overview', component: ClusterOverviewPage },
+          { path: ':groupId/new-container', component: ClusterContainerEditPage, data: { IsNew: true } },
+          { path: ':groupId/containers/:metaId/clone', component: ClusterContainerEditPage, data: { IsClone: true } },
+          { path: ':groupId/containers/:metaId/info', component: ClusterContainerInfoPage }
+        ]
+      },
 
       { path: 'hub', component: HubHomePage },
       { path: 'hub/_/:imageId/overview', component: ImageOverviewPage },
@@ -54,6 +64,8 @@ let routes: Routes = [
       { path: 'account/profile', component: UserProfilePage },
       { path: 'account/change-password', component: ChangePasswordPage },
 
+      { path: '401', component: UnAuthorizedPage },
+      { path: '404', component: NotFoundPage },
       { path: '**', component: NotFoundPage }
     ]
   }

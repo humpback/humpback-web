@@ -112,6 +112,12 @@ export class ContainerListPage {
     this._containerService.get(this.ip)
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
+        this.containers = this.containers.filter((item: any) => {
+          if (item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) {
+            return false;
+          }
+          return true;
+        });
         this.filterContainer();
       })
       .catch(err => {

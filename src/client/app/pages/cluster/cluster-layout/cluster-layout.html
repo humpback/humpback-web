@@ -1,0 +1,27 @@
+<div class="group-wrapper" [class.hidden]="!groups?.length && getGroupDone">
+  <div class="group-tree-panel">
+    <div #groupTreePanel>
+      <ul class="group-tree">
+        <li *ngFor="let group of groups;" [class.active]="group.ID == selectedGroupId">
+          <a [routerLink]="['/cluster', group.ID, 'overview']">
+            <span>{{ group.Name }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="routerOutlet">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+<section class="content" *ngIf="!groups?.length && getGroupDone">
+  <div class="error-page flex-display flex-align-center">
+    <h2 class="headline text-yellow">
+      <i class="fa fa-warning"></i>
+    </h2>
+    <div class="error-content">
+      <h3>You don't have any group's privilege.</h3>
+    </div>
+  </div>
+</section>

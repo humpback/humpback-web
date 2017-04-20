@@ -40,6 +40,7 @@ export class SystemConfigPage {
 
   private save(form: any) {
     if (this.config.EnablePrivateRegistry && form.controls.privateRegistry.invalid) return;
+    if (this.config.EnableClusterMode && form.controls.humpbackCenterAPI.invalid) return;
     this._systemConfig.save(this.config)
       .then(res => {
         messager.success('Updated.');

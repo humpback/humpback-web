@@ -1,0 +1,166 @@
+<section class="content-header">
+  <h1> Cluster Overview <small>{{ groupInfo?.Name }} ( {{ groupInfo?.Servers?.length }} servers )</small></h1>
+</section>
+<section class="content">
+  <div class="box no-border" *ngIf="groupInfo?.Servers?.length > 0">
+    <div class="box-body">
+      <div class="flex-display">
+        <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
+          <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [ngModel]="containerFilter"
+            (ngModelChange)="filterContainer($event)">
+          <span class="fa fa-search form-control-feedback"></span>
+        </div>
+        <div class="form-group form-group-sm margin-bottom-10">
+          <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
+            <i class="fa fa-refresh"></i> Refresh
+          </button>
+        </div>
+        <div class="form-group form-group-sm margin-bottom-10">
+          <a [routerLink]="['/cluster', groupInfo.ID, 'new-container']" class="btn btn-sm bg-olive btn-flat">
+            <i class="fa fa-plus"></i> Add Container
+          </a>
+        </div>
+      </div>
+      <div class="alert alert-info" *ngIf="!filterContainers?.length && filterContainerDone">
+        <i class="fa-fw fa fa-info"></i> No containers found
+      </div>
+      <table class="table table-hover table-bordered" *ngIf="filterContainers?.length > 0">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Image</th>
+            <th class="status">Instances</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of currentContainers; let last = last; let first = first;">
+            <td>
+              <i class="fa fa-circle text-success" title="Health" *ngIf="item.Instances == item.Running"></i>
+              <i class="fa fa-circle text-warning" title="Not Health" *ngIf="item.Running < item.Instances && item.Running > 0"></i>
+              <i class="fa fa-circle text-danger" title="Danger" *ngIf="item.Running == 0"></i>
+            </td>
+            <td class="container-name">
+              <a [routerLink]="['/cluster', groupInfo.ID, 'containers', item.MetaId, 'info']">
+                {{ item.Config.Name }}
+              </a>
+            </td>
+            <td class="image-name" [attr.title]="item.Config.Image">
+              {{ item.Config.Image }}
+            </td>
+            <td class="status">
+              <div class="flex-display">
+                <div *ngFor="let obj of (item.IpTables | objLoop)" [attr.title]="'Running: '+obj.value.Running+' Stopped: '+obj.value.Stopped">
+                  <i class="fa fa-circle text-success" *ngIf="obj.value.Stopped == 0"></i>
+                  <i class="fa fa-circle text-warning" *ngIf="obj.value.Stopped != 0 && obj.value.Running != 0"></i>
+                  <i class="fa fa-circle text-danger" *ngIf="obj.value.Running == 0"></i>
+                  {{ obj.key }}
+                </div>                        
+              </div>
+            </td>
+            <td class="operate">
+              <div class="btn-group operate" [class.dropup]="last && !first">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">    
+                  <i class="fa fa-wrench"></i>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li>
+                    <a href="javascript:void(0)" (click)="operate(item, 'restart')">
+                      <i class="fa fa-refresh text-success"></i> Restart
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" (click)="operate(item, 'stop')">
+                      <i class="fa fa-stop"></i> Stop
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" (click)="operate(item, 'start')">
+                      <i class="fa fa-play text-success"></i> Start
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
+                      <i class="fa fa-trash text-danger"></i> Delete
+                    </a>
+                  </li>
+                  <!--<li>
+                    <a href="javascript:void(0)" (click)="showReAssignConfirm(item)">
+                      <i class="fa fa-exchange text-danger"></i> Reassign
+                    </a>
+                  </li>-->
+                  <li>
+                    <a href="javascript:void(0)" (click)="showUpgradeModal(item)">
+                      <i class="fa fa-upload"></i> Upgrade
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box-footer clearfix">
+      <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
+        (onSelectPage)="setContainerPage($event)" *ngIf="filterContainers?.length > 0">
+      </hb-pagination>
+    </div>
+  </div>
+  <div class="alert alert-info" *ngIf="!groupInfo?.Servers?.length">
+    <i class="fa-fw fa fa-info"></i>
+    <span>No servers.</span>
+  </div>
+</section>
+
+<!-- Modal Define Begin -->
+<hb-modal [options]="rmContainerModalOptions">
+  <div class="description" *ngIf="rmContainerTarget?.Config?.Name">
+    Are you sure you want to delete
+    <strong class="important-text">{{ rmContainerTarget?.Config?.Name }}</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="rmContainerModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="rmContainer()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="reAssignConfirmModalOptions">
+  <p>Are you sure you want to reassign <strong class="text-danger">{{ reAssignTarget?.Config?.Name }}</strong>?</p>
+  <p>This may cause service interruption for a few seconds!</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="reAssignConfirmModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="reAssign()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="upgradeContainerModalOptions">
+  <form novalidate #upgradeForm="ngForm" (ngSubmit)="upgrade(upgradeForm)">
+    <div class="form-group">
+      <label class="control-label">Image</label>
+      <input type="text" class="form-control" value="{{ upgradeContainerTarget?.Config.Image | imageNameFmt:'name' }}" readonly>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Current Tag</label>
+      <input type="text" class="form-control" name="currentTag" value="{{ upgradeContainerTarget?.Config.Image | imageNameFmt:'Tag' }}"
+        readonly>
+    </div>
+    <div class="form-group" [ngClass]="{'has-error': upgradeContainerModalOptions.formSubmitted && newTagInput.invalid}">
+      <label class="control-label">New Tag</label>
+      <select class="form-control" name="newTag" required [(ngModel)]="newTag" #newTagInput="ngModel" [validateNotEqual]="upgradeContainerTarget?.Config.Image | imageNameFmt:'Tag'">        
+        <option value="{{item.tag}}" *ngFor="let item of candidateTags">{{ item.tag }} ({{ item.time*1000 | date:'yyyy/MM/dd HH:mm' }})</option>
+      </select>
+      <div [hidden]="newTagInput.valid || !upgradeContainerModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="newTagInput.errors?.required">Tag cannot be empty.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.validateNotEqual">New tag must be different with the old tag.</span>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="upgradeContainerModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Confirm</button>
+    </div>
+  </form>
+</hb-modal>
+
+<!-- Modal Define End -->
