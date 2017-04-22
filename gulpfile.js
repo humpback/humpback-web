@@ -21,7 +21,8 @@ gulp.task('client:prd-build', (callback) => {
 
 gulp.task('client:dev-build', () => {
   let config = require('./config/webpack.dev.js');
-  webpack(config).watch(200, (err, stats) => {
+  let compiler = webpack(config);
+  compiler.watch(200, (err, stats) => {
     showWebpackError(err, stats);
     notifier.notify({
       title: 'Humpback-Client',
@@ -32,12 +33,12 @@ gulp.task('client:dev-build', () => {
 });
 
 gulp.task('clean', () => {
-  return del(['dist/*', '!dist/dbFiles'], { force: true });
+  return del(['dist/*', '!dist/dbFiles', '!dist/node_modules'], { force: true });
 });
 
 gulp.task('server:clean', (callback) => {
   return del(['dist/**/*', '!dist/client'], { force: true });
-})
+});
 
 gulp.task('server:copy', () => {
   return gulp.src(['src/server/**'])
@@ -115,26 +116,19 @@ let showWebpackError = (err, stats) => {
   if (err) {
     throw new gutil.PluginError('webpack', err);
   }
-  let statColor = stats.compilation.warnings.length < 1 ? 'green' : 'yellow';
-  if (stats.compilation.warnings.length > 0) {
-    stats.compilation.errors.forEach(error => {
-      statColor = 'red';
-    });
-  } else {
-    gutil.log(stats.toString({
-      colors: gutil.colors.supportsColor,
-      hash: false,
-      timings: true,
-      chunks: true,
-      chunkModules: false,
-      modules: false,
-      children: false,
-      version: true,
-      cached: true,
-      cachedAssets: true,
-      reasons: false,
-      source: false,
-      errorDetails: false
-    }));
-  }
+  gutil.log("[webpack:build-dev]", stats.toString({
+    colors: true,
+    hash: false,
+    timings: true,
+    chunks: true,
+    chunkModules: false,
+    modules: false,
+    children: false,
+    version: true,
+    cached: true,
+    cachedAssets: true,
+    reasons: false,
+    source: false,
+    errorDetails: false
+  }));
 };

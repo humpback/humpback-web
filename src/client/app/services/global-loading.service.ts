@@ -36,7 +36,7 @@ export class GlobalLoadingService {
       if (this.count > 0) return;
       this.loadingEl.classList.remove('showLoading');
       document.body.style.overflowY = 'auto';
-    }, 300);
+    }, 100);
   }
 
   isOpen(): boolean {

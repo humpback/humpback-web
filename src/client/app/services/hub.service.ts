@@ -13,7 +13,7 @@ export class HubService {
   }
 
   private genURL(location?: string) {
-    return `http://${this._systemConfigService.Config.PrivateRegistry}/v2`;
+    return `${this._systemConfigService.Config.PrivateRegistry}/v2`;
   }
 
   getImages(location: string): Promise<any> {

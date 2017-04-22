@@ -66,6 +66,7 @@
     "light-reload": "^0.2.0",
     "ng2-select2": "^1.0.0-beta.10",
     "node-notifier": "^4.6.1",
+    "progress-bar-webpack-plugin": "^1.9.3",
     "raw-loader": "^0.5.1",
     "reflect-metadata": "^0.1.10",
     "run-sequence": "^1.2.2",

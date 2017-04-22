@@ -60,6 +60,10 @@
 <hb-modal [options]="deleteGroupModalOptions">
   <div class="description" *ngIf="delTarget">
     Are you sure you want to delete <strong class="important-text">{{ delTarget?.Name }}</strong> ?
+    <br>
+    <strong class="text-danger" *ngIf="delTarget?.IsCluster">
+      This will delete all containers which under this cluster. Please consider carefully!!!
+    </strong>
   </div>
   <hb-modal-footer>
     <button type="button" class="btn btn-default btn-flat" (click)="deleteGroupModalOptions.show = fasle">Cancel</button>

@@ -86,6 +86,8 @@ export class ManageGroupEditPage {
             messager.error(err);
             this._router.navigate(['/manage', 'groups']);
           });
+      } else {
+        this.buildForm();
       }
     });
     this.subscribers.push(paramSub);

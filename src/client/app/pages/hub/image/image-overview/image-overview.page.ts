@@ -17,7 +17,7 @@ export class ImageOverviewPage {
 
   private imageId: string;
   private image: any = {};
-  private imageDescroption: any;
+  private imageDescription: any;
   private imageDockerfile: any;
   private tags: Array<string> = [];
 
@@ -47,7 +47,7 @@ export class ImageOverviewPage {
       hideFooter: true
     };
     let config = this._systemConfigService.Config;
-    let tempUrl = new URL(`http://${config.PrivateRegistry}`);
+    let tempUrl = new URL(`${config.PrivateRegistry}`);
     this.privateRegistryAddress = tempUrl.host;
     if (tempUrl.port) {
       this.privateRegistryAddress += `:${tempUrl.port}`;
@@ -67,8 +67,15 @@ export class ImageOverviewPage {
     this._imageService.getImageInfoFromDB(this.imageId)
       .then(data => {
         this.image = data;
+        let renderer = new marked.Renderer();
+        renderer.code = (code: any, language: any) => {
+          const validLang = !!(language && hljs.getLanguage(language));
+          const highlighted = validLang ? hljs.highlight(language, code).value : code;
+          return `<pre style="padding: 0; border-radius: 0;"><code class="hljs ${language}">${highlighted}</code></pre>`;
+        };
+        marked.setOptions({ renderer });
         let html = marked(this.image.Description || '');
-        this.imageDescroption = this.sanitizer.bypassSecurityTrustHtml(html);
+        this.imageDescription = this.sanitizer.bypassSecurityTrustHtml(html);
         this.highlightDockerfile(this.image.Dockerfile);
       })
       .catch(err => {

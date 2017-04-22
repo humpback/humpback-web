@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const helpers = require('./helpers');
 
 module.exports = {
@@ -22,41 +23,41 @@ module.exports = {
     loaders: [
       {
         test: /\.ts$/,
-        loaders: ['awesome-typescript-loader', 'angular2-template-loader']
+        use: ['awesome-typescript-loader?silent=true', 'angular2-template-loader']
       },
       {
         test: /\.html$/,
-        loader: 'html-loader'
+        use: 'html-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg|ico)$/,
-        loader: 'file-loader?name=static/images/[name].[ext]'
+        use: 'file-loader?name=static/images/[name].[ext]'
       },
       {
         test: /\.(woff|woff2|ttf|eot)$/,
-        loader: 'file-loader?name=static/fonts/[name].[ext]'
+        use: 'file-loader?name=static/fonts/[name].[ext]'
       },
       {
         test: /\.css$/,
         exclude: helpers.root('src', 'client', 'app'),
-        loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader',
-          loader: 'css-loader?sourceMap'
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader?sourceMap'
         })
       },
       {
         test: /\.css$/,
         include: helpers.root('src', 'client', 'app'),
-        loader: 'raw-loader'
+        use: 'raw-loader'
       },
     ]
   },
 
   plugins: [
+    new ProgressBarPlugin(),
     new webpack.ContextReplacementPlugin(
-      /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
-      helpers.root('src', 'client'),
-      {}
+      /angular(\\|\/)core(\\|\/)@angular/,
+      helpers.root('src', 'client')
     ),
     new webpack.optimize.CommonsChunkPlugin({
       name: ['app', 'angular2']
@@ -66,7 +67,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: 'src/client/static',        
+        from: 'src/client/static',
         to: 'static'
       },
       {

@@ -5,15 +5,7 @@ const config = require('./../config');
 let db = dbFactory.getCollection(config.dbConfigs.systemConfigCollection.name);
 
 exports.get = (req, res, next) => {
-  let userId = '';
-  if (req.session.currentUser) {
-    userId = (req.session.currentUser.UserID || '').toLowerCase();
-  }
-  let filesOpt = {};
-  if (config.superAdmins.indexOf(userId) === -1) {
-    filesOpt.Admins = 0;
-  }
-  db.findOne({ ID: 1 }, filesOpt, (err, doc) => {
+  db.findOne({ ID: 1 }, (err, doc) => {
     if (err) return next(err);
     res.json(doc || {});
   });

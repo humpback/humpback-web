@@ -23,8 +23,9 @@ export class ContainerClonePage {
   private containerInfo: any;
 
   private selectedGroupId: string = '';
+  private selectedGroup: any;
   private serversSelect2Options: any;
-  private servers: Array<string> = [];
+  private servers: Array<any> = [];
   private selectedServers: Array<any>;
   private currentEditEnvServer: string;
   private cloneProcessModalOptions: any;
@@ -189,36 +190,51 @@ export class ContainerClonePage {
   }
 
   private selectedGroupChanged(value: any) {
-    let selectedGroup = _.find(this.groups, (item: any) => {
+    this.selectedGroup = _.find(this.groups, (item: any) => {
       return item.ID === value;
     });
-    this.servers = selectedGroup.Servers || [];
+    this.servers = [];
+    let tempData = this.selectedGroup.Servers || [];
+    tempData.forEach((item: any) => {
+      let temp: any = { id: item.IP || item.Name, text: item.IP };
+      if (item.Name) {
+        temp.text = item.Name;
+        if (item.IP) temp.text = `${item.Name}(${item.IP})`;
+      }
+      this.servers.push({
+        id: item.IP || item.Name,
+        text: item.Name || item.IP
+      })
+    });
   }
 
   private refreshSelectedServer(data: any) {
-    this.selectedServers = (data.value || []).sort();
-    this.currentEditEnvServer = this.selectedServers[0] || '';
+    let selectedServers = (data.value || []).sort();
     let control = <FormGroup>this.form.controls['ServerEnvs'];
     if (!control) {
       control = this._fb.group({});
       this.form.addControl('ServerEnvs', control);
     }
-    let currentServers = Object.keys(control.value);
-    for (let item of currentServers) {
-      if (this.selectedServers.indexOf(item) !== -1) continue;
-      control.removeControl(item);
+    let currentServers = Object.keys(control.controls);
+    for (let server of currentServers) {
+      if (selectedServers.indexOf(server) !== -1) continue;
+      control.removeControl(server);
     }
-    for (let server of this.selectedServers) {
+    for (let server of selectedServers) {
       if (!control.contains[server]) {
-        let tempControl = this._fb.array([]);
+        let envCtrl = this._fb.array([]);
         if (this.containerInfo && this.containerInfo.Env) {
           this.containerInfo.Env.forEach((item: any) => {
-            tempControl.push(this._fb.group({ Value: item }));
+            envCtrl.push(this._fb.group({
+              Value: item
+            }));
           });
         }
-        control.addControl(server, tempControl);
+        control.addControl(server, envCtrl);
       }
     }
+    this.selectedServers = selectedServers;
+    this.currentEditEnvServer = this.selectedServers[0] || '';
   }
 
   private addPortBinding() {

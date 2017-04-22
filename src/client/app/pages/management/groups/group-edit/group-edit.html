@@ -41,7 +41,7 @@
       <div class="col-md-3">
         <div class="form-group">
           <label>Cluster Mode</label>
-          <select name="isCluster" class="form-control" formControlName="IsCluster">            
+          <select name="isCluster" class="form-control" formControlName="IsCluster">
             <option [ngValue]="undefined" disabled>-- Enable / Disable --</option>
             <option [ngValue]="true">Enable</option>
             <option [ngValue]="false">Disable</option>
@@ -49,12 +49,17 @@
         </div>
       </div>
     </div>
+    <div class="form-group" *ngIf="groupInfo?.IsCluster && !serverForm.value.IsCluster">
+      <div class="alert alert-danger">
+        If you change cluster mode from <strong style="color: mediumspringgreen">Enable</strong> to <strong style="color: mediumspringgreen">Disable</strong> will delete all containers which under this cluster. Please consider carefully!!!
+      </div>
+    </div>
     <div class="form-group" [class.has-error]="submitted && serverForm.controls.ContactInfo.invalid">
       <label>Contact Info</label>
-      <input type="text" class="form-control" placeholder="Email address(es)" maxlength="500" required formControlName="ContactInfo"
+      <input type="text" class="form-control" placeholder="Email address(es)" maxlength="500" formControlName="ContactInfo"
         multipleEmails>
       <div *ngIf="submitted && serverForm.controls.ContactInfo.invalid">
-        <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.required">Contact info cannot be empty.</span>
+        <!--<span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.required">Contact info cannot be empty.</span>-->
         <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.maxlength">Contact info cannot more than 500 characters.</span>
         <span class="help-block" *ngIf="serverForm.controls.ContactInfo.errors?.multipleEmails">Invalid email address(es).</span>
       </div>

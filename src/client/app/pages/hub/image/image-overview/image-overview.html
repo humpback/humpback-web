@@ -15,7 +15,7 @@
         Last Edit by {{ image?.EditUser }} on {{ image?.EditDate | date:'yyyy-MM-dd HH:mm' }}
       </span>
       <span class="text-info" *ngIf="image?.NotFoundInDB">
-        No one has edited this page. To be the first!  
+        No one has edited this page. To be the first!
       </span>
     </div>
   </div>
@@ -43,7 +43,7 @@
           <i class="fa fa-pencil"></i> Edit
         </a>
         <div *ngIf="image.Description">
-          <div [innerHtml]="imageDescroption"></div>
+          <div [innerHtml]="imageDescription"></div>
         </div>
       </div>
       <div class="tab-pane" id="tags" [class.active]="activedTab == 'tags'">
