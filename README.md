@@ -1,12 +1,12 @@
 # Introduction
 
-A website that you can use it to manage docker. Build with [angular2](https://github.com/angular/angular) and [AdminLTE](https://github.com/almasaeed2010/AdminLTE).    
-Work with [Humpbak-Agent](https://github.com/humpback/humpback-agent).
+作为 [Humpback](https://humpback.github.io/humpback) 的直观展现，基于 [Angular2](https://github.com/angular/angular) 和 [AdminLTE](https://github.com/almasaeed2010/AdminLTE) 构建的用于管理 `docker ` 的网站。
+
 # Usage
 ```bash
 git clone https://github.com/humpback/humpback-web.git
 cd humpback-web
-npm i
+npm install
 npm start
 ```
 Open [http://localhost](http://localhost)
@@ -16,14 +16,12 @@ Default Account
 Password: `123456`    
 
 # Functions
-- manage server with group
-- manage containers and docker images of server
-- create/remove container
-- start/stop/restart/pause/unpause container
-- batch clone / batch update image `tag`
-- real time monitoring (cpu and memory usage)
-- view container's log
-- manage private registry
+- 服务器分组管理
+- 容器及镜像管理
+- 容器批量操作
+- 容器实时监控
+- 容器日志查看
+- 私有仓库管理
 - etc.
 
 # Sample Page
@@ -39,3 +37,7 @@ Password: `123456`
 #### Private registry explor - docker image detail
 ![image](https://cloud.githubusercontent.com/assets/9428909/22238333/ca0debee-e24b-11e6-871b-a1134ed8af46.png)
 etc.
+
+## License
+
+Apache-2.0
