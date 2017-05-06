@@ -42,9 +42,11 @@ export class GroupOverviewPage {
           if (!data.Servers || data.Servers.length === 0) {
             return;
           }
-          for (let ip of data.Servers) {
+          for (let item of data.Servers) {
+            let ip = item.IP || item.Name;
             let temp: any = {
-              ip: ip,
+              ip: item.IP,
+              name: item.Name,
               isLoading: true,
               running: [],
               stoped: []

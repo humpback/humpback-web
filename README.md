@@ -34,7 +34,7 @@ Password: `123456`
 #### New Container
 ![image](https://cloud.githubusercontent.com/assets/9428909/22238315/b8292790-e24b-11e6-84ba-58e97288a104.png)
 
-#### Private registry explor - docker image detail
+#### Private registry explore - docker image detail
 ![image](https://cloud.githubusercontent.com/assets/9428909/22238333/ca0debee-e24b-11e6-871b-a1134ed8af46.png)
 etc.
 
