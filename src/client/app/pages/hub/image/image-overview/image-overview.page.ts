@@ -49,9 +49,9 @@ export class ImageOverviewPage {
     let config = this._systemConfigService.Config;
     let tempUrl = new URL(`${config.PrivateRegistry}`);
     this.privateRegistryAddress = tempUrl.host;
-    if (tempUrl.port) {
-      this.privateRegistryAddress += `:${tempUrl.port}`;
-    }
+    //if (tempUrl.port) {
+    //  this.privateRegistryAddress += `:${tempUrl.port}`;
+    //}
     let paramSub = this._route.params.subscribe(param => {
       this.imageId = param['imageId'];
       this.getImageInfo();
