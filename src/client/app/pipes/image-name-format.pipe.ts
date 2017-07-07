@@ -10,11 +10,13 @@ export class ImageNameFormatPipe implements PipeTransform {
       return '';
     }
     let type = args || 'name';
-    let arr = value.split(':');
+    let slashArr = value.split('/');
+    let tagSplitArr = slashArr.pop().split(':');
     if (type === 'name') {
-      return arr[0];
+      slashArr.push(tagSplitArr[0]);
+      return slashArr.join('/');
     } else {
-      return arr[1] || "latest";
+      return tagSplitArr[1] || "latest";
     }
   }
 }
