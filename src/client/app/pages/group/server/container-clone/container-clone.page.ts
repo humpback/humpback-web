@@ -103,7 +103,7 @@ export class ContainerClonePage {
       HostName: [''],
       NetworkMode: [data.NetworkMode],
       RestartPolicy: [data.RestartPolicy],
-      RestartRetryCount: [5],
+      RestartRetryCount: '',
       Ports: this._fb.array([]),
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
