@@ -25,6 +25,7 @@ export class ContainerDetailPage {
   private serversSelect2Options: Select2Options;
 
   private deleteContainerModalOptions: any = {};
+  private forceDeletion: boolean = false;
   private renameContainerModalOptions: any = {};
   private upgradeContainerModalOptions: any = {};
   private upgradeProgressModalOptions: any = {};
@@ -175,7 +176,7 @@ export class ContainerDetailPage {
   }
 
   private deleteContainer() {
-    this._containerService.delete(this.ip, this.containerId)
+    this._containerService.delete(this.ip, this.containerId, this.forceDeletion)
       .then(data => {
         this._logService.addLog(`Deleted container ${this.containerId} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
         this._router.navigate(["/group", this.groupInfo.ID, this.ip, 'overview']);
@@ -210,6 +211,10 @@ export class ContainerDetailPage {
   private showUpgradeModal() {
     this.upgradeContainerModalOptions.formSubmitted = false;
     this.upgradeContainerModalOptions.show = true;
+  }
+
+  private enableForceDeletion(value: any){
+    this.forceDeletion = value.target.checked;
   }
 
   private refreshSelectedServer(data: any) {

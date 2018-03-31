@@ -77,6 +77,11 @@ exports.getClusters = (req, res, next) => {
   }
   db.find(queryOption).sort({ Name: 1 }).exec((err, docs) => {
     if (err) return next(err);
+    docs.map((data) => {
+      if (data.IsRemoveDelay === undefined) {
+        data.IsRemoveDelay = true;
+      }
+    })
     res.json(docs || []);
   });
 }

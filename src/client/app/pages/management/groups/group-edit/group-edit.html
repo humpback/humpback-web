@@ -49,6 +49,14 @@
         </div>
       </div>
     </div>
+    <div class="form-group" *ngIf="serverForm.value.IsCluster">
+      <div class="checkbox alert alert-info">
+        <label>
+          <input type="checkbox" name="delay" formControlName="IsRemoveDelay">Remove delay
+        </label>
+        <span class="text-danger">&nbsp;&nbsp;(Delay (8 minutes) remove unused containers for service debounce.)</span>
+      </div>
+    </div>
     <div class="form-group" *ngIf="groupInfo?.IsCluster && !serverForm.value.IsCluster">
       <div class="alert alert-danger">
         If you change cluster mode from <strong style="color: mediumspringgreen">Enable</strong> to <strong style="color: mediumspringgreen">Disable</strong> will delete all containers which under this cluster. Please consider carefully!!!

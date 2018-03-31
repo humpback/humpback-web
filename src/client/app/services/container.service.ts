@@ -95,9 +95,12 @@ export class ContainerService {
     });
   }
 
-  delete(ip: string, id: string): Promise<any> {
+  delete(ip: string, id: string, forceDeletion?: boolean): Promise<any> {
     let reqConfig = this.buildReq(ip, false);
-    let url: string = `${reqConfig.url}/containers/${id}`;
+    let url: string = `${reqConfig.url}/containers/${id}?force=false`;
+    if(forceDeletion){
+      url = `${reqConfig.url}/containers/${id}?force=true`;
+    }
     return new Promise((resolve, reject) => {
       this.http.delete(url, reqConfig.options)
         .then(res => {
