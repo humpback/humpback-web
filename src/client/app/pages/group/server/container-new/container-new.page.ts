@@ -43,6 +43,13 @@ export class ContainerNewPage {
         });
       this.ip = params["ip"];
       this.buildForm();
+      let control = <FormArray>this.form.controls['LogOpts'];
+      control.push(this._fb.group({
+        "Value": ['max-size=10m']
+      }));
+      control.push(this._fb.group({
+        "Value": ['max-file=3']
+      }));
     });
     this.subscribers.push(paramSub);
   }
@@ -63,6 +70,8 @@ export class ContainerNewPage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
+      LogDriver: 'json-file',
+      LogOpts: this._fb.array([]),
       Dns: [[]],
       CPUShares: [''],
       Memory: ['']
@@ -150,11 +159,29 @@ export class ContainerNewPage {
     control.removeAt(i);
   }
 
+  private addLogOpt() {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLogOpt(i: number) {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.removeAt(i);
+  }
+
   private onSubmit() {
     this.submitted = true;
     if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
+    let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
+    let optsObj = {};
+    optsArr.forEach((item: any) => {
+      let splitArr = item.split('=');
+      optsObj[splitArr[0]] = splitArr[1];
+    })
     let config: IContainer = {
       Name: formData.Name,
       Image: formData.Image,
@@ -171,6 +198,8 @@ export class ContainerNewPage {
       Env: (formData.Envs || []).map((item: any) => item.Value),
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
+      LogDriver: formData.LogDriver,
+      LogOpts: optsObj,
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }

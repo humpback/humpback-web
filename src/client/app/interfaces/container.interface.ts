@@ -11,6 +11,8 @@ export interface IContainer {
   Env: IEnvironment[];
   Dns: string[];
   Links: ILink[];
+  LogDriver: string;
+  LogOpts: any;
   CPUShares: any;
   Memory: any;
 }

@@ -37,6 +37,7 @@ export class ContainerListPage {
 
   private rmContainerTarget: any;
   private rmContainerModalOptions: any = {};
+  private forceDeletion: boolean = false;
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
@@ -184,10 +185,14 @@ export class ContainerListPage {
     this.rmContainerModalOptions.show = true;
   }
 
+  private enableForceDeletion(value: any){
+    this.forceDeletion = value.target.checked;
+  }
+
   private rmContainer() {
     let id = this.rmContainerTarget.Id.substring(0, 14);
     let name = this.rmContainerTarget.Names[0].substring(1);
-    this._containerService.delete(this.ip, id)
+    this._containerService.delete(this.ip, id, this.forceDeletion)
       .then((data) => {
         messager.success('succeed');
         this._logService.addLog(`Deleted container ${name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);

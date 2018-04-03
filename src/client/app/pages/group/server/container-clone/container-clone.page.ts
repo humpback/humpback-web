@@ -102,11 +102,13 @@ export class ContainerClonePage {
       Command: [data.Command],
       HostName: [''],
       NetworkMode: [data.NetworkMode],
-      RestartPolicy: [data.RestartPolicy],      
+      RestartPolicy: [data.RestartPolicy],
       Ports: this._fb.array([]),
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
+      LogDriver: data.LogDriver || 'json-file',
+      LogOpts: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
@@ -152,6 +154,19 @@ export class ContainerClonePage {
     if (data.Links) {
       let control = <FormArray>this.form.controls['Links'];
       data.Links.forEach((item: any) => {
+        control.push(this._fb.group({
+          "Value": [item]
+        }));
+      })
+    }
+
+    if(data.LogOpts){
+      let cloneOptsArr = [];
+      for(let key in data.LogOpts){
+        cloneOptsArr.push(`${key}=${data.LogOpts[key]}`)
+      }
+      let control = <FormArray>this.form.controls['LogOpts'];
+      cloneOptsArr.forEach((item: any) => {
         control.push(this._fb.group({
           "Value": [item]
         }));
@@ -290,11 +305,29 @@ export class ContainerClonePage {
     control.removeAt(i);
   }
 
+  private addLogOpt() {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLogOpt(i: number) {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.removeAt(i);
+  }
+
   private onSubmit() {
     this.submitted = true;
     if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
+    let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
+    let optsObj = {};
+    optsArr.forEach((item: any) => {
+      let splitArr = item.split('=');
+      optsObj[splitArr[0]] = splitArr[1];
+    })
     let config: IContainer = {
       Name: formData.Name,
       Image: formData.Image,
@@ -311,6 +344,8 @@ export class ContainerClonePage {
       Env: [],
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
+      LogDriver: formData.LogDriver,
+      LogOpts: optsObj,
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }

@@ -69,7 +69,7 @@
                   </td>
                   <td class="operate">
                     <div class="btn-group operate" [class.dropup]="last">
-                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">    
+                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-wrench"></i>
                       </button>
                       <ul class="dropdown-menu" role="menu">
@@ -154,7 +154,7 @@
                   <td>{{ item.Created | date:'yyyy-MM-dd HH:mm' }}</td>
                   <td>
                     <div class="operate">
-                      <button type="button" class="btn btn-sm btn-default" (click)="showRmImageModal(item)">    
+                      <button type="button" class="btn btn-sm btn-default" (click)="showRmImageModal(item)">
                         <i class="fa fa-close text-danger"></i>
                       </button>
                     </div>
@@ -179,6 +179,14 @@
   <div class="description" *ngIf="rmContainerTarget?.Names">
     Are you sure you want to delete
     <strong class="important-text">{{ rmContainerTarget?.Names[0].substring(1) }}</strong> ?
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" (change)="enableForceDeletion($event)">
+        <span class="text-danger">
+            You want to force delete
+        </span>
+      </label>
+    </div>
   </div>
   <hb-modal-footer>
     <button type="button" class="btn btn-default btn-flat" (click)="rmContainerModalOptions.show = fasle">Cancel</button>

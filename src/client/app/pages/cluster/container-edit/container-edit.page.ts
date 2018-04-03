@@ -83,6 +83,8 @@ export class ClusterContainerEditPage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
+      LogDriver: data.LogDriver || 'json-file',
+      LogOpts: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
@@ -146,9 +148,30 @@ export class ClusterContainerEditPage {
         });
       }
 
+      if(data.LogOpts){
+        let cloneOptsArr = [];
+        for(let key in data.LogOpts){
+          cloneOptsArr.push(`${key}=${data.LogOpts[key]}`)
+        }
+        let control = <FormArray>this.form.controls['LogOpts'];
+        cloneOptsArr.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Value": [item]
+          }));
+        })
+      }
+
       if (this.isClone) {
         this.form.controls['Name'].setValue('');
       }
+    }else{
+      let control = <FormArray>this.form.controls['LogOpts'];
+      control.push(this._fb.group({
+        "Value": ['max-size=10m']
+      }));
+      control.push(this._fb.group({
+        "Value": ['max-file=3']
+      }));
     }
 
     let restartSub = this.form.controls['RestartPolicy'].valueChanges.subscribe(value => {
@@ -239,6 +262,18 @@ export class ClusterContainerEditPage {
     control.removeAt(i);
   }
 
+  private addLogOpt() {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLogOpt(i: number) {
+    let control = <FormArray>this.form.controls['LogOpts'];
+    control.removeAt(i);
+  }
+
   private removeWebhook(index: number) {
     let hooksCtrl = <FormArray>this.form.controls['WebHooks'];
     hooksCtrl.removeAt(index);
@@ -257,6 +292,12 @@ export class ClusterContainerEditPage {
     if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
+    let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
+    let optsObj = {};
+    optsArr.forEach((item: any) => {
+      let splitArr = item.split('=');
+      optsObj[splitArr[0]] = splitArr[1];
+    })
     if (formData.WebHooks.length > 0) {
       let temp = {};
       let duplicates: Array<any> = [];
@@ -304,6 +345,8 @@ export class ClusterContainerEditPage {
         Env: (formData.Envs || []).map((item: any) => item.Value),
         Dns: formData.Dns,
         Links: [],
+        LogDriver: formData.LogDriver,
+        LogOpts: optsObj,
         CPUShares: formData.CPUShares || 0,
         Memory: formData.Memory || 0
       };

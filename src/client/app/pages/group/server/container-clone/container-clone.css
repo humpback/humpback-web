@@ -25,3 +25,11 @@
   min-width: unset;
   flex: unset;
 }
+
+.box-body .box-second-title{
+  margin-bottom: 10px;
+}
+
+.box-body .equal-fields{
+  margin-bottom: 10px;
+}
