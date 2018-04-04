@@ -116,7 +116,7 @@
               </li>
             </ul>
           </div>
-          <div *ngIf="container.Config?.LogConfig">
+          <div *ngIf="container.Config?.LogConfig?.Type">
             <p class="text-info title"><strong>Log Config</strong></p>
             <div *ngIf="container.Config?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">
                 <span *ngIf="container.Config?.LogConfig?.Type">Driver : {{ container.Config.LogConfig.Type }}</span>
@@ -254,10 +254,10 @@
     <div class="form-group" [ngClass]="{'has-error': upgradeContainerModalOptions.formSubmitted && newTagInput.invalid}">
       <label class="control-label">New Tag</label>
       <input type="text" autocomplete="off" class="form-control" name="newTag" [(ngModel)]="newTag" #newTagInput="ngModel" required
-        maxlength="10" pattern="^[0-9a-z._-]*$" [validateNotEqual]="container?.Config?.Image | imageNameFmt:'Tag'">
+        maxlength="128" pattern="^[0-9a-z._-]*$" [validateNotEqual]="container?.Config?.Image | imageNameFmt:'Tag'">
       <div [hidden]="newTagInput.valid || !upgradeContainerModalOptions.formSubmitted">
         <span class="help-block" *ngIf="newTagInput.errors?.required">Tag cannot be empty.</span>
-        <span class="help-block" *ngIf="newTagInput.errors?.maxlength">Tag cannot more than 10 characters.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.maxlength">Tag cannot more than 128 characters.</span>
         <span class="help-block" *ngIf="newTagInput.errors?.pattern">Tag must match ^[0-9a-z._-]*$.</span>
         <span class="help-block" *ngIf="newTagInput.errors?.validateNotEqual">New tag must be different with the old tag.</span>
       </div>
