@@ -198,8 +198,10 @@ export class ContainerNewPage {
       Env: (formData.Envs || []).map((item: any) => item.Value),
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
-      LogDriver: formData.LogDriver,
-      LogOpts: optsObj,
+      LogConfig: {
+        Type: formData.LogDriver,
+        Config: optsObj
+      },
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }

@@ -83,7 +83,7 @@ export class ClusterContainerEditPage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
-      LogDriver: data.LogDriver || 'json-file',
+      LogDriver: data.LogConfig ? (data.LogConfig.LogDriver  || 'json-file') : 'json-file',
       LogOpts: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
@@ -148,17 +148,19 @@ export class ClusterContainerEditPage {
         });
       }
 
-      if(data.LogOpts){
-        let cloneOptsArr = [];
-        for(let key in data.LogOpts){
-          cloneOptsArr.push(`${key}=${data.LogOpts[key]}`)
+      if(data.LogConfig){
+        if(data.LogConfig.Config){
+          let cloneOptsArr = [];
+          for(let key in data.LogConfig.Config){
+            cloneOptsArr.push(`${key}=${data.LogConfig.Config[key]}`)
+          }
+          let control = <FormArray>this.form.controls['LogOpts'];
+          cloneOptsArr.forEach((item: any) => {
+            control.push(this._fb.group({
+              "Value": [item]
+            }));
+          })
         }
-        let control = <FormArray>this.form.controls['LogOpts'];
-        cloneOptsArr.forEach((item: any) => {
-          control.push(this._fb.group({
-            "Value": [item]
-          }));
-        })
       }
 
       if (this.isClone) {
@@ -345,8 +347,10 @@ export class ClusterContainerEditPage {
         Env: (formData.Envs || []).map((item: any) => item.Value),
         Dns: formData.Dns,
         Links: [],
-        LogDriver: formData.LogDriver,
-        LogOpts: optsObj,
+        LogConfig: {
+          Type: formData.LogDriver,
+          Config: optsObj
+        },
         CPUShares: formData.CPUShares || 0,
         Memory: formData.Memory || 0
       };

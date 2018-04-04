@@ -107,7 +107,7 @@ export class ContainerClonePage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
-      LogDriver: data.LogDriver || 'json-file',
+      LogDriver: data.LogConfig ? (data.LogConfig.LogDriver  || 'json-file') : 'json-file',
       LogOpts: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
@@ -160,17 +160,19 @@ export class ContainerClonePage {
       })
     }
 
-    if(data.LogOpts){
-      let cloneOptsArr = [];
-      for(let key in data.LogOpts){
-        cloneOptsArr.push(`${key}=${data.LogOpts[key]}`)
+    if(data.LogConfig){
+      if(data.LogConfig.Config){
+        let cloneOptsArr = [];
+        for(let key in data.LogConfig.Config){
+          cloneOptsArr.push(`${key}=${data.LogConfig.Config[key]}`)
+        }
+        let control = <FormArray>this.form.controls['LogOpts'];
+        cloneOptsArr.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Value": [item]
+          }));
+        })
       }
-      let control = <FormArray>this.form.controls['LogOpts'];
-      cloneOptsArr.forEach((item: any) => {
-        control.push(this._fb.group({
-          "Value": [item]
-        }));
-      })
     }
 
     let restartSub = this.form.controls['RestartPolicy'].valueChanges.subscribe(value => {
@@ -320,6 +322,10 @@ export class ContainerClonePage {
   private onSubmit() {
     this.submitted = true;
     if (this.form.invalid) return;
+    if (!this.selectedServers || !this.selectedServers.length) {
+      messager.error('Please select one server at least');
+      return;
+    }
     let formData = _.cloneDeep(this.form.value);
 
     let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
@@ -344,8 +350,10 @@ export class ContainerClonePage {
       Env: [],
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
-      LogDriver: formData.LogDriver,
-      LogOpts: optsObj,
+      LogConfig: {
+        Type: formData.LogDriver,
+        Config: optsObj
+      },
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }

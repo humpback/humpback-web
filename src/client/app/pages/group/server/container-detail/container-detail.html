@@ -146,6 +146,30 @@
       </div>
     </li>
     <li>
+      <i class="fa fa-file-text"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          <span>Log Config</span>
+        </div>
+        <div class="timeline-body">
+          <div *ngIf="container.HostConfig?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">
+            <span *ngIf="container.HostConfig?.LogConfig?.Type">Driver : {{ container.HostConfig.LogConfig.Type }}</span>
+          </div>
+          <ul class="list-unstyled" *ngIf="container.HostConfig?.LogConfig?.Config | isEmptyObj">
+            <div style="padding-bottom: 10px;">
+              Opts :
+            </div>
+            <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let log of container.HostConfig?.LogConfig.Config | objLoop">
+              <span class="break-word">{{log.key}}={{ log.value }}</span>
+            </li>
+          </ul>
+          <span *ngIf="!(container.HostConfig?.LogConfig | isEmptyObj)">
+            No Log Config defined.
+          </span>
+        </div>
+      </div>
+    </li>
+    <li>
       <i class="fa fa-envira"></i>
       <div class="timeline-item">
         <div class="timeline-header">

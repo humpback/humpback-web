@@ -116,6 +116,20 @@
               </li>
             </ul>
           </div>
+          <div *ngIf="container.Config?.LogConfig">
+            <p class="text-info title"><strong>Log Config</strong></p>
+            <div *ngIf="container.Config?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">
+                <span *ngIf="container.Config?.LogConfig?.Type">Driver : {{ container.Config.LogConfig.Type }}</span>
+              </div>
+              <ul class="list-unstyled" *ngIf="container.Config?.LogConfig?.Config | isEmptyObj">
+                <div style="padding-bottom: 10px;">
+                  Opts :
+                </div>
+                <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let log of container.Config?.LogConfig.Config | objLoop">
+                  <span class="break-word">{{log.key}}={{ log.value }}</span>
+                </li>
+              </ul>
+          </div>
           <div *ngIf="container.WebHooks?.length > 0">
             <p class="text-info title"><strong>WebHooks</strong></p>
             <ul class="list-unstyled" *ngIf="container.WebHooks">

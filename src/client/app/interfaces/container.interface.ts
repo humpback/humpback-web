@@ -11,8 +11,7 @@ export interface IContainer {
   Env: IEnvironment[];
   Dns: string[];
   Links: ILink[];
-  LogDriver: string;
-  LogOpts: any;
+  LogConfig: any;
   CPUShares: any;
   Memory: any;
 }
@@ -21,6 +20,11 @@ export interface IPortBinding {
   PrivatePort: number;
   PublicPort: number;
   Type: string;
+}
+
+export interface LogConfig {
+  Type: string;
+  Config: any;
 }
 
 export interface IVolumeBinding {
