@@ -45,6 +45,21 @@ export class ContainerService {
     });
   }
 
+  getDockerInfo(ip: string, hidenLoading: boolean = false): Promise<any> {
+    let reqConfig = this.buildReq(ip, hidenLoading);
+    let url: string = `${reqConfig.url}/dockerinfo`;
+    return new Promise((resolve, reject) => {
+      this.http.get(url, reqConfig.options)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => {
+          let errData = JSON.parse(JSON.stringify(err));
+          reject(errData.json ? errData.json() : errData);
+        });
+    });
+  }
+
   getById(ip: string, id: string, formatted: boolean = false): Promise<any> {
     let reqConfig = this.buildReq(ip);
     let url: string = `${reqConfig.url}/containers/${id}?originaldata=${!formatted}`;

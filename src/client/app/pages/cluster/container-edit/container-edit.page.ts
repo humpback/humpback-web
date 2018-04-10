@@ -83,6 +83,7 @@ export class ClusterContainerEditPage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
+      EnableLogFile: data.LogConfig ? (data.LogConfig.Type ? 1 : 0) : 0,
       LogDriver: data.LogConfig ? (data.LogConfig.LogDriver  || 'json-file') : 'json-file',
       LogOpts: this._fb.array([]),
       Dns: [data.Dns],
@@ -291,15 +292,22 @@ export class ClusterContainerEditPage {
 
   private onSubmit() {
     this.submitted = true;
-    if (this.form.invalid) return;
+    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
+    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
+    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
+    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
+    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
+    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
     let formData = _.cloneDeep(this.form.value);
 
-    let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
     let optsObj = {};
-    optsArr.forEach((item: any) => {
-      let splitArr = item.split('=');
-      optsObj[splitArr[0]] = splitArr[1];
-    })
+    if(this.form.controls.EnableLogFile.value){
+      let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
+      optsArr.forEach((item: any) => {
+        let splitArr = item.split('=');
+        optsObj[splitArr[0]] = splitArr[1];
+      })
+    }
     if (formData.WebHooks.length > 0) {
       let temp = {};
       let duplicates: Array<any> = [];
@@ -354,6 +362,12 @@ export class ClusterContainerEditPage {
         CPUShares: formData.CPUShares || 0,
         Memory: formData.Memory || 0
       };
+      if(this.form.controls.EnableLogFile.value){
+        containerConfig.LogConfig = {
+          Type: formData.LogDriver,
+          Config: optsObj
+        }
+      }
       config.Config = containerConfig;
       config.GroupId = this.isClone ? this.selectedGroupId : this.groupInfo.ID;
       this._clusterService.addContainer(config)

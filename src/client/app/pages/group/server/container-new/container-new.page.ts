@@ -20,6 +20,7 @@ export class ContainerNewPage {
 
   private form: FormGroup;
   private submitted: boolean = false;
+  private hasGetDockerInfo: boolean = false;
 
   private subscribers: Array<any> = [];
 
@@ -43,13 +44,6 @@ export class ContainerNewPage {
         });
       this.ip = params["ip"];
       this.buildForm();
-      let control = <FormArray>this.form.controls['LogOpts'];
-      control.push(this._fb.group({
-        "Value": ['max-size=10m']
-      }));
-      control.push(this._fb.group({
-        "Value": ['max-file=3']
-      }));
     });
     this.subscribers.push(paramSub);
   }
@@ -70,6 +64,7 @@ export class ContainerNewPage {
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
+      EnableLogFile: 0,
       LogDriver: 'json-file',
       LogOpts: this._fb.array([]),
       Dns: [[]],
@@ -154,6 +149,36 @@ export class ContainerNewPage {
     }));
   }
 
+  private getTargetLogDriver(){
+    if(this.form.controls.LogDriver.value && this.form.controls.LogOpts.value.length == 0 && !this.hasGetDockerInfo){
+      this._containerService.getDockerInfo(this.ip)
+      .then((data:any) => {
+        if(data && data.LoggingDriver){
+          this.form.controls.LogDriver.setValue(data.LoggingDriver);
+        }
+        if(data && data.LoggingDriver == 'json-file'){
+          let control = <FormArray>this.form.controls['LogOpts'];
+          control.push(this._fb.group({
+            "Value": ['max-size=10m']
+          }));
+          control.push(this._fb.group({
+            "Value": ['max-file=3']
+          }));
+        }
+        this.hasGetDockerInfo = true;
+      })
+      .catch(err => {
+        let control = <FormArray>this.form.controls['LogOpts'];
+          control.push(this._fb.group({
+            "Value": ['max-size=10m']
+          }));
+          control.push(this._fb.group({
+            "Value": ['max-file=3']
+          }));
+      })
+    }
+  }
+
   private removeLink(i: number) {
     let control = <FormArray>this.form.controls['Links'];
     control.removeAt(i);
@@ -173,16 +198,23 @@ export class ContainerNewPage {
 
   private onSubmit() {
     this.submitted = true;
-    if (this.form.invalid) return;
+    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
+    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
+    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
+    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
+    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
+    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
     let formData = _.cloneDeep(this.form.value);
 
-    let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
     let optsObj = {};
-    optsArr.forEach((item: any) => {
-      let splitArr = item.split('=');
-      optsObj[splitArr[0]] = splitArr[1];
-    })
-    let config: IContainer = {
+    if(this.form.controls.EnableLogFile.value){
+      let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
+      optsArr.forEach((item: any) => {
+        let splitArr = item.split('=');
+        optsObj[splitArr[0]] = splitArr[1];
+      })
+    }
+    let config: any = {
       Name: formData.Name,
       Image: formData.Image,
       Command: formData.Command,
@@ -198,12 +230,14 @@ export class ContainerNewPage {
       Env: (formData.Envs || []).map((item: any) => item.Value),
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
-      LogConfig: {
-        Type: formData.LogDriver,
-        Config: optsObj
-      },
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
+    }
+    if(this.form.controls.EnableLogFile.value){
+      config.LogConfig = {
+        Type: formData.LogDriver,
+        Config: optsObj
+      }
     }
     this._containerService.create(this.ip, config)
       .then(data => {
