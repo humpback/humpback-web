@@ -16,15 +16,15 @@ Default Account
 Password: `123456`    
 
 # Docker image
-[![](https://images.microbadger.com/badges/image/humpbacks/humpback-web:1.0.1.svg)](https://microbadger.com/images/humpbacks/humpback-web:1.0.1 "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/version/humpbacks/humpback-web:1.0.1.svg)](https://microbadger.com/images/humpbacks/humpback-web:1.0.1 "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/humpbacks/humpback-web:1.3.0.svg)](https://microbadger.com/images/humpbacks/humpback-web:1.3.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/humpbacks/humpback-web:1.3.0.svg)](https://microbadger.com/images/humpbacks/humpback-web:1.3.0 "Get your own version badge on microbadger.com")
 ```bash
-$ docker pull humpbacks/humpback-web:1.0.1
+$ docker pull humpbacks/humpback-web:1.3.0
 
 $ docker run -d --net=host --restart=always -e HUMPBACK_LISTEN_PORT=8012 \
   -v /opt/app/humpback-web/dbFiles:/humpback-web/dbFiles \
   --name humpback-web \
-  humpbacks/humpback-web:1.0.1
+  humpbacks/humpback-web:1.3.0
 ```
 
 # Functions
