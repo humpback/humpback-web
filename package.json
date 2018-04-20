@@ -19,13 +19,16 @@
     },
     "homepage": "https://github.com/humpback/humpback-web#readme",
     "dependencies": {
+        "@types/js-yaml": "^3.11.1",
         "body-parser": "^1.17.1",
+        "brace": "^0.11.1",
         "compression": "^1.6.2",
         "console-stamp": "^0.2.5",
         "cookie-parser": "^1.4.3",
         "errorhandler": "^1.5.0",
         "express": "^4.15.2",
         "express-session": "^1.15.1",
+        "js-yaml": "^3.11.0",
         "nedb": "^1.8.0",
         "nedb-session-store": "^1.1.1",
         "uuid": "^3.0.1"

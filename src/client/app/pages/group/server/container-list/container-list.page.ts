@@ -42,6 +42,7 @@ export class ContainerListPage {
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
 
+  private aaa: Array<any> = [];
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
@@ -53,6 +54,28 @@ export class ContainerListPage {
   }
 
   ngOnInit() {
+    this.aaa =  [
+       {
+        "name": "Cat 2",
+        "competences": [{
+          "name": "Comp 3",
+          "users": 'aaaa'
+        }, {
+          "name": "Comp 4",
+          "users": 'bbb'
+        }, {
+          "name": "Comp N",
+          "users": 'ccc'
+        }]
+      },
+       {
+        "name": "Cat N",
+        "competences": [{
+          "name": "Comp 5",
+          "users": 'ddd'
+        }]
+      }
+    ];
     this.containerPageOption = {
       "boundaryLinks": false,
       "directionLinks": true,

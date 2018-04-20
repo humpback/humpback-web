@@ -105,6 +105,11 @@ td.operate {
   padding: 0 10px;
 }
 
+.td-components tbody > tr > td{
+  border: 1px solid #dddddd;
+  vertical-align: middle;
+}
+
 @media(max-width:1024px) {
   th.status, td.status {
     width: auto;

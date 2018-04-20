@@ -1,0 +1,56 @@
+<section class="content-header">
+  <h1> New Compose</h1>
+  <ol class="breadcrumb">
+    <li>
+      <i class="fa fa-th"></i> Container List
+    </li>
+    <li class="active">New Compose</li>
+  </ol>
+</section>
+<section class="content">
+  <form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+    <div class="form-group" [class.has-error]="submitted && form.controls.Name.invalid">
+      <label>Name</label>
+      <input type="text" class="form-control" formControlName="Name" maxlength="30" required pattern="^[0-9a-zA-Z-_.]*$">
+      <div *ngIf="submitted && form.controls.Name.invalid">
+        <span class="help-block" *ngIf="form.controls.Name.errors.required">Name is required.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.maxlength">Name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.pattern">Name cannot contain special characters.</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Compose Data</label>
+      <div class="form-control" style="margin-bottom: 10px;">
+        <input type="file" accept=".yml" (change)="selectedFileOnChanged($event)" style="outline: none;width: 100%;cursor: pointer;">
+      </div>
+      <div [class.has-error]="submitted && !form.value.Data">
+        <div class="flex-display">
+          <div class="btn-group btn-group-sm">
+            <label class="btn btn-sm btn-default" [class.active]="configInfo._sandMode == 'yaml'">Yaml</label>
+          </div>
+          <button type="button" class="btn btn-sm btn-default m-l-xs" (click)="showFullScreen('prd', prdEditor)">
+            <i class="fa fa-arrows-alt"></i>
+          </button>
+        </div>
+        <div class="editor ace-editor-panel" #prdEditor>
+          <div class="tool-bar">
+            <button type="button" class="btn btn-sm btn-default m-l-xs" (click)="showFullScreen('prd', prdEditor)">
+              <i class="fa fa-arrows-alt"></i>
+            </button>
+          </div>
+          <nd-ace-editor formControlName="Data" [mode]="configInfo._sandMode" (onLoad)="aceLoaded($event, 'prd')" name="SandboxValue"></nd-ace-editor>
+        </div>
+        <div *ngIf="submitted && !form.value.Data">
+          <span class="help-block">Compose data is required.</span>
+        </div>
+      </div>
+      <div class="alert alert-danger show" style="margin: 10px 0;" *ngIf="composeDataError">
+        {{ composeDataError }}
+      </div>
+    </div>
+    <div class="form-group">
+      <a class="btn bg-olive btn-flat" (click)="checkComposeData()">校验</a>
+      <button type="submit" class="btn bg-olive btn-flat">Save</button>
+    </div>
+  </form>
+</section>
