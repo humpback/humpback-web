@@ -1,0 +1,158 @@
+<section class="content-header">
+  <h1> Service Info <small>{{ container?.Config?.Name }}</small></h1>
+  <!-- <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/cluster', groupInfo.ID, 'overview']"><i class="fa fa-th"></i> Container List</a>
+    </li>
+    <li class="active">Detail</li>
+  </ol> -->
+</section>
+<section class="content">
+  <div class="btn-panel flex-display">
+    <div class="btn-group">
+      <button type="button" class="btn bg-olive btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        Operate&nbsp;&nbsp;
+        <span class="fa fa-caret-down"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" (click)="operate('start', $event)">Start</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('stop', $event)">Stop</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('restart', $event)">Restart</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('restart', $event)">Up</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" (click)="operate('restart', $event)">Down</a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="javascript:void(0)" (click)="showDeleteModal($event)">
+            <i class="fa fa-warning text-danger"></i> Delete
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- <a [routerLink]="['/cluster', groupInfo.ID, 'containers', metaId, 'clone']" class="btn btn-default btn-flat">
+      <i class="fa fa-copy"></i> Clone
+    </a> -->
+  </div>
+  <ul class="timeline" *ngIf="service">
+    <li>
+      <i class="fa fa-cog"></i>
+      <div class="timeline-item">
+        <div class="timeline-header flex-display">
+          <span>Compose Info (Yaml)</span>
+        </div>
+        <div class="timeline-body container-basic-info">
+          <!-- <nd-ace-editor formControlName="Data" [mode]="configInfo._sandMode" (onLoad)="aceLoaded($event, 'prd')" name="SandboxValue"></nd-ace-editor> -->
+          <nd-ace-editor disabled style="width:100%;height:220px;" [ngModel]="service.ComposeData" [mode]="composeDataConfig._sandMode" (onLoad)="aceLoaded($event, 'prd')" name="SandboxValue"></nd-ace-editor>
+          <div class="text-right">
+            <button style="width:auto;" type="button" class="btn bg-olive btn-flat" (click)="downloadComposeData()">
+              <i class="fa fa-download"></i>
+              Download Compose File
+            </button>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li>
+      <i class="fa fa-gears"></i>
+      <div class="timeline-item">
+        <div class="timeline-header">
+          Containers
+        </div>
+        <div class="timeline-body">
+          <div class="nav-tabs-custom flex-display" *ngIf="service.Containers | isEmptyObj">
+            <ul class="nav nav-tabs nav-stacked">
+              <li [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop)">
+                <a href="javascript:void(0)" (click)="changeTab(obj.Name)">
+                  {{ obj.value.Name }}
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content flex-1" style="padding-top: initial">
+              <div class="tab-pane" [attr.id]="'ins_'+obji" [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop); let obji = index;">
+                <div [attr.class]="'panel box box-'+getStatusCls(item.Status)" *ngFor="let item of obj.value.Containers; let i = index; let isFirst = first;" style="border-top-width: 2px;">
+                  <div class="box-header with-border">
+                    <h4 class="box-title">
+                      <a class="flex-display" data-toggle="collapse" [attr.data-parent]="'#ins_'+obji" [attr.href]="'#ins_'+obji+'_'+i" aria-expanded="false" [ngClass]="{'collapsed': !isFirst}">
+                        {{ item.Name?.substr(17) }}
+                        <span [attr.class]="'label label-'+getStatusCls(item.Status)" style="margin-left: 10px; font-size: 10px;">
+                          {{ getStatusText(item.Status) }}
+                        </span>
+                      </a>
+                    </h4>
+                  </div>
+                  <div [attr.id]="'ins_'+obji+'_'+i" class="panel-collapse collapse" [ngClass]="{'in': isFirst}" aria-expanded="false">
+                    <div class="box-body">
+                      <div>
+                        <p>
+                          <a href="javascript: void(0)" (click)="showLogsView(obj.key, item)">
+                            View Logs
+                          </a>
+                        </p>
+                        <p class="text-info title" style="margin-top: initial">
+                          <strong>Status</strong>
+                        </p>
+                        <ul class="list-unstyled">
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="item.NetworkMode == 'host'">
+                            HostName: {{ item.HostName }}
+                          </li>
+                          <li value="-" class="flex-display flex-align-center custom-list">
+                            Pid: {{ item.Status.Pid }}
+                          </li>
+                          <li value="-" class="flex-display flex-align-center custom-list">
+                            StartAt: {{ item.Status.StartedAt | date:'yyyy/MM/dd HH:mm' }}
+                          </li>
+                        </ul>
+                      </div>
+                      <div *ngIf="item.Ports?.length > 0">
+                        <p class="text-info title"><strong>Ports Binding</strong></p>
+                        <ul class="list-unstyled">
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let port of item.Ports">
+                            <span class="no-margin" *ngIf="port.PublicPort > 0">
+                              {{ (port.Ip || '0.0.0.0') + ":" + port.PublicPort }}
+                            </span>
+                            <i class="fa fa-long-arrow-right"></i> {{ port.PrivatePort }}
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info" *ngIf="!(instances | isEmptyObj)">
+            No instances.
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- Modal Define Begin -->
+<!-- <hb-modal [options]="deleteContainerModalOptions">
+  <p>Are you sure you want to delete <strong class="text-danger">{{ container?.Config?.Name }}</strong>?</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="deleteContainerModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="deleteContainer()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal>
+
+<hb-modal [options]="reAssignConfirmModalOptions">
+  <p>Are you sure you want to reassign <strong class="text-danger">{{ container?.Config?.Name }}</strong>?</p>
+  <p>This may cause service interruption for a few seconds!</p>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="reAssignConfirmModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="reAssign()">Confirm</button>
+  </hb-modal-footer>
+</hb-modal> -->
+<!-- Modal Define End -->

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ContainerService, GroupService, ImageService, LogService } from './../../../../services';
+import { ContainerService, GroupService, ImageService, LogService, ComposeService } from './../../../../services';
+import * as fileSaver from 'file-saver';
+import { RegExp } from 'core-js/library/web/timers';
 
 declare let _: any;
 declare let messager: any;
@@ -28,6 +30,15 @@ export class ContainerListPage {
   private currentImages: Array<any> = [];
   private imagePageIndex: number = 1;
 
+  private serviceInfo: Array<any> = [];
+  private filterServiceDone: boolean;
+  private filterServices: Array<any> = [];
+  private serviceFilter: string;
+  private currentServices: Array<any> = [];
+  private servicePageIndex: number = 1;
+  private hasFailedContainer: boolean = false;
+
+
   private subscribers: Array<any> = [];
 
   private activedTab: string = 'containers';
@@ -42,11 +53,11 @@ export class ContainerListPage {
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
 
-  private aaa: Array<any> = [];
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
     private _containerService: ContainerService,
+    private _composeService: ComposeService,
     private _groupService: GroupService,
     private _imageService: ImageService,
     private _logService: LogService) {
@@ -54,28 +65,7 @@ export class ContainerListPage {
   }
 
   ngOnInit() {
-    this.aaa =  [
-       {
-        "name": "Cat 2",
-        "competences": [{
-          "name": "Comp 3",
-          "users": 'aaaa'
-        }, {
-          "name": "Comp 4",
-          "users": 'bbb'
-        }, {
-          "name": "Comp N",
-          "users": 'ccc'
-        }]
-      },
-       {
-        "name": "Cat N",
-        "competences": [{
-          "name": "Comp 5",
-          "users": 'ddd'
-        }]
-      }
-    ];
+
     this.containerPageOption = {
       "boundaryLinks": false,
       "directionLinks": true,
@@ -117,10 +107,17 @@ export class ContainerListPage {
     this.filterContainers = [];
     this.filterContainerDone = false;
     this.currentContainers = [];
+
     this.images = [];
     this.filterImages = [];
     this.filterImageDone = false;
     this.currentImages = [];
+
+    this.serviceInfo = [];
+    this.filterServices = [];
+    this.filterServiceDone = false;
+    this.currentServices = [];
+
     this.activedTab = 'containers';
     this.getContainers();
   }
@@ -129,6 +126,9 @@ export class ContainerListPage {
     this.activedTab = tab;
     if (tab === 'images' && this.images.length === 0) {
       this.getImages();
+    }
+    if (tab === 'service' && this.serviceInfo.length === 0) {
+      this.getService();
     }
   }
 
@@ -147,6 +147,32 @@ export class ContainerListPage {
       .catch(err => {
         messager.error(err.message || "Get containers failed");
       });
+  }
+
+  private getService() {
+    this._composeService.getService(this.ip)
+      .then(data => {
+        this.serviceInfo = _.sortBy(data, 'Name');
+        this.filterService();
+      })
+  }
+
+  private getContainerStatus(status: any) {
+    let cls = 'success';
+    if (status.indexOf('Paused') !== -1 || status.indexOf('Restarting') !== -1 || status === 'Created') {
+      cls = 'warning';
+      this.hasFailedContainer = true;
+    }else{
+      //是否存在失败的container
+      this.hasFailedContainer = false;
+    }
+    if (status.startsWith('Exited')) {
+      cls = 'danger';
+      this.hasFailedContainer = true;
+    }else{
+      this.hasFailedContainer = false;
+    }
+    return cls;
   }
 
   private filterContainerTimeout: any;
@@ -208,7 +234,7 @@ export class ContainerListPage {
     this.rmContainerModalOptions.show = true;
   }
 
-  private enableForceDeletion(value: any){
+  private enableForceDeletion(value: any) {
     this.forceDeletion = value.target.checked;
   }
 
@@ -283,6 +309,35 @@ export class ContainerListPage {
     this.currentImages = this.filterImages.slice(start, end);
   }
 
+  private filterServiceTimeout: any;
+  private filterService(value?: any) {
+    this.serviceFilter = value || '';
+    if (this.filterServiceTimeout) {
+      clearTimeout(this.filterServiceTimeout);
+    }
+    this.filterServiceTimeout = setTimeout(() => {
+      let keyWord = this.serviceFilter;
+      if (!keyWord) {
+        this.filterServices = this.serviceInfo;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterServices = this.serviceInfo.filter(item => {
+          return regex.test(item.Name);
+        })
+      }
+      this.setServicePage(this.servicePageIndex);
+      this.filterServiceDone = true;
+    }, 100);
+  }
+
+  private setServicePage(pageIndex: number) {
+    this.servicePageIndex = pageIndex;
+    if (!this.filterServices) return;
+    let start = (pageIndex - 1) * this.pageSize;
+    let end = start + this.pageSize;
+    this.currentServices = this.filterServices.slice(start, end);
+  }
+
   private showPullImageModal() {
     this.pullImageModalOptions.formSubmitted = false;
     this.pullImageModalOptions.show = true;
@@ -334,5 +389,23 @@ export class ContainerListPage {
       .catch(err => {
         messager.error(err.Detail || err);
       });
+  }
+
+  private ServiceOperate(service: any, action: any) {
+    this._composeService.ComposeOperate(this.ip, service.Name, action)
+      .then(data => {
+        messager.success('succeed');
+        // this._logService.addLog(`${action}ed container ${name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
+        this.getService();
+      })
+      .catch(err => {
+        messager.error(err.Detail || err);
+      });
+  }
+
+  private downloadComposeData(item: any) {
+    let content = item.ComposeData;
+    let blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    fileSaver.saveAs(blob, "content.yml")
   }
 }

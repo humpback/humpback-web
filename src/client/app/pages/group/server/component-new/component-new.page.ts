@@ -1,8 +1,10 @@
 import { Component, Renderer  } from "@angular/core";
 import { FormGroup, FormBuilder} from "@angular/forms"
-import { CusHttpService } from '../../../../services/custom-http.service';
+import { ComposeService } from '../../../../services/compose.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import * as jsYaml from 'js-yaml';
+import * as fileSaver from 'file-saver';
 
 declare let messager: any;
 
@@ -19,9 +21,12 @@ export class ComponentNewPage {
   private configInfo: any;
   private composeDataError: any;
   private submitted: boolean = false;
+  private ip: any;
+  private subscribers: Array<any> = [];
 
   constructor(
-    private _http: CusHttpService,
+    private _route: ActivatedRoute,
+    private _composeService: ComposeService,
     private _renderer: Renderer,
     private _fb: FormBuilder,
   ){
@@ -78,6 +83,10 @@ export class ComponentNewPage {
   }
 
   ngOnInit(){
+    let paramSub = this._route.params.subscribe(params => {
+      this.ip = params['ip'];
+    });
+    this.subscribers.push(paramSub);
     this.buildForm();
     this.configInfo = {
       // SystemId: this.systemId,
@@ -90,7 +99,10 @@ export class ComponentNewPage {
       _prdEnableCanary: false,
       _sandEnableCanary: false
     }
+  }
 
+  ngOnDestroy() {
+    this.subscribers.forEach(item => item.unsubscribe());
   }
 
   private showFullScreen(env: string, container: HTMLDivElement) {
@@ -107,25 +119,31 @@ export class ComponentNewPage {
     try {
       let doc = jsYaml.safeLoad(this.form.value.Data);
       this.composeDataError = '';
-      console.log(doc);
     } catch (e) {
-      console.log(e);
       this.composeDataError = e.message;
     }
   }
 
+  private downloadComposeData(){
+    let content = this.form.value.Data;
+    let blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+    fileSaver.saveAs(blob, "content.yml")
+  }
 
   private onSubmit(){
     this.submitted = true;
     let form = this.form;
     if (form.invalid) return;
+    this.checkComposeData();
+    if(this.composeDataError) return;
     let config: any = {
       Name: form.value.Name,
       ComposeData: `${form.value.Data}`
     }
-    console.log(JSON.parse(JSON.stringify(config)));
-    this._http.post('http://10.16.85.173:8550/dockerapi/v2/projects', JSON.parse(JSON.stringify(config)))
-    .then(data => console.log(data))
-    .catch(err => messager.error(err.Detail || err))
+    this._composeService.addCompose(this.ip,JSON.parse(JSON.stringify(config)))
+      .then(data => {
+        // this._router.navigate(['/group']);
+      })
+      .catch(err => messager.error(err.Detail || err))
   }
 }

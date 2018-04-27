@@ -1,20 +1,22 @@
 <section class="content-header">
-  <h1> Server Overview <small>{{ ip }}</small></h1>
+  <h1> Server Overview
+    <small>{{ ip }}</small>
+  </h1>
 </section>
 <section class="content">
   <div class="nav-tabs-custom">
     <ul class="nav nav-tabs pull-right">
       <li class="pull-left header">
-        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : 'Docker Images' }}
-      </li>
-      <li [ngClass]="{'active': activedTab == 'components'}">
-        <a href="javascript:void(0)" (click)="changeTab('components')">Compose</a>
+        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : (activedTab == 'images' ? 'Docker Images' : 'Compose') }}
       </li>
       <li [ngClass]="{'active': activedTab == 'images'}">
         <a href="javascript:void(0)" (click)="changeTab('images')">Docker Images</a>
       </li>
       <li [ngClass]="{'active': activedTab == 'containers'}">
         <a href="javascript:void(0)" (click)="changeTab('containers')">Containers</a>
+      </li>
+      <li [ngClass]="{'active': activedTab == 'service'}">
+        <a href="javascript:void(0)" (click)="changeTab('service')">Services</a>
       </li>
     </ul>
     <div class="tab-content no-padding">
@@ -25,7 +27,7 @@
               <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
                 <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [ngModel]="containerFilter"
                   (ngModelChange)="filterContainer($event)">
-                  <span class="fa fa-search form-control-feedback"></span>
+                <span class="fa fa-search form-control-feedback"></span>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
@@ -117,7 +119,7 @@
           <div class="box-footer clearfix">
             <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
               (onSelectPage)="setContainerPage($event)">
-              </hb-pagination>
+            </hb-pagination>
           </div>
         </div>
       </div>
@@ -128,7 +130,7 @@
               <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
                 <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [ngModel]="imageFilter"
                   (ngModelChange)="filterImage($event)">
-                  <span class="fa fa-search form-control-feedback"></span>
+                <span class="fa fa-search form-control-feedback"></span>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <button class="btn bg-olive btn-sm btn-flat" (click)="showPullImageModal()">
@@ -173,7 +175,7 @@
         </div>
       </div>
 
-      <div class="tab-pane" [ngClass]="{'active': activedTab == 'components'}">
+      <div class="tab-pane" [ngClass]="{'active': activedTab == 'service'}">
         <div class="box no-border">
           <div class="box-body">
             <div class="flex-display">
@@ -183,72 +185,77 @@
                 <span class="fa fa-search form-control-feedback"></span>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
-                  <a [routerLink]="['/group', groupInfo.ID, ip, 'new-component']" class="btn btn-sm bg-olive btn-flat">
-                    <i class="fa fa-plus"></i> Add Component
-                  </a>
-                </div>
+                <a [routerLink]="['/group', groupInfo.ID, ip, 'new-component']" class="btn btn-sm bg-olive btn-flat">
+                  <i class="fa fa-plus"></i> Add Component
+                </a>
+              </div>
             </div>
             <div class="alert alert-info" *ngIf="!filterImages?.length && filterImageDone">
               <i class="fa-fw fa fa-info"></i> No components found
             </div>
-            <table class="table table-hover table-bordered td-components">
+            <table class="table table-hover table-bordered">
               <thead>
                 <tr>
+                  <th></th>
                   <th>Name</th>
-                  <th>containers</th>
-                  <!-- <th>status</th> -->
+                  <th>Create Time</th>
                   <th>Virual Size</th>
-                  <th>Created</th>
                   <th></th>
                 </tr>
               </thead>
-              <tbody *ngFor="let category of aaa;let i = index;">
-                <tr>
-                  <td [attr.rowspan]="category.competences.length">
-                    <div style="margin: 10px;">
-                      <i class="fa fa-circle text-success small"></i>
-                      {{ category.name }}
-                    </div>
-                  </td>
-                  <td>{{ category.competences[0].name }}</td>
-                  <td>{{category.competences[0].users}}</td>
-                  <td>12345</td>
+              <tbody>
+                <tr *ngFor="let item of currentServices; let last = last;">
                   <td>
-                    <div class="operate">
-                      <button type="button" class="btn btn-sm btn-default" (click)="showRmImageModal(item)">
-                        <i class="fa fa-close text-danger"></i>
-                      </button>
-                    </div>
+                    <i class="fa fa-circle text-success" title="Health"></i>
                   </td>
-                  <td [attr.rowspan]="category.competences.length" class="operate">
-                    <div class="btn-group operate" [class.dropup]="last">
+                  <td>
+                    <a [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">
+                      {{ item.Name }}
+                    </a>
+                  </td>
+                  <td>{{ item.Timestamp | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                  <td>
+                    <div class="flex-display">
+                        <div *ngFor="let obj of (item.Containers | objLoop)">
+                          <!-- <i class="fa fa-circle text-success" *ngIf="obj.value.Stopped == 0"></i> -->
+                          <!-- <i class="fa fa-circle text-warning" *ngIf="obj.value.Stopped != 0 && obj.value.Running != 0"></i> -->
+                          <i class="fa fa-circle text-{{getContainerStatus(obj.value.State)}}"></i>
+                          {{ obj.value.Name }}
+                        </div>
+                      </div>
+                  </td>
+                  <td class="operate">
+                    <div class="btn-group operate" [class.dropup]="last && !first">
                       <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-wrench"></i>
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li>
-                          <a href="javascript:void(0)" (click)="operate(item, 'restart')">
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'restart')">
                             <i class="fa fa-refresh text-success"></i> Restart
                           </a>
                         </li>
                         <li>
-                          <a href="javascript:void(0)" (click)="operate(item, 'stop')">
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'stop')">
                             <i class="fa fa-stop"></i> Stop
                           </a>
                         </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'start')">
+                            <i class="fa fa-play text-success"></i> Start
+                          </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
+                            <i class="fa fa-trash text-danger"></i> Delete
+                          </a>
+                        </li>
+                        <li>
+                          <a title="Download Compose File" href="javascript:void(0)" (click)="downloadComposeData(item)">
+                            <i class="fa fa-download"></i> Download
+                          </a>
+                        </li>
                       </ul>
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngFor="let item of category.competences.slice(1)">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.users }}</td>
-                  <td>32434</td>
-                  <td>
-                    <div class="operate">
-                      <button type="button" class="btn btn-sm btn-default" (click)="showRmImageModal(item)">
-                        <i class="fa fa-close text-danger"></i>
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -256,12 +263,12 @@
             </table>
           </div>
           <div class="box-footer clearfix">
-            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)"
-              *ngIf="filterImages?.length > 0">
+            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)">
             </hb-pagination>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -276,7 +283,7 @@
       <label>
         <input type="checkbox" (change)="enableForceDeletion($event)">
         <span class="text-danger">
-            You want to force delete
+          You want to force delete
         </span>
       </label>
     </div>
@@ -292,11 +299,11 @@
     <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
       <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
         autocomplete="off" #imageName="ngModel" required maxlength="30" pattern="^[0-9a-z.\/:_-]*$">
-        <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
-          <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
-          <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
-          <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
-        </div>
+      <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
+        <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
+      </div>
     </div>
     <div class="form-group text-right">
       <button type="button" class="btn btn-default btn-flat" (click)="pullImageModalOptions.show = fasle">Cancel</button>
@@ -307,7 +314,8 @@
 
 <hb-modal [options]="rmImageModalOptions">
   <div class="description" *ngIf="rmImageTarget?._repo">
-    Are you sure you want to delete <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
+    Are you sure you want to delete
+    <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
   </div>
   <hb-modal-footer>
     <button type="button" class="btn btn-default btn-flat" (click)="rmImageModalOptions.show = fasle">Cancel</button>

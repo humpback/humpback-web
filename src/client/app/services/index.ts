@@ -12,11 +12,13 @@ import { LogService } from './log.service';
 import { MostUsedService } from './most-used.service';
 import { EventNotifyService } from './event-notify.service';
 import { UserService } from './user.service';
+import { ComposeService } from './compose.service';
 import { SystemConfigService } from './system-config.service';
 
 export * from './auth-guard.service';
 export * from './auth.service';
 export * from './group.service';
+export * from './compose.service';
 export * from './cluster.service';
 export * from './dashboard.service';
 export * from './container.service';
@@ -35,6 +37,7 @@ let Services: Array<any> = [
   IsGroupOwner,
   AuthService,
   GroupService,
+  ComposeService,
   ClusterService,
   DashboardService,
   ContainerService,
