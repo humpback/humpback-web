@@ -47,7 +47,8 @@ export class ComposeService {
           resolve(res.json ? res.json() : res.text());
         })
         .catch(err => {
-          reject(err.json ? err.json() : err);
+          let errData = JSON.parse(JSON.stringify(err));
+          reject(errData.json ? errData.json() : errData);
         });
     });
   }

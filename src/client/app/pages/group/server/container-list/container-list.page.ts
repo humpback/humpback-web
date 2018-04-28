@@ -118,18 +118,27 @@ export class ContainerListPage {
     this.filterServiceDone = false;
     this.currentServices = [];
 
-    this.activedTab = 'containers';
-    this.getContainers();
+    if(sessionStorage.getItem('serverTab') == 'service'){
+      this.activedTab = 'service';
+      this.getService();
+    }else{
+      this.activedTab = 'containers';
+      this.getContainers();
+    }
   }
 
   private changeTab(tab: string) {
     this.activedTab = tab;
+    if (tab === 'containers' && this.containers.length === 0) {
+      this.getContainers();
+    }
     if (tab === 'images' && this.images.length === 0) {
       this.getImages();
     }
     if (tab === 'service' && this.serviceInfo.length === 0) {
       this.getService();
     }
+    sessionStorage.setItem('serverTab', tab);
   }
 
   private getContainers() {
@@ -154,6 +163,9 @@ export class ContainerListPage {
       .then(data => {
         this.serviceInfo = _.sortBy(data, 'Name');
         this.filterService();
+      })
+      .catch(err => {
+        messager.error(err.message || "Get services failed");
       })
   }
 

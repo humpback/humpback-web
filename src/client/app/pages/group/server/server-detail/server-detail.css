@@ -3,6 +3,10 @@
   flex-wrap: wrap;
 }
 
+.panel.box .box-header{
+  box-shadow: 0px 5px 10px lightgrey;
+}
+
 .btn-panel .btn-group {
   margin-right: initial;
 }

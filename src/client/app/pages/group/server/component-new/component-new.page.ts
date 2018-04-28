@@ -1,6 +1,6 @@
 import { Component, Renderer  } from "@angular/core";
 import { FormGroup, FormBuilder} from "@angular/forms"
-import { ComposeService } from '../../../../services/compose.service';
+import { ComposeService, GroupService } from '../../../../services';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import * as jsYaml from 'js-yaml';
@@ -22,11 +22,15 @@ export class ComponentNewPage {
   private composeDataError: any;
   private submitted: boolean = false;
   private ip: any;
+  private groupInfo: any;
+  private groupId: any;
   private subscribers: Array<any> = [];
 
   constructor(
+    private _router: Router,
     private _route: ActivatedRoute,
     private _composeService: ComposeService,
+    private _groupService: GroupService,
     private _renderer: Renderer,
     private _fb: FormBuilder,
   ){
@@ -85,6 +89,12 @@ export class ComponentNewPage {
   ngOnInit(){
     let paramSub = this._route.params.subscribe(params => {
       this.ip = params['ip'];
+      this.groupId = params["groupId"];
+      // this.groupInfo = { ID: groupId };
+      // this._groupService.getById(groupId)
+      //   .then(data => {
+      //     this.groupInfo = data;
+      //   });
     });
     this.subscribers.push(paramSub);
     this.buildForm();
@@ -142,7 +152,7 @@ export class ComponentNewPage {
     }
     this._composeService.addCompose(this.ip,JSON.parse(JSON.stringify(config)))
       .then(data => {
-        // this._router.navigate(['/group']);
+        this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
       })
       .catch(err => messager.error(err.Detail || err))
   }

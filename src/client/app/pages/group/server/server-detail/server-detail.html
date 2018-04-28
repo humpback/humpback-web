@@ -70,26 +70,29 @@
         <div class="timeline-body">
           <div class="nav-tabs-custom flex-display" *ngIf="service.Containers | isEmptyObj">
             <ul class="nav nav-tabs nav-stacked">
-              <li [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop)">
-                <a href="javascript:void(0)" (click)="changeTab(obj.Name)">
+              <li [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop); let obji = index;">
+                <a href="javascript:void(0)" (click)="changeTab(obj.value.Name, obj.value.Id)">
                   {{ obj.value.Name }}
                 </a>
               </li>
             </ul>
             <div class="tab-content flex-1" style="padding-top: initial">
-              <div class="tab-pane" [attr.id]="'ins_'+obji" [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop); let obji = index;">
-                <div [attr.class]="'panel box box-'+getStatusCls(item.Status)" *ngFor="let item of obj.value.Containers; let i = index; let isFirst = first;" style="border-top-width: 2px;">
+              <div class="tab-pane" [attr.id]="'ins_'+obji" [ngClass]="{'active': activedTab == obj.value.Name}" *ngFor="let obj of (service.Containers | objLoop); let i = index; let isFirst = first;">
+                <div [attr.class]="'panel box box-'+getContainerStatus(obj.value.State)" style="border-top-width: 2px;">
                   <div class="box-header with-border">
                     <h4 class="box-title">
                       <a class="flex-display" data-toggle="collapse" [attr.data-parent]="'#ins_'+obji" [attr.href]="'#ins_'+obji+'_'+i" aria-expanded="false" [ngClass]="{'collapsed': !isFirst}">
-                        {{ item.Name?.substr(17) }}
-                        <span [attr.class]="'label label-'+getStatusCls(item.Status)" style="margin-left: 10px; font-size: 10px;">
-                          {{ getStatusText(item.Status) }}
+                        {{ obj.value.Name }}
+                        <span style="margin-left: 10px;font-size: 10px;" class="label" [ngClass]="{
+                          'label-success': container.State?.StateText == 'Running',
+                          'label-warning': container.State?.Paused || container.State?.Restarting,
+                          'label-danger': container.State?.Dead || !container.State?.Running }">
+                          {{ container.State?.StateText }}
                         </span>
                       </a>
                     </h4>
                   </div>
-                  <div [attr.id]="'ins_'+obji+'_'+i" class="panel-collapse collapse" [ngClass]="{'in': isFirst}" aria-expanded="false">
+                  <div [attr.id]="'ins_'+obji+'_'+i" class="panel-collapse" [ngClass]="{'in': isFirst}" aria-expanded="false">
                     <div class="box-body">
                       <div>
                         <p>
@@ -97,39 +100,65 @@
                             View Logs
                           </a>
                         </p>
+                        <p>
+                          <a  [routerLink]="['/group', groupId, this.ip, 'containers', obj.value.Name]" href="javascript: void(0)">
+                            More Detail
+                          </a>
+                        </p>
                         <p class="text-info title" style="margin-top: initial">
                           <strong>Status</strong>
                         </p>
                         <ul class="list-unstyled">
-                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="item.NetworkMode == 'host'">
-                            HostName: {{ item.HostName }}
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="container.Config?.Hostname">
+                            HostName: {{ container.Config.Hostname }}
                           </li>
-                          <li value="-" class="flex-display flex-align-center custom-list">
-                            Pid: {{ item.Status.Pid }}
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="container.State?.Pid">
+                            Pid: {{ container.State.Pid }}
                           </li>
-                          <li value="-" class="flex-display flex-align-center custom-list">
-                            StartAt: {{ item.Status.StartedAt | date:'yyyy/MM/dd HH:mm' }}
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="container.State?.StartedAt">
+                            StartAt: {{ container.State.StartedAt | date:'yyyy/MM/dd HH:mm' }}
                           </li>
                         </ul>
                       </div>
-                      <div *ngIf="item.Ports?.length > 0">
+
+
+                      <div *ngIf="container.Config?.Image">
+                        <p class="text-info title"><strong>Image</strong></p>
+                        <ul class="list-unstyled">
+                          <li class="flex-display flex-align-center custom-list break-word">
+                            {{ container.Config.Image }}
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div *ngIf="container.Path && container.Args">
+                        <p class="text-info title"><strong>Command</strong></p>
+                        <ul class="list-unstyled">
+                          <li class="flex-display flex-align-center custom-list break-word">
+                            {{ getContainerCommand() }}
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div *ngIf="container.formettedPortsBindings | isEmptyObj">
                         <p class="text-info title"><strong>Ports Binding</strong></p>
                         <ul class="list-unstyled">
-                          <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let port of item.Ports">
-                            <span class="no-margin" *ngIf="port.PublicPort > 0">
-                              {{ (port.Ip || '0.0.0.0') + ":" + port.PublicPort }}
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let entry of container.formettedPortsBindings | objLoop">
+                            <span class="no-margin" *ngFor="let item of entry.value">
+                              {{ (item.HostIp || '0.0.0.0') + ":" + item.HostPort }}
                             </span>
-                            <i class="fa fa-long-arrow-right"></i> {{ port.PrivatePort }}
+                            <i class="fa fa-long-arrow-right"></i> {{ entry.key }}
                           </li>
                         </ul>
                       </div>
+
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="alert alert-info" *ngIf="!(instances | isEmptyObj)">
+          <div class="alert alert-info" *ngIf="!(service.Containers | isEmptyObj)">
             No instances.
           </div>
         </div>
