@@ -18,6 +18,26 @@
         <span class="help-block" *ngIf="form.controls.Name.errors.pattern">Name cannot contain special characters.</span>
       </div>
     </div>
+
+    <div class="form-group" style="margin-bottom: 25px;">
+      <div class="checkbox">
+        <label style="font-weight: 700;">
+          <input type="checkbox" formControlName="EnablePackageFile">
+          Package File
+        </label>
+      </div>
+      <div class="well well-sm" *ngIf="form.controls.EnablePackageFile.value">
+        <div class="form-group">
+          <div class="form-control" style="margin-bottom: 10px;">
+            <input id="packagefile" name="packagefile" (change)="packageFileOnChanged($event)" type="file" accept="application/gzip, .gz" enctype="multipart/form-data" style="outline: none;width: 100%;cursor: pointer;">
+            <p class="text-danger margin-top-5" style="margin: 5px 0;">
+              Please compress your folder as <strong>tar.gz</strong> archive.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label>Compose Data</label>
       <div class="form-control" style="margin-bottom: 10px;">
@@ -50,7 +70,6 @@
     </div>
     <div class="form-group">
       <a class="btn bg-olive btn-flat" (click)="checkComposeData()">校验</a>
-      <a class="btn bg-olive btn-flat" (click)="downloadComposeData()">下载</a>
       <button type="submit" class="btn bg-olive btn-flat">Save</button>
     </div>
   </form>

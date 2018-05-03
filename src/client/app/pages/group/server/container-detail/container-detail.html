@@ -38,17 +38,19 @@
         </li>
       </ul>
     </div>
-    <button type="button" class="btn btn-default btn-flat" (click)="showRenameModal()">
-      <i class="fa fa-exchange"></i>
-      Rename
-    </button>
-    <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
-      <i class="fa fa-arrow-circle-up"></i>
-      Upgrade
-    </button>
-    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'clone']">
-      <i class="fa fa-clone"></i> Clone
-    </a>
+    <div *ngIf="!isComposedData">
+      <button type="button" class="btn btn-default btn-flat" (click)="showRenameModal()">
+        <i class="fa fa-exchange"></i>
+        Rename
+      </button>
+      <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
+        <i class="fa fa-arrow-circle-up"></i>
+        Upgrade
+      </button>
+      <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'clone']">
+        <i class="fa fa-clone"></i> Clone
+      </a>
+    </div>
     <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'monitor']">
       <i class="fa fa-line-chart"></i> Monitor
     </a>

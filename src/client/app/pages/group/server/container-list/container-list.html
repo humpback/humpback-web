@@ -182,8 +182,13 @@
             <div class="flex-display">
               <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
                 <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [ngModel]="imageFilter"
-                  (ngModelChange)="filterImage($event)">
+                  (ngModelChange)="filterService($event)">
                 <span class="fa fa-search form-control-feedback"></span>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <button class="btn btn-olive btn-sm btn-flat" (click)="getService()">
+                  <i class="fa fa-refresh"></i> Refresh
+                </button>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <a [routerLink]="['/group', groupInfo.ID, ip, 'new-component']" class="btn btn-sm bg-olive btn-flat">
@@ -200,14 +205,16 @@
                   <th></th>
                   <th>Name</th>
                   <th>Create Time</th>
-                  <th>Virual Size</th>
+                  <th>Containers</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of currentServices; let last = last;">
                   <td>
-                    <i class="fa fa-circle text-success" title="Health"></i>
+                    <i class="fa fa-circle text-success" title="Health" *ngIf="item.Containers.length == item.Running"></i>
+                    <i class="fa fa-circle text-warning" title="Not Health" *ngIf="item.Running < containerNum && item.Running > 0"></i>
+                    <i class="fa fa-circle text-danger" title="Danger" *ngIf="item.Running == 0"></i>
                   </td>
                   <td>
                     <a [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">

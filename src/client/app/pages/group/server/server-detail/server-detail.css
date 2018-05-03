@@ -46,3 +46,11 @@ div.timeline-body li>i.fa {
   padding: 5px;
   font-weight: bolder;
 }
+
+.logs-panel {
+  padding: 10px;
+  background: rgba(34, 45, 50, .7);
+  color: lightsteelblue;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+}

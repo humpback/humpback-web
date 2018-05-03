@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ContainerService, GroupService, ImageService, LogService, ComposeService } from './../../../../services';
 import * as fileSaver from 'file-saver';
-import { RegExp } from 'core-js/library/web/timers';
 
 declare let _: any;
 declare let messager: any;
@@ -37,7 +36,6 @@ export class ContainerListPage {
   private currentServices: Array<any> = [];
   private servicePageIndex: number = 1;
   private hasFailedContainer: boolean = false;
-
 
   private subscribers: Array<any> = [];
 
@@ -146,7 +144,7 @@ export class ContainerListPage {
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
         this.containers = this.containers.filter((item: any) => {
-          if (item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) {
+          if ((item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}")) {
             return false;
           }
           return true;
@@ -162,6 +160,21 @@ export class ContainerListPage {
     this._composeService.getService(this.ip)
       .then(data => {
         this.serviceInfo = _.sortBy(data, 'Name');
+        this.serviceInfo.forEach(item => {
+					item.Containers = item.Containers || [];
+					item.Containers = _.sortBy(item.Containers, 'Name');
+					item.Running = 0;
+					item.Containers.forEach((subItem: any) => {
+						// if (!item.IpTables[subItem.IP]) item.IpTables[subItem.IP] = { Running: 0, Stopped: 0 };
+						// let stateText = '';
+						if (!(subItem.State.indexOf('Paused') !== -1 || subItem.State.indexOf('Restarting') !== -1 || subItem.State === 'Created' || subItem.State.startsWith('Exited'))) {
+							// stateText = 'Running';
+							// item.IpTables[subItem.IP].Running++;
+							item.Running++;
+						}
+					});
+
+				});
         this.filterService();
       })
       .catch(err => {

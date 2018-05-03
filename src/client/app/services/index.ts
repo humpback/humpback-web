@@ -13,12 +13,14 @@ import { MostUsedService } from './most-used.service';
 import { EventNotifyService } from './event-notify.service';
 import { UserService } from './user.service';
 import { ComposeService } from './compose.service';
+import { FileUploader } from './fileUploader.service';
 import { SystemConfigService } from './system-config.service';
 
 export * from './auth-guard.service';
 export * from './auth.service';
 export * from './group.service';
 export * from './compose.service';
+export * from './fileUploader.service';
 export * from './cluster.service';
 export * from './dashboard.service';
 export * from './container.service';
@@ -49,6 +51,7 @@ let Services: Array<any> = [
   MostUsedService,
   EventNotifyService,
   UserService,
+  FileUploader,
   SystemConfigService
 ]
 

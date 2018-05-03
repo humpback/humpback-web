@@ -1,4 +1,4 @@
-import { Component} from "@angular/core"
+import { Component, ViewChild, ElementRef} from "@angular/core"
 import { CusHttpService } from './../../../../services';
 import { ComposeService, ContainerService } from '../../../../services';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -15,6 +15,9 @@ declare let messager: any;
 
 export class ServerDetailPage {
 
+  @ViewChild('logPanel')
+  private logPanel: ElementRef;
+
   private service: any;
   private containerBasicInfo: Array<any> = [];
   private activedTab: string;
@@ -27,6 +30,8 @@ export class ServerDetailPage {
   private container: any;
   private containerId: any;
   private groupId: any;
+  private logsViewModalOptions: any = {};
+  private logs: Array<any>;
 
   constructor(
     private _router: Router,
@@ -70,6 +75,14 @@ export class ServerDetailPage {
         _prdEnableCanary: false,
         _sandEnableCanary: false
       }
+      this.logsViewModalOptions = {
+        size: 'lg',
+        show: false,
+        title: '',
+        hideFooter: true,
+        closable: false,
+        logs: []
+      }
   }
 
   ngOnDestroy() {
@@ -96,6 +109,7 @@ export class ServerDetailPage {
         stateText = 'Dead';
       }
       this.container.State.StateText = stateText;
+      this.container.formettedPortsBindings = this.container.NetworkSettings.Ports || this.container.HostConfig.PortBindings;
     })
     .catch(err => {
       messager.error(err.Detail || "Get containers failed.");
@@ -143,6 +157,39 @@ export class ServerDetailPage {
 
   private getContainerCommand(){
     return `${this.container.Path} ${this.container.Args.join(' ')}`
+  }
+
+  private showLogsView(instance: any) {
+    this.logsViewModalOptions.selectedInstance = {
+      ip: this.ip,
+      container: instance.Id.substr(0, 12)
+    };
+    this.logsViewModalOptions.tailNum = 100;
+    this.logsViewModalOptions.title = `Logs for ${instance.Name} on ${this.ip}`;
+    this.getLogs();
+    this.logsViewModalOptions.show = true;
+  }
+
+  private getLogs() {
+    let instance = this.logsViewModalOptions.selectedInstance;
+    this._containerService.getLogs(instance.ip, instance.container, this.logsViewModalOptions.tailNum)
+      .then(data => {
+        this.logs = data || [];
+        if (this.logs.length > 0) {
+          setTimeout(() => {
+            $(this.logPanel.nativeElement).animate({ scrollTop: this.logPanel.nativeElement.scrollHeight }, '500', 'swing')
+          }, 500);
+        }
+      })
+      .catch(err => {
+        this.logs = [];
+        messager.error(err);
+      });
+  }
+
+  private tailNumChanged(value: any) {
+    this.logsViewModalOptions.tailNum = value;
+    this.getLogs();
   }
 
   private getStatusText(status: any) {

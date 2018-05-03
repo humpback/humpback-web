@@ -1,6 +1,6 @@
-import { Component, Renderer  } from "@angular/core";
-import { FormGroup, FormBuilder} from "@angular/forms"
-import { ComposeService, GroupService } from '../../../../services';
+import { Component, Renderer } from "@angular/core";
+import { FormGroup, FormBuilder } from "@angular/forms"
+import { ComposeService, GroupService, FileUploader } from '../../../../services';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import * as jsYaml from 'js-yaml';
@@ -24,23 +24,26 @@ export class ComponentNewPage {
   private ip: any;
   private groupInfo: any;
   private groupId: any;
+  private inputValue: any;
   private subscribers: Array<any> = [];
 
   constructor(
     private _router: Router,
+    private _fileUploader: FileUploader,
     private _route: ActivatedRoute,
     private _composeService: ComposeService,
     private _groupService: GroupService,
     private _renderer: Renderer,
     private _fb: FormBuilder,
-  ){
+  ) {
 
   }
 
-  private buildForm(){
+  private buildForm() {
     this.form = this._fb.group({
       Name: '',
-      Data: ''
+      EnablePackageFile: 0,
+      Data: '',
     })
   }
 
@@ -49,13 +52,13 @@ export class ComponentNewPage {
     editor.$blockScrolling = Infinity;
   }
 
-  private changeValue(){
+  private changeValue() {
 
   }
 
-  private readerFile(reader: any): any{
+  private readerFile(reader: any): any {
     let self = this;
-    reader.onload = function(event: any) {
+    reader.onload = function (event: any) {
       self.form.controls['Data'].setValue(event.target.result);
     };
   }
@@ -68,25 +71,10 @@ export class ComponentNewPage {
         this.readerFile(reader);
         reader.readAsText(file);
       }
-      // if (this.inputValue) {
-      //   this.fileError = false;
-      //   let allowSize = 50 * 1024 * 1024;
-      //   if (this.inputValue.size > allowSize) {
-      //     this.fileError = true;
-      //   }
-      // }
-      // if (value.target && value.target.value) {
-      //   let arr = value.target.value.split('\\');
-      //   this.inputFile = arr[arr.length - 1];
-      //   this.inputFile = this.inputFile.replace(/.tar/, '');
-      //   this.inputFile = this.inputFile.replace(/.gz/, '');
-      //   let date = moment(Date.now()).format('YYYY-MM-DD_HH-mm-ss');
-      //   this.inputFile = `${this.inputFile}-${date}.tar.gz`;
-      // }
     }
   }
 
-  ngOnInit(){
+  ngOnInit() {
     let paramSub = this._route.params.subscribe(params => {
       this.ip = params['ip'];
       this.groupId = params["groupId"];
@@ -125,35 +113,61 @@ export class ComponentNewPage {
     }
   }
 
-  private checkComposeData(){
-    try {
-      let doc = jsYaml.safeLoad(this.form.value.Data);
-      this.composeDataError = '';
-    } catch (e) {
-      this.composeDataError = e.message;
+  private checkComposeData() {
+    if(this.form.value.Data){
+      try {
+        let doc = jsYaml.safeLoad(this.form.value.Data);
+        this.composeDataError = '';
+      } catch (e) {
+        this.composeDataError = e.message;
+      }
     }
   }
 
-  private downloadComposeData(){
-    let content = this.form.value.Data;
-    let blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-    fileSaver.saveAs(blob, "content.yml")
+  packageFileOnChanged(value: any) {
+    if (value) {
+      if (value.target && value.target.files.length > 0) {
+        this.inputValue = value.target.files[0];
+      } else {
+        this.inputValue = '';
+      }
+    } else {
+      this.inputValue = '';
+    }
   }
 
-  private onSubmit(){
+  private onSubmit() {
     this.submitted = true;
     let form = this.form;
     if (form.invalid) return;
     this.checkComposeData();
-    if(this.composeDataError) return;
-    let config: any = {
-      Name: form.value.Name,
-      ComposeData: `${form.value.Data}`
+    if (this.composeDataError) return;
+    if (this.inputValue) {
+      this._fileUploader.upload(`http://10.16.77.72:8500/dockerapi/v2/services/${form.controls.Name.value}/upload`, this.inputValue, { disableLoading: false })
+        .then((res: any) => {
+          let config: any = {
+            Name: form.value.Name,
+            ComposeData: `${form.value.Data} packagefile:${res.json().PackageFile}`
+          }
+          this._composeService.addCompose(this.ip, JSON.parse(JSON.stringify(config)))
+            .then(data => {
+              this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
+            })
+            .catch(err => messager.error(err.Detail || err))
+        })
+        .catch(err => {
+          messager.err(err.message || 'Upload file failed');
+        })
+    } else {
+      let config: any = {
+        Name: form.value.Name,
+        ComposeData: `${form.value.Data}`
+      }
+      this._composeService.addCompose(this.ip, JSON.parse(JSON.stringify(config)))
+        .then(data => {
+          this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
+        })
+        .catch(err => messager.error(err.Detail || err))
     }
-    this._composeService.addCompose(this.ip,JSON.parse(JSON.stringify(config)))
-      .then(data => {
-        this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
-      })
-      .catch(err => messager.error(err.Detail || err))
   }
 }
