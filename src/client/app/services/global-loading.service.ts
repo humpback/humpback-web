@@ -39,6 +39,11 @@ export class GlobalLoadingService {
     }, 100);
   }
 
+  remove() {
+      this.loadingEl.classList.remove('showLoading');
+      document.body.style.overflowY = 'auto';
+  }
+
   isOpen(): boolean {
     return this.loadingEl.classList.contains('showLoading');
   }

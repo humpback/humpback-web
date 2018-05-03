@@ -22,7 +22,7 @@ export class FileUploader {
       let xhr = new XMLHttpRequest();
       xhr.open('POST', url);
       xhr.setRequestHeader('Content-Type', 'application/tar');
-      xhr.setRequestHeader('Content-Disposition', `attachment;filename=${file.name}`);
+      xhr.setRequestHeader('PackageFileName', `${file.name}`);
       xhr.addEventListener('readystatechange', (evt) => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
           if (xhr.status !== 200) {
@@ -33,6 +33,7 @@ export class FileUploader {
       });
       xhr.addEventListener('error', (err) => {
         reject(err);
+        this._globalLoading.remove();
       });
       xhr.send(file);
     });
