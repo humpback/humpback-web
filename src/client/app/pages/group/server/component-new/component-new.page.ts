@@ -143,7 +143,7 @@ export class ComponentNewPage {
     this.checkComposeData();
     if (this.composeDataError) return;
     if (this.inputValue) {
-      this._fileUploader.upload(`http://10.16.77.72:8500/dockerapi/v2/services/${form.controls.Name.value}/upload`, this.inputValue, { disableLoading: false })
+      this._fileUploader.upload(`http://${this.ip}:8500/dockerapi/v2/services/${form.controls.Name.value}/upload`, this.inputValue, { disableLoading: false })
         .then((res: any) => {
           let config: any = {
             Name: form.value.Name,
@@ -156,7 +156,7 @@ export class ComponentNewPage {
             .catch(err => messager.error(err.Detail || err))
         })
         .catch(err => {
-          messager.err(err.message || 'Upload file failed');
+          messager.error(err.message || 'Upload file failed');
         })
     } else {
       let config: any = {
