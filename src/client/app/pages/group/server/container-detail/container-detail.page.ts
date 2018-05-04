@@ -210,7 +210,11 @@ export class ContainerDetailPage {
       });
   }
 
-  private showUpgradeModal() {
+  private showUpgradeModal(event:any) {
+    if (event && event.target.classList.contains('disabled')) {
+      event.stopPropagation();
+      return;
+    }
     this.upgradeContainerModalOptions.formSubmitted = false;
     this.upgradeContainerModalOptions.show = true;
   }

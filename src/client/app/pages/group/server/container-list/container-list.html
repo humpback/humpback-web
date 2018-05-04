@@ -7,7 +7,7 @@
   <div class="nav-tabs-custom">
     <ul class="nav nav-tabs pull-right">
       <li class="pull-left header">
-        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : (activedTab == 'images' ? 'Docker Images' : 'Compose') }}
+        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : (activedTab == 'images' ? 'Docker Images' : 'Service') }}
       </li>
       <li [ngClass]="{'active': activedTab == 'images'}">
         <a href="javascript:void(0)" (click)="changeTab('images')">Docker Images</a>
@@ -192,17 +192,16 @@
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <a [routerLink]="['/group', groupInfo.ID, ip, 'new-component']" class="btn btn-sm bg-olive btn-flat">
-                  <i class="fa fa-plus"></i> Add Compose
+                  <i class="fa fa-plus"></i> Add Service
                 </a>
               </div>
             </div>
             <div class="alert alert-info" *ngIf="!filterServices?.length && filterServiceDone">
-              <i class="fa-fw fa fa-info"></i> No composes found
+              <i class="fa-fw fa fa-info"></i> No services found
             </div>
             <table class="table table-hover table-bordered" *ngIf="filterServices?.length > 0">
               <thead>
                 <tr>
-                  <th></th>
                   <th>Name</th>
                   <th>Create Time</th>
                   <th>Containers</th>
@@ -212,22 +211,22 @@
               <tbody>
                 <tr *ngFor="let item of currentServices; let last = last;">
                   <td>
-                    <i class="fa fa-circle text-success" title="Health" *ngIf="item.Containers.length == item.Running"></i>
-                    <i class="fa fa-circle text-warning" title="Not Health" *ngIf="item.Running < containerNum && item.Running > 0"></i>
-                    <i class="fa fa-circle text-danger" title="Danger" *ngIf="item.Running == 0"></i>
-                  </td>
-                  <td>
+                    <ng-template #containerIdTemplate>
+                      <div style="word-break: break-all;">{{item.HashCode}}</div>
+                    </ng-template>
+                    <i class="fa fa-info-circle text-muted" (click)="copyId(cIdInput)" style="cursor: pointer; margin-right: 5px;" title="Click To Copy" [tooltip]="containerIdTemplate" triggers="hover"></i>
+                    <input type="text" #cIdInput value="{{item.Id}}" class="empty-input">
                     <a [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">
                       {{ item.Name }}
                     </a>
                   </td>
-                  <td>{{ item.Timestamp | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                  <td>{{ item.Timestamp*1000 | date:'yyyy/MM/dd HH:mm:ss' }}</td>
                   <td>
-                    <div class="flex-display">
+                    <div style="column-width: 200px; -webkit-column-width: 200px;">
                         <div *ngFor="let obj of (item.Containers | objLoop)">
                           <!-- <i class="fa fa-circle text-success" *ngIf="obj.value.Stopped == 0"></i> -->
                           <!-- <i class="fa fa-circle text-warning" *ngIf="obj.value.Stopped != 0 && obj.value.Running != 0"></i> -->
-                          <i class="fa fa-circle text-{{getContainerStatus(obj.value.State)}}"></i>
+                          <i class="fa fa-circle text-{{getContainerStatus(obj.value.State)}}" [title]="obj.value.State"></i>
                           {{ obj.value.Name }}
                         </div>
                       </div>
@@ -238,6 +237,16 @@
                         <i class="fa fa-wrench"></i>
                       </button>
                       <ul class="dropdown-menu" role="menu">
+                      <li>
+                        <a href="javascript:void(0)" (click)="ServiceOperate(item, 'unpause')">
+                          <i class="fa fa-hourglass-start text-success"></i> Unpause
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" (click)="ServiceOperate(item, 'pause')">
+                          <i class="fa fa-pause"></i> Pause
+                        </a>
+                        </li>
                         <li>
                           <a href="javascript:void(0)" (click)="ServiceOperate(item, 'restart')">
                             <i class="fa fa-refresh text-success"></i> Restart
@@ -254,8 +263,13 @@
                           </a>
                         </li>
                         <li>
+                          <a href="javascript:void(0)" (click)="showRmContainerModal(item, 'kill')">
+                            <i class="fa fa-trash text-danger"></i> Kill
+                          </a>
+                        </li>
+                        <li>
                           <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
-                            <i class="fa fa-trash text-danger"></i> Delete
+                            <i class="fa fa-trash text-danger"></i> Down
                           </a>
                         </li>
                         <li>

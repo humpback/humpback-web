@@ -32,6 +32,7 @@ export class ServerDetailPage {
   private groupId: any;
   private logsViewModalOptions: any = {};
   private logs: Array<any>;
+  private deleteContainerModalOptions: any = {};
 
   constructor(
     private _router: Router,
@@ -46,24 +47,19 @@ export class ServerDetailPage {
   ngOnInit(){
     this.service = {};
     this.container = {};
+    let modalCommonOptions = {
+      show: false,
+      title: 'WRAN',
+      closable: false
+    };
     let paramSub = this._route.params.subscribe(params => {
       this.ip = params['ip'];
       this.serviceName = params['serviceName'];
       this.groupId = params["groupId"];
     });
     this.subscribers.push(paramSub);
-    this._composeService.getServiceByOne(this.ip, this.serviceName)
-      .then(res => {
-        this.service = res;
-        this.activedTab = this.service.Containers[0].Name;
-        this.containerId = this.service.Containers[0].Id;
-        this.getContainerInfo(this.containerId);
-        // let data = res.json();
-      })
-      .catch(err => {
-        messager.error(err);
-        this._router.navigate(['/cluster', this.groupId, 'overview']);
-      });
+    this.deleteContainerModalOptions = _.cloneDeep(modalCommonOptions);
+    this.getService();
       this.composeDataConfig = {
         // SystemId: this.systemId,
         ConfigKey: '',
@@ -83,6 +79,21 @@ export class ServerDetailPage {
         closable: false,
         logs: []
       }
+  }
+
+  private getService(){
+    this._composeService.getServiceByOne(this.ip, this.serviceName)
+    .then(res => {
+      this.service = res;
+      this.activedTab = this.service.Containers[0].Name;
+      this.containerId = this.service.Containers[0].Id;
+      this.getContainerInfo(this.containerId);
+      // let data = res.json();
+    })
+    .catch(err => {
+      messager.error(err);
+      this._router.navigate(['/cluster', this.groupId, 'overview']);
+    });
   }
 
   ngOnDestroy() {
@@ -168,6 +179,29 @@ export class ServerDetailPage {
     this.logsViewModalOptions.title = `Logs for ${instance.Name} on ${this.ip}`;
     this.getLogs();
     this.logsViewModalOptions.show = true;
+  }
+
+  private operate(action: string, event: any) {
+    if (event && event.target.classList.contains('disable')) {
+      event.stopPropagation();
+      return;
+    }
+    this._containerService.operate(this.ip, this.containerId, action)
+      .then(data => {
+        messager.success('succeed');
+        this.getService();
+      })
+      .catch(err => {
+        messager.error(err.message || err);
+      });
+  }
+
+  private showDeleteModal(event: any) {
+    if (event && event.target.classList.contains('disable')) {
+      event.stopPropagation();
+      return;
+    }
+    this.deleteContainerModalOptions.show = true;
   }
 
   private getLogs() {

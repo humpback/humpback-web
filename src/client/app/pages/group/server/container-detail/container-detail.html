@@ -32,25 +32,23 @@
         </li>
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" [class.disable]="container.State?.Running" (click)="showDeleteModal($event)">
+          <a href="javascript:void(0)" [class.disable]="container.State?.Running || isComposedData" (click)="showDeleteModal($event)">
             <i class="fa fa-warning text-danger"></i> Delete
           </a>
         </li>
       </ul>
     </div>
-    <div *ngIf="!isComposedData">
-      <button type="button" class="btn btn-default btn-flat" (click)="showRenameModal()">
-        <i class="fa fa-exchange"></i>
-        Rename
-      </button>
-      <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
-        <i class="fa fa-arrow-circle-up"></i>
-        Upgrade
-      </button>
-      <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'clone']">
-        <i class="fa fa-clone"></i> Clone
-      </a>
-    </div>
+    <button type="button" class="btn btn-default btn-flat" (click)="showRenameModal()">
+      <i class="fa fa-exchange"></i>
+      Rename
+    </button>
+    <button type="button" [class.disabled]="isComposedData" class="btn btn-default btn-flat" (click)="showUpgradeModal($event)">
+      <i class="fa fa-arrow-circle-up"></i>
+      Upgrade
+    </button>
+    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'clone']">
+      <i class="fa fa-clone"></i> Clone
+    </a>
     <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'monitor']">
       <i class="fa fa-line-chart"></i> Monitor
     </a>

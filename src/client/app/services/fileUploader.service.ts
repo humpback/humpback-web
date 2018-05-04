@@ -27,7 +27,7 @@ export class FileUploader {
           if (xhr.status !== 200) {
             return reject(xhr.statusText);
           }
-          resolve(url);
+          resolve(xhr.response);
         }
       });
       xhr.addEventListener('error', (err) => {

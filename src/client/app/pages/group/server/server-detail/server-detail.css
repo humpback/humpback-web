@@ -54,3 +54,26 @@ div.timeline-body li>i.fa {
   max-height: calc(100vh - 260px);
   overflow-y: auto;
 }
+
+.nav-tabs-custom > .nav-tabs.nav-stacked > li.active {
+  border-top: none;
+  border-left: 3px solid #3c8dbc;
+  border-right: 1px solid white;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+}
+
+.nav-tabs-custom > .nav-tabs.nav-stacked > li {
+  margin-right: 0px;
+}
+
+.tab-content {
+  margin-left: -1px;
+  border-left: 1px solid lightgray;
+  padding-left: 15px;
+}
+
+p.title {
+  margin-top: 20px;
+  border-bottom: 1px solid lightgray;
+}

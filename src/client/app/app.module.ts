@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { CommonModule } from '@angular/common';
 import { Select2Module } from 'ng2-select2';
+import { TooltipModule } from 'ngx-bootstrap';
 
 import { HumpbackApp } from './app';
 import { PAGES } from './pages';
@@ -26,6 +27,7 @@ import { AppRouting } from './app.routes';
     CommonModule,
     HttpModule,
     AppRouting,
+    TooltipModule.forRoot(),
     Select2Module
   ],
   declarations: [

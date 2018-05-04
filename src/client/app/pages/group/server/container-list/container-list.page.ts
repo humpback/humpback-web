@@ -163,16 +163,16 @@ export class ContainerListPage {
         this.serviceInfo.forEach(item => {
 					item.Containers = item.Containers || [];
 					item.Containers = _.sortBy(item.Containers, 'Name');
-					item.Running = 0;
-					item.Containers.forEach((subItem: any) => {
-						// if (!item.IpTables[subItem.IP]) item.IpTables[subItem.IP] = { Running: 0, Stopped: 0 };
-						// let stateText = '';
-						if (!(subItem.State.indexOf('Paused') !== -1 || subItem.State.indexOf('Restarting') !== -1 || subItem.State === 'Created' || subItem.State.startsWith('Exited'))) {
-							// stateText = 'Running';
-							// item.IpTables[subItem.IP].Running++;
-							item.Running++;
-						}
-					});
+					// item.Running = 0;
+					// item.Containers.forEach((subItem: any) => {
+					// 	// if (!item.IpTables[subItem.IP]) item.IpTables[subItem.IP] = { Running: 0, Stopped: 0 };
+					// 	// let stateText = '';
+					// 	if (!(subItem.State.indexOf('Paused') !== -1 || subItem.State.indexOf('Restarting') !== -1 || subItem.State === 'Created' || subItem.State.startsWith('Exited'))) {
+					// 		// stateText = 'Running';
+					// 		// item.IpTables[subItem.IP].Running++;
+					// 		item.Running++;
+					// 	}
+					// });
 
 				});
         this.filterService();
@@ -432,5 +432,13 @@ export class ContainerListPage {
     let content = item.ComposeData;
     let blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     fileSaver.saveAs(blob, "content.yml")
+  }
+
+  copyId(cIdInput: HTMLInputElement) {
+    if (cIdInput) {
+      cIdInput.select();
+      document.execCommand('Copy');
+      messager.success('Copied');
+    }
   }
 }

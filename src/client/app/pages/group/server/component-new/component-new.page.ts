@@ -147,8 +147,9 @@ export class ComponentNewPage {
         .then((res: any) => {
           let config: any = {
             Name: form.value.Name,
-            ComposeData: `${form.value.Data} packagefile:${res.json().PackageFile}`
-          }
+            ComposeData: `${form.value.Data}`,
+            packagefile: JSON.parse(res).PackageFile
+          };
           this._composeService.addCompose(this.ip, JSON.parse(JSON.stringify(config)))
             .then(data => {
               this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
