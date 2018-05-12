@@ -25,6 +25,8 @@ export class ComponentNewPage {
   private groupInfo: any;
   private groupId: any;
   private inputValue: any;
+  private isSaveCheck: boolean;
+  private dockerEngineVersion: any;
   private subscribers: Array<any> = [];
 
   constructor(
@@ -44,6 +46,7 @@ export class ComponentNewPage {
       Name: '',
       EnablePackageFile: 0,
       Data: '',
+      EnableUploadYaml: 0
     })
   }
 
@@ -78,6 +81,7 @@ export class ComponentNewPage {
     let paramSub = this._route.params.subscribe(params => {
       this.ip = params['ip'];
       this.groupId = params["groupId"];
+      this.dockerEngineVersion = params["serverversion"];
       // this.groupInfo = { ID: groupId };
       // this._groupService.getById(groupId)
       //   .then(data => {
@@ -113,13 +117,30 @@ export class ComponentNewPage {
     }
   }
 
-  private checkComposeData() {
-    if(this.form.value.Data){
+  private showExample(value: any){
+    this._composeService.getComposeExample()
+    .then(data => {
+      this.form.controls['Data'].setValue(data);
+    })
+  }
+
+
+  private checkComposeData(isSave: any) {
+    if (this.form.value.Data) {
       try {
         let doc = jsYaml.safeLoad(this.form.value.Data);
-        this.composeDataError = '';
+        if (doc) {
+          this.composeDataError = 'succeed';
+        } else {
+          this.composeDataError = '';
+        }
       } catch (e) {
         this.composeDataError = e.message;
+      }
+      if (isSave) {
+        this.isSaveCheck = true;
+      } else {
+        this.isSaveCheck = false;
       }
     }
   }
@@ -140,9 +161,9 @@ export class ComponentNewPage {
     this.submitted = true;
     let form = this.form;
     if (form.invalid) return;
-    this.checkComposeData();
-    if (this.composeDataError) return;
-    if (this.inputValue) {
+    this.checkComposeData(true);
+    if (this.composeDataError && this.composeDataError !== 'succeed') return;
+    if (this.inputValue && form.controls.EnablePackageFile.value) {
       this._fileUploader.upload(`http://${this.ip}:8500/dockerapi/v2/services/${form.controls.Name.value}/upload?filename=${this.inputValue.name}`, this.inputValue, { disableLoading: false })
         .then((res: any) => {
           let config: any = {

@@ -67,11 +67,55 @@ export class ComposeService {
     });
   }
 
+  getAgentInfo(ip: string, hidenLoading: boolean = false): Promise<any> {
+    let reqConfig = this.buildReq(ip, hidenLoading);
+    let url: string = `${reqConfig.url}/ping`;
+    return new Promise((resolve, reject) => {
+      this._http.get(url, reqConfig.options)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => {
+          let errData = JSON.parse(JSON.stringify(err));
+          reject(errData.json ? errData.json() : errData);
+        });
+    });
+  }
+
+  getComposeExample(): Promise<any> {
+    let url: string = `api/groups/getComposeExample`;
+    return new Promise((resolve, reject) => {
+      this._http.get(url)
+        .then(res => {
+          resolve(JSON.parse(JSON.stringify(res))._body);
+        })
+        .catch(err => {
+          let errData = JSON.parse(JSON.stringify(err));
+          reject(errData.json ? errData.json() : errData);
+        });
+    });
+  }
+
+  getDockerVersion(ip: string, hidenLoading: boolean = false): Promise<any> {
+    let reqConfig = this.buildReq(ip, hidenLoading);
+    let url: string = `${reqConfig.url}/dockerversion`;
+    return new Promise((resolve, reject) => {
+      this._http.get(url, reqConfig.options)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => {
+          let errData = JSON.parse(JSON.stringify(err));
+          reject(errData.json ? errData.json() : errData);
+        });
+    });
+  }
+
   addCompose(ip: string, data: any): Promise<any>{
     let reqConfig = this.buildReq(ip);
     let url: string = `${reqConfig.url}/services`;
     return new Promise((resolve, reject) => {
-      this._http.post(url, data)
+      this._http.post(url, data, reqConfig.options)
       .then((res) => {
         resolve(res);
       })

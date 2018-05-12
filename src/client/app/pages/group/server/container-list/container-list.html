@@ -118,7 +118,7 @@
           </div>
           <div class="box-footer clearfix">
             <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
-              (onSelectPage)="setContainerPage($event)" *ngIf="filterServices?.length > 0">
+              (onSelectPage)="setContainerPage($event)" *ngIf="filterContainers?.length > 0">
             </hb-pagination>
           </div>
         </div>
@@ -176,7 +176,7 @@
         </div>
       </div>
 
-      <div class="tab-pane" [ngClass]="{'active': activedTab == 'service'}">
+      <div class="tab-pane" *ngIf="!agentInvalid" [ngClass]="{'active': activedTab == 'service'}">
         <div class="box no-border">
           <div class="box-body">
             <div class="flex-display">
@@ -191,7 +191,7 @@
                 </button>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
-                <a [routerLink]="['/group', groupInfo.ID, ip, 'new-component']" class="btn btn-sm bg-olive btn-flat">
+                <a [routerLink]="['/group', groupInfo.ID, ip, 'new-service', {serverversion: dockerEngineVersion}]" class="btn btn-sm bg-olive btn-flat">
                   <i class="fa fa-plus"></i> Add Service
                 </a>
               </div>
@@ -209,7 +209,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of currentServices; let last = last;">
+                <tr *ngFor="let item of currentServices; let last = last; let first = first;">
                   <td>
                     <ng-template #containerIdTemplate>
                       <div style="word-break: break-all;">{{item.HashCode}}</div>
@@ -264,7 +264,7 @@
                         </li>
                         <li>
                           <a href="javascript:void(0)" (click)="showRmContainerModal(item, 'kill')">
-                            <i class="fa fa-trash text-danger"></i> Kill
+                            <i class="fa fa-remove text-danger"></i> Kill
                           </a>
                         </li>
                         <li>
@@ -285,13 +285,17 @@
             </table>
           </div>
           <div class="box-footer clearfix">
-            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)"
+            <hb-pagination [totalCount]="filterServices.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)"
             *ngIf="filterServices?.length > 0">
             </hb-pagination>
           </div>
         </div>
       </div>
-
+      <div [ngClass]="{'active': activedTab == 'service'}" *ngIf="agentInvalid" style="padding: 15px;">
+        <div class="alert alert-danger show">
+          Please upgrade humpback-agent version to 1.3.1 or higher.
+        </div>
+      </div>
     </div>
   </div>
 </section>

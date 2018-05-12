@@ -2,9 +2,10 @@
   <h1> Container Detail <small>{{ container?.Name?.substr(1) }}</small></h1>
   <ol class="breadcrumb">
     <li>
-      <a [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+      <a *ngIf="!isComposedData" [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+      <a *ngIf="isComposedData" [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Service List</a>
     </li>
-    <li class="active">Detail</li>
+    <li class="active">Container Detail</li>
   </ol>
 </section>
 <section class="content">

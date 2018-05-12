@@ -134,9 +134,9 @@ export class ServerDetailPage {
   }
 
   private downloadComposeData(){
-    let content = '';
+    let content = this.service.ComposeData;
     let blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-    fileSaver.saveAs(blob, "content.yml")
+    fileSaver.saveAs(blob, `${this.serviceName}.yml`)
   }
 
   private changeTab(tab: string, id: string) {
@@ -181,18 +181,14 @@ export class ServerDetailPage {
     this.logsViewModalOptions.show = true;
   }
 
-  private operate(action: string, event: any) {
-    if (event && event.target.classList.contains('disable')) {
-      event.stopPropagation();
-      return;
-    }
-    this._containerService.operate(this.ip, this.containerId, action)
+  private operate(action: string) {
+    this._composeService.ComposeOperate(this.ip, this.service.Name, action)
       .then(data => {
         messager.success('succeed');
         this.getService();
       })
       .catch(err => {
-        messager.error(err.message || err);
+        messager.error(err.Detail || err);
       });
   }
 

@@ -31,7 +31,7 @@ let routes: Routes = [
           { path: ':groupId/overview', component: GroupOverviewPage },
           { path: ':groupId/:ip/overview', component: ContainerListPage },
           { path: ':groupId/:ip/new-container', component: ContainerNewPage },
-          { path: ':groupId/:ip/new-component', component: ComponentNewPage },
+          { path: ':groupId/:ip/new-service', component: ComponentNewPage },
           { path: ':groupId/:ip/service/:serviceName', component: ServerDetailPage },
           { path: ':groupId/:ip/containers/:containerId', component: ContainerDetailPage },
           { path: ':groupId/:ip/containers/:containerId/clone', component: ContainerClonePage },

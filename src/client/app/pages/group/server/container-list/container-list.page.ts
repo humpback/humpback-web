@@ -50,6 +50,8 @@ export class ContainerListPage {
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
+  private agentInvalid: boolean = false;
+  private dockerEngineVersion: string;
 
   constructor(
     private _route: ActivatedRoute,
@@ -136,10 +138,12 @@ export class ContainerListPage {
     if (tab === 'service' && this.serviceInfo.length === 0) {
       this.getService();
     }
+    this.agentInvalid = false;
     sessionStorage.setItem('serverTab', tab);
   }
 
   private getContainers() {
+    this.agentInvalid = false;
     this._containerService.get(this.ip)
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
@@ -157,28 +161,36 @@ export class ContainerListPage {
   }
 
   private getService() {
-    this._composeService.getService(this.ip)
+    this._composeService.getAgentInfo(this.ip)
       .then(data => {
-        this.serviceInfo = _.sortBy(data, 'Name');
-        this.serviceInfo.forEach(item => {
-					item.Containers = item.Containers || [];
-					item.Containers = _.sortBy(item.Containers, 'Name');
-					// item.Running = 0;
-					// item.Containers.forEach((subItem: any) => {
-					// 	// if (!item.IpTables[subItem.IP]) item.IpTables[subItem.IP] = { Running: 0, Stopped: 0 };
-					// 	// let stateText = '';
-					// 	if (!(subItem.State.indexOf('Paused') !== -1 || subItem.State.indexOf('Restarting') !== -1 || subItem.State === 'Created' || subItem.State.startsWith('Exited'))) {
-					// 		// stateText = 'Running';
-					// 		// item.IpTables[subItem.IP].Running++;
-					// 		item.Running++;
-					// 	}
-					// });
+        if (data.AppVersion >= "1.3.2") {
+          this.agentInvalid = false;
+          this._composeService.getDockerVersion(this.ip)
+            .then(data => {
+              this.dockerEngineVersion = data.ServerVersion.Version;
+            })
+            .catch(err => {
+              messager.error(err.message || "Get services failed");
+            })
+          this._composeService.getService(this.ip)
+            .then(data => {
+              this.serviceInfo = _.sortBy(data, 'Name');
+              this.serviceInfo.forEach(item => {
+                item.Containers = item.Containers || [];
+                item.Containers = _.sortBy(item.Containers, 'Name');
 
-				});
-        this.filterService();
+              });
+              this.filterService();
+            })
+            .catch(err => {
+              messager.error(err.message || "Get services failed");
+            })
+        } else {
+          this.agentInvalid = true;
+        }
       })
       .catch(err => {
-        messager.error(err.message || "Get services failed");
+        messager.error(err.message || "Server is no response");
       })
   }
 
@@ -431,7 +443,7 @@ export class ContainerListPage {
   private downloadComposeData(item: any) {
     let content = item.ComposeData;
     let blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    fileSaver.saveAs(blob, "content.yml")
+    fileSaver.saveAs(blob, `${item.Name}.yml`)
   }
 
   copyId(cIdInput: HTMLInputElement) {
