@@ -34,6 +34,7 @@
         "js-yaml": "^3.11.0",
         "nedb": "^1.8.0",
         "nedb-session-store": "^1.1.1",
+        "ngx-bootstrap": "^2.0.4",
         "uuid": "^3.0.1"
     },
     "devDependencies": {
