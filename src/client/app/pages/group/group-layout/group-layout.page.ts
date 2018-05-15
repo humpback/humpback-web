@@ -81,6 +81,8 @@ export class GroupLayoutPage {
   private addToMostUsed(groupId: any, server: any) {
     let add = server.Name || server.IP;
     this._mostUsedService.add(add, groupId);
+    //重置serverTab
+    sessionStorage.removeItem('serverTab');
   }
 
   private fixGroupTreePanel() {

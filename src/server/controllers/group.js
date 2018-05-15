@@ -1,6 +1,8 @@
 const uuid = require('uuid');
 const dbFactory = require('./../db/dbFactory').factory;
 const config = require('./../config');
+const fs = require('fs');
+const path = require('path');
 
 let db = dbFactory.getCollection(config.dbConfigs.groupCollection.name);
 
@@ -159,6 +161,20 @@ let isExists = (name, groupID) => {
     }, (err, docs) => {
       if (err) return reject(err);
       resolve(docs.length > 0);
+    });
+  });
+}
+
+exports.getComposeExample = (req, res, next) => {
+  let avatarDir = path.join(__dirname, `./../public`);
+  let avatarPath = `${avatarDir}/docker-compose-example.yaml`;
+  fs.exists(avatarPath, (exists) => {
+    fs.readFile(avatarPath, (err, data) => {
+      if (err) return next(err);
+      res.writeHead(200, {
+        'Content-Type': 'text/x-yaml',
+      });
+      res.end(data);
     });
   });
 }

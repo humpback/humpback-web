@@ -32,6 +32,7 @@ export class ContainerDetailPage {
 
   private isUpgradeDone: Array<any> = [];
   private upgradeProcessMsg: Array<any> = [];
+  private isComposedData: boolean = false;
 
   private subscribers: Array<any> = [];
 
@@ -74,6 +75,7 @@ export class ContainerDetailPage {
       let groupId = params['groupId'];
       this.ip = params['ip'];
       this.containerId = params['containerId'];
+      this.isComposedData = params['compose'];
       this.groupInfo = { ID: groupId };
       this._groupService.getById(groupId)
         .then(data => {
@@ -208,7 +210,11 @@ export class ContainerDetailPage {
       });
   }
 
-  private showUpgradeModal() {
+  private showUpgradeModal(event:any) {
+    if (event && event.target.classList.contains('disabled')) {
+      event.stopPropagation();
+      return;
+    }
     this.upgradeContainerModalOptions.formSubmitted = false;
     this.upgradeContainerModalOptions.show = true;
   }

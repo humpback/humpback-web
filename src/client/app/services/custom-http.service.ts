@@ -57,7 +57,7 @@ export class CusHttpService {
         p = this._http.post(url, body, this._buildOptions(options, 'POST'));
         break;
       case 'PUT':
-        p = this._http.put(url, body, this._buildOptions(options, 'PUT'));
+        p = this._http.put(url, body, this._buildOptions(options, 'PUT'))
         break;
       case 'DELETE':
         p = this._http.delete(url, this._buildOptions(options, 'DELETE'));
@@ -70,6 +70,7 @@ export class CusHttpService {
     }
     return new Promise((resolve, reject) => {
       if (!options.disableLoading) {
+        this._globalLoading.sub();
         this._globalLoading.add();
       }
       p.toPromise()

@@ -22,6 +22,10 @@ router.get('/getbasicgroupsinfo',
   groupCtrl.getBasicGroupsInfo
 )
 
+router.get('/getComposeExample',
+  groupCtrl.getComposeExample
+)
+
 router.get('/:groupID',
   groupCtrl.getByID
 );

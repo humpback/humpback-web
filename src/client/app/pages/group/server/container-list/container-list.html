@@ -1,17 +1,22 @@
 <section class="content-header">
-  <h1> Server Overview <small>{{ ip }}</small></h1>
+  <h1> Server Overview
+    <small>{{ ip }}</small>
+  </h1>
 </section>
 <section class="content">
   <div class="nav-tabs-custom">
     <ul class="nav nav-tabs pull-right">
       <li class="pull-left header">
-        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : 'Docker Images' }}
+        <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : (activedTab == 'images' ? 'Docker Images' : 'Service') }}
       </li>
       <li [ngClass]="{'active': activedTab == 'images'}">
         <a href="javascript:void(0)" (click)="changeTab('images')">Docker Images</a>
       </li>
       <li [ngClass]="{'active': activedTab == 'containers'}">
         <a href="javascript:void(0)" (click)="changeTab('containers')">Containers</a>
+      </li>
+      <li [ngClass]="{'active': activedTab == 'service'}">
+        <a href="javascript:void(0)" (click)="changeTab('service')">Services</a>
       </li>
     </ul>
     <div class="tab-content no-padding">
@@ -22,7 +27,7 @@
               <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
                 <input type="text" class="form-control" autocomplete="off" placeholder="Enter key word" name="containerFilter" [ngModel]="containerFilter"
                   (ngModelChange)="filterContainer($event)">
-                  <span class="fa fa-search form-control-feedback"></span>
+                <span class="fa fa-search form-control-feedback"></span>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <button class="btn btn-olive btn-sm btn-flat" (click)="getContainers()">
@@ -113,8 +118,8 @@
           </div>
           <div class="box-footer clearfix">
             <hb-pagination [totalCount]="filterContainers.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption"
-              (onSelectPage)="setContainerPage($event)">
-              </hb-pagination>
+              (onSelectPage)="setContainerPage($event)" *ngIf="filterContainers?.length > 0">
+            </hb-pagination>
           </div>
         </div>
       </div>
@@ -125,7 +130,7 @@
               <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
                 <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [ngModel]="imageFilter"
                   (ngModelChange)="filterImage($event)">
-                  <span class="fa fa-search form-control-feedback"></span>
+                <span class="fa fa-search form-control-feedback"></span>
               </div>
               <div class="form-group form-group-sm margin-bottom-10">
                 <button class="btn bg-olive btn-sm btn-flat" (click)="showPullImageModal()">
@@ -164,9 +169,131 @@
             </table>
           </div>
           <div class="box-footer clearfix">
-            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)">
+            <hb-pagination [totalCount]="filterImages.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)"
+            *ngIf="filterImages?.length > 0">
             </hb-pagination>
           </div>
+        </div>
+      </div>
+
+      <div class="tab-pane" *ngIf="!agentInvalid" [ngClass]="{'active': activedTab == 'service'}">
+        <div class="box no-border">
+          <div class="box-body">
+            <div class="flex-display">
+              <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
+                <input type="text" class="form-control" autocomplete="off" name="imageFilter" placeholder="Enter key word" [ngModel]="imageFilter"
+                  (ngModelChange)="filterService($event)">
+                <span class="fa fa-search form-control-feedback"></span>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <button class="btn btn-olive btn-sm btn-flat" (click)="getService()">
+                  <i class="fa fa-refresh"></i> Refresh
+                </button>
+              </div>
+              <div class="form-group form-group-sm margin-bottom-10">
+                <a [routerLink]="['/group', groupInfo.ID, ip, 'new-service', {serverversion: dockerEngineVersion}]" class="btn btn-sm bg-olive btn-flat">
+                  <i class="fa fa-plus"></i> Add Service
+                </a>
+              </div>
+            </div>
+            <div class="alert alert-info" *ngIf="!filterServices?.length && filterServiceDone">
+              <i class="fa-fw fa fa-info"></i> No services found
+            </div>
+            <table class="table table-hover table-bordered" *ngIf="filterServices?.length > 0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Create Time</th>
+                  <th>Containers</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of currentServices; let last = last; let first = first;">
+                  <td>
+                    <ng-template #containerIdTemplate>
+                      <div style="word-break: break-all;">{{item.HashCode}}</div>
+                    </ng-template>
+                    <i class="fa fa-info-circle text-muted" (click)="copyId(cIdInput)" style="cursor: pointer; margin-right: 5px;" title="Click To Copy" [tooltip]="containerIdTemplate" triggers="hover"></i>
+                    <input type="text" #cIdInput value="{{item.Id}}" class="empty-input">
+                    <a [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">
+                      {{ item.Name }}
+                    </a>
+                  </td>
+                  <td>{{ item.Timestamp*1000 | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                  <td>
+                    <div style="column-width: 200px; -webkit-column-width: 200px;">
+                        <div *ngFor="let obj of (item.Containers | objLoop)">
+                          <!-- <i class="fa fa-circle text-success" *ngIf="obj.value.Stopped == 0"></i> -->
+                          <!-- <i class="fa fa-circle text-warning" *ngIf="obj.value.Stopped != 0 && obj.value.Running != 0"></i> -->
+                          <i class="fa fa-circle text-{{getContainerStatus(obj.value.State)}}" [title]="obj.value.State"></i>
+                          {{ obj.value.Name }}
+                        </div>
+                      </div>
+                  </td>
+                  <td class="operate">
+                    <div class="btn-group operate" [class.dropup]="last && !first">
+                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-wrench"></i>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      <li>
+                        <a href="javascript:void(0)" (click)="ServiceOperate(item, 'unpause')">
+                          <i class="fa fa-hourglass-start text-success"></i> Unpause
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" (click)="ServiceOperate(item, 'pause')">
+                          <i class="fa fa-pause"></i> Pause
+                        </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'restart')">
+                            <i class="fa fa-refresh text-success"></i> Restart
+                          </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'stop')">
+                            <i class="fa fa-stop"></i> Stop
+                          </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="ServiceOperate(item, 'start')">
+                            <i class="fa fa-play text-success"></i> Start
+                          </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="showRmContainerModal(item, 'kill')">
+                            <i class="fa fa-remove text-danger"></i> Kill
+                          </a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
+                            <i class="fa fa-trash text-danger"></i> Down
+                          </a>
+                        </li>
+                        <li>
+                          <a title="Download Compose File" href="javascript:void(0)" (click)="downloadComposeData(item)">
+                            <i class="fa fa-download"></i> Download
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box-footer clearfix">
+            <hb-pagination [totalCount]="filterServices.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setImagePage($event)"
+            *ngIf="filterServices?.length > 0">
+            </hb-pagination>
+          </div>
+        </div>
+      </div>
+      <div [ngClass]="{'active': activedTab == 'service'}" *ngIf="agentInvalid" style="padding: 15px;">
+        <div class="alert alert-danger show">
+          Please upgrade humpback-agent version to 1.3.1 or higher.
         </div>
       </div>
     </div>
@@ -183,7 +310,7 @@
       <label>
         <input type="checkbox" (change)="enableForceDeletion($event)">
         <span class="text-danger">
-            You want to force delete
+          You want to force delete
         </span>
       </label>
     </div>
@@ -199,11 +326,11 @@
     <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
       <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
         autocomplete="off" #imageName="ngModel" required maxlength="30" pattern="^[0-9a-z.\/:_-]*$">
-        <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
-          <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
-          <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
-          <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
-        </div>
+      <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
+        <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
+      </div>
     </div>
     <div class="form-group text-right">
       <button type="button" class="btn btn-default btn-flat" (click)="pullImageModalOptions.show = fasle">Cancel</button>
@@ -214,7 +341,8 @@
 
 <hb-modal [options]="rmImageModalOptions">
   <div class="description" *ngIf="rmImageTarget?._repo">
-    Are you sure you want to delete <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
+    Are you sure you want to delete
+    <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
   </div>
   <hb-modal-footer>
     <button type="button" class="btn btn-default btn-flat" (click)="rmImageModalOptions.show = fasle">Cancel</button>

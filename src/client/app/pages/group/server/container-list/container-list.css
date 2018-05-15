@@ -105,6 +105,18 @@ td.operate {
   padding: 0 10px;
 }
 
+.td-components tbody > tr > td{
+  border: 1px solid #dddddd;
+  vertical-align: middle;
+}
+
+.empty-input {
+  width: 1px;
+  border: none;
+  position: fixed;
+  top: -10px;
+}
+
 @media(max-width:1024px) {
   th.status, td.status {
     width: auto;
@@ -123,3 +135,4 @@ td.operate {
     display: none;
   }
 }
+

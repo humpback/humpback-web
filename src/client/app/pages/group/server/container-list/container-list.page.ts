@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ContainerService, GroupService, ImageService, LogService } from './../../../../services';
+import { ContainerService, GroupService, ImageService, LogService, ComposeService } from './../../../../services';
+import * as fileSaver from 'file-saver';
 
 declare let _: any;
 declare let messager: any;
@@ -28,6 +29,14 @@ export class ContainerListPage {
   private currentImages: Array<any> = [];
   private imagePageIndex: number = 1;
 
+  private serviceInfo: Array<any> = [];
+  private filterServiceDone: boolean;
+  private filterServices: Array<any> = [];
+  private serviceFilter: string;
+  private currentServices: Array<any> = [];
+  private servicePageIndex: number = 1;
+  private hasFailedContainer: boolean = false;
+
   private subscribers: Array<any> = [];
 
   private activedTab: string = 'containers';
@@ -41,11 +50,14 @@ export class ContainerListPage {
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
+  private agentInvalid: boolean = false;
+  private dockerEngineVersion: string;
 
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
     private _containerService: ContainerService,
+    private _composeService: ComposeService,
     private _groupService: GroupService,
     private _imageService: ImageService,
     private _logService: LogService) {
@@ -53,6 +65,7 @@ export class ContainerListPage {
   }
 
   ngOnInit() {
+
     this.containerPageOption = {
       "boundaryLinks": false,
       "directionLinks": true,
@@ -94,27 +107,48 @@ export class ContainerListPage {
     this.filterContainers = [];
     this.filterContainerDone = false;
     this.currentContainers = [];
+
     this.images = [];
     this.filterImages = [];
     this.filterImageDone = false;
     this.currentImages = [];
-    this.activedTab = 'containers';
-    this.getContainers();
+
+    this.serviceInfo = [];
+    this.filterServices = [];
+    this.filterServiceDone = false;
+    this.currentServices = [];
+
+    if(sessionStorage.getItem('serverTab') == 'service'){
+      this.activedTab = 'service';
+      this.getService();
+    }else{
+      this.activedTab = 'containers';
+      this.getContainers();
+    }
   }
 
   private changeTab(tab: string) {
     this.activedTab = tab;
+    if (tab === 'containers' && this.containers.length === 0) {
+      this.getContainers();
+    }
     if (tab === 'images' && this.images.length === 0) {
       this.getImages();
     }
+    if (tab === 'service' && this.serviceInfo.length === 0) {
+      this.getService();
+    }
+    this.agentInvalid = false;
+    sessionStorage.setItem('serverTab', tab);
   }
 
   private getContainers() {
+    this.agentInvalid = false;
     this._containerService.get(this.ip)
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
         this.containers = this.containers.filter((item: any) => {
-          if (item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) {
+          if ((item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}")) {
             return false;
           }
           return true;
@@ -124,6 +158,58 @@ export class ContainerListPage {
       .catch(err => {
         messager.error(err.message || "Get containers failed");
       });
+  }
+
+  private getService() {
+    this._composeService.getAgentInfo(this.ip)
+      .then(data => {
+        if (data.AppVersion >= "1.3.2") {
+          this.agentInvalid = false;
+          this._composeService.getDockerVersion(this.ip)
+            .then(data => {
+              this.dockerEngineVersion = data.ServerVersion.Version;
+            })
+            .catch(err => {
+              messager.error(err.message || "Get services failed");
+            })
+          this._composeService.getService(this.ip)
+            .then(data => {
+              this.serviceInfo = _.sortBy(data, 'Name');
+              this.serviceInfo.forEach(item => {
+                item.Containers = item.Containers || [];
+                item.Containers = _.sortBy(item.Containers, 'Name');
+
+              });
+              this.filterService();
+            })
+            .catch(err => {
+              messager.error(err.message || "Get services failed");
+            })
+        } else {
+          this.agentInvalid = true;
+        }
+      })
+      .catch(err => {
+        messager.error(err.message || "Server is no response");
+      })
+  }
+
+  private getContainerStatus(status: any) {
+    let cls = 'success';
+    if (status.indexOf('Paused') !== -1 || status.indexOf('Restarting') !== -1 || status === 'Created') {
+      cls = 'warning';
+      this.hasFailedContainer = true;
+    }else{
+      //是否存在失败的container
+      this.hasFailedContainer = false;
+    }
+    if (status.startsWith('Exited')) {
+      cls = 'danger';
+      this.hasFailedContainer = true;
+    }else{
+      this.hasFailedContainer = false;
+    }
+    return cls;
   }
 
   private filterContainerTimeout: any;
@@ -185,7 +271,7 @@ export class ContainerListPage {
     this.rmContainerModalOptions.show = true;
   }
 
-  private enableForceDeletion(value: any){
+  private enableForceDeletion(value: any) {
     this.forceDeletion = value.target.checked;
   }
 
@@ -260,6 +346,35 @@ export class ContainerListPage {
     this.currentImages = this.filterImages.slice(start, end);
   }
 
+  private filterServiceTimeout: any;
+  private filterService(value?: any) {
+    this.serviceFilter = value || '';
+    if (this.filterServiceTimeout) {
+      clearTimeout(this.filterServiceTimeout);
+    }
+    this.filterServiceTimeout = setTimeout(() => {
+      let keyWord = this.serviceFilter;
+      if (!keyWord) {
+        this.filterServices = this.serviceInfo;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterServices = this.serviceInfo.filter(item => {
+          return regex.test(item.Name);
+        })
+      }
+      this.setServicePage(this.servicePageIndex);
+      this.filterServiceDone = true;
+    }, 100);
+  }
+
+  private setServicePage(pageIndex: number) {
+    this.servicePageIndex = pageIndex;
+    if (!this.filterServices) return;
+    let start = (pageIndex - 1) * this.pageSize;
+    let end = start + this.pageSize;
+    this.currentServices = this.filterServices.slice(start, end);
+  }
+
   private showPullImageModal() {
     this.pullImageModalOptions.formSubmitted = false;
     this.pullImageModalOptions.show = true;
@@ -311,5 +426,31 @@ export class ContainerListPage {
       .catch(err => {
         messager.error(err.Detail || err);
       });
+  }
+
+  private ServiceOperate(service: any, action: any) {
+    this._composeService.ComposeOperate(this.ip, service.Name, action)
+      .then(data => {
+        messager.success('succeed');
+        // this._logService.addLog(`${action}ed container ${name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
+        this.getService();
+      })
+      .catch(err => {
+        messager.error(err.Detail || err);
+      });
+  }
+
+  private downloadComposeData(item: any) {
+    let content = item.ComposeData;
+    let blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    fileSaver.saveAs(blob, `${item.Name}.yml`)
+  }
+
+  copyId(cIdInput: HTMLInputElement) {
+    if (cIdInput) {
+      cIdInput.select();
+      document.execCommand('Copy');
+      messager.success('Copied');
+    }
   }
 }

@@ -3,7 +3,7 @@ let getConfig = () => {
   let configInfo = {
     version: '1.0.0',
     isDebugMode: true,
-    listenPort: process.env.HUMPBACK_LISTEN_PORT || 80,
+    listenPort: process.env.HUMPBACK_LISTEN_PORT || 8100,
     dbConfigs: {
       groupCollection: { name: 'GroupInfo' },
       imageCollection: { name: 'ImageInfo' },

@@ -2,9 +2,10 @@
   <h1> Container Detail <small>{{ container?.Name?.substr(1) }}</small></h1>
   <ol class="breadcrumb">
     <li>
-      <a [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+      <a *ngIf="!isComposedData" [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
+      <a *ngIf="isComposedData" [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Service List</a>
     </li>
-    <li class="active">Detail</li>
+    <li class="active">Container Detail</li>
   </ol>
 </section>
 <section class="content">
@@ -32,7 +33,7 @@
         </li>
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" [class.disable]="container.State?.Running" (click)="showDeleteModal($event)">
+          <a href="javascript:void(0)" [class.disable]="container.State?.Running || isComposedData" (click)="showDeleteModal($event)">
             <i class="fa fa-warning text-danger"></i> Delete
           </a>
         </li>
@@ -42,7 +43,7 @@
       <i class="fa fa-exchange"></i>
       Rename
     </button>
-    <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
+    <button type="button" [class.disabled]="isComposedData" class="btn btn-default btn-flat" (click)="showUpgradeModal($event)">
       <i class="fa fa-arrow-circle-up"></i>
       Upgrade
     </button>

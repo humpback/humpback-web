@@ -1,0 +1,97 @@
+<section class="content-header">
+  <h1> New Service</h1>
+  <ol class="breadcrumb">
+    <li>
+      <a [routerLink]="['/group', groupId, ip, 'overview']"><i class="fa fa-th"></i> Service List</a>
+    </li>
+    <li class="active">New Service</li>
+  </ol>
+</section>
+<section class="content">
+  <form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+    <div class="form-group" [class.has-error]="submitted && form.controls.Name.invalid">
+      <label>Name</label>
+      <input type="text" class="form-control" formControlName="Name" maxlength="30" required pattern="^[0-9a-zA-Z-_.]*$">
+      <div *ngIf="submitted && form.controls.Name.invalid">
+        <span class="help-block" *ngIf="form.controls.Name.errors.required">Name is required.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.maxlength">Name cannot more than 30 characters.</span>
+        <span class="help-block" *ngIf="form.controls.Name.errors.pattern">Name cannot contain special characters.</span>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 25px;">
+      <div class="checkbox">
+        <label style="font-weight: 700;">
+          <input type="checkbox" formControlName="EnablePackageFile">
+          Package File
+        </label>
+      </div>
+      <div class="well well-sm" *ngIf="form.controls.EnablePackageFile.value">
+        <div class="form-group">
+          <div class="form-control" style="margin-bottom: 10px;">
+            <input id="packagefile" name="packagefile" (change)="packageFileOnChanged($event)" type="file" accept="application/gzip, .gz" enctype="multipart/form-data" style="outline: none;width: 100%;cursor: pointer;">
+            <p class="text-danger margin-top-5" style="margin: 5px 0;">
+              Please compress your folder as <strong>tar.gz</strong> archive.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Compose Yaml <a style="color: #155bb3" target="_black" href="https://docs.docker.com/compose/faq/">(FAQ)</a></label>
+      <div class="alert alert-warning show" style="margin: 10px 0;">
+        The current docker version is <strong> {{ dockerEngineVersion }} </strong>,
+        &nbsp;
+        Humpback compose yaml currently supports
+        <a style="color: #155bb3" target="_black" href="https://docs.docker.com/compose/compose-file/compose-file-v1/">v1</a>
+        and
+        <a style="color: #155bb3" target="_black" href="https://docs.docker.com/compose/compose-file/compose-file-v2/">v2</a>
+        version
+      </div>
+      <div [class.has-error]="submitted && !form.value.Data">
+        <div class="flex-display">
+          <div class="btn-group btn-group-sm">
+            <label style="display:inline-block; vertical-align: middle; padding: 5px 5px 5px 10px;margin-bottom: 0; font-weight: normal">Yaml</label>
+          </div>
+          <button type="button" class="btn btn-sm btn-default m-l-xs" (click)="showFullScreen('prd', prdEditor)">
+            <i class="fa fa-arrows-alt"></i>
+          </button>
+        </div>
+        <div class="editor ace-editor-panel" #prdEditor>
+          <div class="tool-bar">
+            <button type="button" class="btn btn-sm btn-default m-l-xs" (click)="showFullScreen('prd', prdEditor)">
+              <i class="fa fa-arrows-alt"></i>
+            </button>
+          </div>
+          <nd-ace-editor formControlName="Data" [mode]="configInfo._sandMode" (onLoad)="aceLoaded($event, 'prd')" name="SandboxValue"></nd-ace-editor>
+        </div>
+        <div *ngIf="submitted && !form.value.Data">
+          <span class="help-block">Compose data is required.</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox">
+          <label style="font-weight: 700;">
+            <input type="checkbox" formControlName="EnableUploadYaml">
+            Upload Yaml
+          </label>
+        </div>
+        <div class="form-control" style="margin-bottom: 10px;" *ngIf="form.controls.EnableUploadYaml.value">
+          <input type="file" accept=".yml, .yaml" (change)="selectedFileOnChanged($event)" style="outline: none;width: 100%;cursor: pointer;">
+        </div>
+      </div>
+      <div class="alert alert-danger show" style="margin: 10px 0;" *ngIf="composeDataError && composeDataError!=='succeed'">
+        {{ composeDataError }}
+      </div>
+      <div class="alert alert-success show" style="margin: 10px 0;" *ngIf="composeDataError=='succeed' && !isSaveCheck">
+        Succeed
+      </div>
+    </div>
+    <div class="form-group">
+      <a class="btn bg-olive btn-flat" (click)="showExample()">Show Example</a>
+      <a class="btn bg-olive btn-flat" (click)="checkComposeData()">Check</a>
+      <button type="submit" class="btn bg-olive btn-flat">Save</button>
+    </div>
+  </form>
+</section>
