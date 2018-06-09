@@ -216,11 +216,15 @@
                     </ng-template>
                     <i class="fa fa-info-circle text-muted" (click)="copyId(cIdInput)" style="cursor: pointer; margin-right: 5px;" title="Click To Copy" [tooltip]="containerIdTemplate" triggers="hover"></i>
                     <input type="text" #cIdInput value="{{item.Id}}" class="empty-input">
-                    <a [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">
+                    <a *ngIf="item.Timestamp!=0" [routerLink]="['/group', groupInfo.ID, ip, 'service', item.Name]">
+                      {{ item.Name }}
+                    </a>
+                    <a *ngIf="item.Timestamp==0">
                       {{ item.Name }}
                     </a>
                   </td>
-                  <td>{{ item.Timestamp*1000 | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                  <td *ngIf="item.Timestamp!=0">{{ item.Timestamp*1000 | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+                  <td *ngIf="item.Timestamp==0">--/--</td>
                   <td>
                     <div style="column-width: 200px; -webkit-column-width: 200px;">
                         <div *ngFor="let obj of (item.Containers | objLoop)">
@@ -270,11 +274,6 @@
                         <li>
                           <a href="javascript:void(0)" (click)="showRmContainerModal(item)">
                             <i class="fa fa-trash text-danger"></i> Down
-                          </a>
-                        </li>
-                        <li>
-                          <a title="Download Compose File" href="javascript:void(0)" (click)="downloadComposeData(item)">
-                            <i class="fa fa-download"></i> Download
                           </a>
                         </li>
                       </ul>
