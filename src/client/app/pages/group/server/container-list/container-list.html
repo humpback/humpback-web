@@ -221,6 +221,10 @@
                     </a>
                     <a *ngIf="item.Timestamp==0">
                       {{ item.Name }}
+                      &nbsp;&nbsp;
+                      <span class="label label-danger">
+                        not humpback service
+                      </span>
                     </a>
                   </td>
                   <td *ngIf="item.Timestamp!=0">{{ item.Timestamp*1000 | date:'yyyy/MM/dd HH:mm:ss' }}</td>
@@ -237,7 +241,7 @@
                   </td>
                   <td class="operate">
                     <div class="btn-group operate" [class.dropup]="last && !first">
-                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" disabled="{{ item.Timestamp == 0 ? 'true' : null }}">
                         <i class="fa fa-wrench"></i>
                       </button>
                       <ul class="dropdown-menu" role="menu">

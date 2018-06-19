@@ -29,7 +29,7 @@ export class ImageService {
         'x-proxy-ip': ip
       };
     }
-    let url: string = `http://${ip}:8500/v1`;
+    let url: string = `http://${ip}:8500/dockerapi/v2`;
     let req = {
       url: url,
       options: options
