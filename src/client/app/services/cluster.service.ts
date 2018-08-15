@@ -113,4 +113,37 @@ export class ClusterService {
         .catch(err => reject(err.json ? err.json() : err));
     });
   }
+
+  getServerStatus(groupId: string, hidenLoading: boolean = false, groupInfo: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.systemConfig.HumpbackCenterAPI}/v1/groups/${groupId}/engines`;
+      this._http.get(url)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => reject(err.json ? err.json() : err));
+    });
+  }
+
+  setClusterNode(postData: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.systemConfig.HumpbackCenterAPI}/v1/groups/nodelabels`;
+      this._http.put(url, postData)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => reject(err.json ? err.json() : err));
+    })
+  }
+
+  getEnginesById(ip: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.systemConfig.HumpbackCenterAPI}/v1/groups/engines/${ip}`;
+      this._http.get(url)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => reject(err.json ? err.json() : err));
+    })
+  }
 }

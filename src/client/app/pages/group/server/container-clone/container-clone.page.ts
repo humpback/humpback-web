@@ -99,17 +99,19 @@ export class ContainerClonePage {
     this.form = this._fb.group({
       Name: [''],
       Image: [data.Image],
-      Command: [data.Command],
+      Command: [data.CommandWithoutEntryPoint || data.Command],
       HostName: [''],
       NetworkMode: [data.NetworkMode],
       RestartPolicy: [data.RestartPolicy],
       Ports: this._fb.array([]),
       Volumes: this._fb.array([]),
-      Envs: this._fb.array([]),
+      // Envs: this._fb.array([]),
       Links: this._fb.array([]),
       EnableLogFile: data.LogConfig ? (data.LogConfig.Type ? 1 : 0) : 0,
-      LogDriver: data.LogConfig ? (data.LogConfig.LogDriver  || 'json-file') : 'json-file',
+      Labels: this._fb.array([]),
+      LogDriver: data.LogConfig ? (data.LogConfig.Type || 'json-file') : 'json-file',
       LogOpts: this._fb.array([]),
+      Ulimits: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
@@ -143,14 +145,14 @@ export class ContainerClonePage {
       });
     }
 
-    if (data.Env) {
-      let envCtrl = <FormArray>this.form.controls['Envs'];
-      data.Env.forEach((item: any) => {
-        envCtrl.push(this._fb.group({
-          Value: item
-        }));
-      });
-    }
+    // if (data.Env) {
+    //   let envCtrl = <FormArray>this.form.controls['Envs'];
+    //   data.Env.forEach((item: any) => {
+    //     envCtrl.push(this._fb.group({
+    //       Value: item
+    //     }));
+    //   });
+    // }
 
     if (data.Links) {
       let control = <FormArray>this.form.controls['Links'];
@@ -159,6 +161,15 @@ export class ContainerClonePage {
           "Value": [item]
         }));
       })
+    }
+
+    if (data.Labels) {
+      let control = <FormArray>this.form.controls['Labels'];
+      for (let key in data.Labels) {
+        control.push(this._fb.group({
+          "Value": [`${key}:${data.Labels[key]}`]
+        }));
+      }
     }
 
     if(data.LogConfig){
@@ -174,6 +185,17 @@ export class ContainerClonePage {
           }));
         })
       }
+    }
+
+    if (data.Ulimits) {
+      let control = <FormArray>this.form.controls['Ulimits'];
+      data.Ulimits.forEach((item: any) => {
+        control.push(this._fb.group({
+          "Name": [item['Name']],
+          "Soft": [item['Soft']],
+          "Hard": [item['Hard']]
+        }));
+      })
     }
 
     let restartSub = this.form.controls['RestartPolicy'].valueChanges.subscribe(value => {
@@ -320,6 +342,32 @@ export class ContainerClonePage {
     control.removeAt(i);
   }
 
+  private addLabel() {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLabel(i: number) {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.removeAt(i);
+  }
+
+  private addUlimit() {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.push(this._fb.group({
+      Name: [''],
+      Soft: [''],
+      Hard: ['']
+    }));
+  }
+
+  private removeUlimit(i: number) {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.removeAt(i);
+  }
+
   private onSubmit() {
     this.submitted = true;
     if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
@@ -327,7 +375,7 @@ export class ContainerClonePage {
     || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
     || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
     || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
-    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
+    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid || this.form.controls.ServerEnvs.invalid)) return;
     if (!this.selectedServers || !this.selectedServers.length) {
       messager.error('Please select one server at least');
       return;

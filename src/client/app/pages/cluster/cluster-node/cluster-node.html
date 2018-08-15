@@ -1,0 +1,186 @@
+<section class="content-header">
+  <h1>Node details</h1>
+  <ol class="breadcrumb">
+      <li>
+          <a [routerLink]="['/cluster', groupId, 'overview']">
+              <i class="fa fa-th"></i> Cluster Overview
+          </a>
+      </li>
+      <li class="active">Node Details</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="box">
+      <div class="box-header" style="font-weight: 900">Node specification</div>
+      <div class="box-body">
+          <table class="table">
+              <tbody>
+                  <tr>
+                      <td>
+                          ID
+                      </td>
+                      <td>
+                          {{ nodeInfo.ID }}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Host Name
+                      </td>
+                      <td>
+                          {{ nodeInfo.Name }}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          IP
+                      </td>
+                      <td>
+                          {{ nodeInfo.IP }}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Status
+                      </td>
+                      <td>
+                          <span class="label label-success" *ngIf="nodeInfo.StateText == 'Healthy'">{{ nodeInfo.StateText }}</span>
+                          <span class="label label-danger" *ngIf="nodeInfo.StateText != 'Healthy'">{{ nodeInfo.StateText }}</span>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+
+  <div class="box">
+      <div class="box-header" style="font-weight: 900">Node description</div>
+      <div class="box-body">
+          <table class="table">
+              <tbody>
+                  <tr>
+                      <td>
+                          CPU
+                      </td>
+                      <td>
+                          {{ nodeInfo.Cpus }} Core
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Memory
+                      </td>
+                      <td>
+                          {{ (nodeInfo.Memory / 1024).toFixed(2) }} GB
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Platform
+                      </td>
+                      <td>
+                          {{ nodeInfo.OSType }} {{ nodeInfo.Architecture }}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Docker Engine version
+                      </td>
+                      <td>
+                          {{ nodeInfo.DockerVersion }}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          Agent Version
+                      </td>
+                      <td>
+                          {{ nodeInfo.AppVersion }}
+                      </td>
+                  </tr>
+                  <tr>
+                    <td>
+                        Storage Dirver
+                    </td>
+                    <td>
+                      {{ nodeInfo.StorageDirver }}
+                    </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+
+  <div class="box" *ngIf="nodeInfo?.EngineLabels | isEmptyObj">
+      <div class="box-header" style="font-weight: 900">Engine labels</div>
+      <div class="box-body">
+          <table class="table">
+              <thead>
+                  <tr>
+                      <th>
+                          Label
+                      </th>
+                      <th>
+                          Value
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let label of nodeInfo?.EngineLabels | objLoop">
+                      <td>
+                          {{ label.key }}
+                      </td>
+                      <td>
+                          {{ label.value }}
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+
+  <div class="box">
+      <div class="box-header" style="font-weight: 900">Node labels</div>
+      <form novalidate [formGroup]="form" (ngSubmit)="onSubmit(form)" *ngIf="form">
+          <div class="box-body" formArrayName="Labels">
+              <div class="equal-fields" *ngFor="let label of form.controls.Labels.controls; let i = index;" [formGroupName]="i">
+                  <div class="form-group" [class.has-error]="submitted && label.controls.Name.invalid">
+                      <div class="input-group">
+                          <label class="input-group-addon" style="background: #eee;">name</label>
+                          <input type="text" class="form-control" placeholder="e.g. com.example.foo" required maxlength="200" formControlName="Name">
+                      </div>
+                      <div *ngIf="submitted && label.controls.Name.invalid">
+                          <span class="help-block" *ngIf="label.controls.Name.errors.required">Label name is required.</span>
+                          <span class="help-block" *ngIf="label.controls.Name.errors.maxlength">Label name cannot more than 20 characters.</span>
+                      </div>
+                  </div>
+                  <div class="form-group" [class.has-error]="submitted && label.controls.Value.invalid">
+                      <div class="input-group">
+                          <label class="input-group-addon" style="background: #eee;">value</label>
+                          <input type="text" class="form-control" placeholder="e.g. bar" required maxlength="200" formControlName="Value">
+                      </div>
+                      <div *ngIf="submitted && label.controls.Value.invalid">
+                          <span class="help-block" *ngIf="label.controls.Value.errors.required">Label value is required.</span>
+                          <span class="help-block" *ngIf="label.controls.Value.errors.maxlength">Label value cannot more than 20 characters.</span>
+                      </div>
+                  </div>
+                  <div>
+                      <button type="button" class="btn btn-default btn-flat" (click)="removeLabel(i)">
+                          <i class="fa fa-close"></i>
+                      </button>
+                  </div>
+              </div>
+              <div class="form-group no-margin">
+                  <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLabel()">
+                      <i class="fa fa-plus"></i> Add Label
+                  </button>
+              </div>
+              <div class="form-group" style="margin-top: 20px;">
+                  <button type="submit" class="btn bg-olive btn-flat">
+                      <i class="fa fa-save"></i> Save
+                  </button>
+              </div>
+          </div>
+      </form>
+  </div>
+</section>

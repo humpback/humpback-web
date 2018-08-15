@@ -8,7 +8,7 @@ td.container-name {
 
 td.image-name {
   max-width: 250px;
-  white-space: nowrap;
+  word-wrap: break-word;
 }
 
 td.operate {

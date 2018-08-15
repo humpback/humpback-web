@@ -42,7 +42,7 @@
             <h3 class="box-title">Favorites</h3>
           </div>
           <div class="box-body">
-            <div *ngFor="let item of mostUsedServers | orderBy:['ip']">
+            <div *ngFor="let item of mostUsedServers | orderBy:['-count']">
               <a [routerLink]="['/group', item.groupId, item.ip, 'overview']">{{ item.ip }}</a>
             </div>
           </div>

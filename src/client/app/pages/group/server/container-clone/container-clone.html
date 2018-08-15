@@ -137,57 +137,6 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <div class="checkbox">
-        <label style="font-weight: 700;">
-          <input type="checkbox" formControlName="EnableLogFile">
-          Log Config
-        </label>
-      </div>
-      <div class="box" *ngIf="form.controls.EnableLogFile.value">
-        <div class="box-body">
-          <div style="padding-left: 20px; padding-right: 20px;">
-            <div class="box-second-title">Driver</div>
-            <div class="form-group" style="padding: 0 45px 0 15px;" [class.has-error]="submitted && form.controls.LogDriver.invalid">
-              <input class="form-control" style="width:50%;" formControlName="LogDriver" required maxlength="100"/>
-              <div *ngIf="submitted && form.controls.LogDriver.invalid">
-                <span class="help-block" *ngIf="form.controls.LogDriver.errors.required">log driver is required.</span>
-                <span class="help-block" *ngIf="form.controls.LogDriver.errors.maxlength">log driver cannot more than 100 characters.</span>
-              </div>
-            </div>
-            <div class="alert alert-warning show" style="margin: 0 15px;">
-              For more information on the <strong>log driver</strong>, please refer to the official
-              <a style="color: #155bb3" target="_black" href="https://docs.docker.com/config/containers/logging/configure/#supported-logging-drivers">website link</a>
-            </div>
-            <div style="display:inline-block;width:100%;" formArrayName="LogOpts">
-              <div class="box-second-title" style="margin-top:10px;">Opts</div>
-              <div class="col-md-6" *ngFor="let opt of form.controls.LogOpts.controls; let i = index;" [formGroupName]="i">
-                <div class="equal-fields">
-                  <div class="form-group" [class.has-error]="submitted && opt.controls.Value.invalid">
-                    <input type="text" class="form-control" placeholder="e.g. option=xxx" required maxlength="100" formControlName="Value">
-                    <div *ngIf="submitted && opt.controls.Value.invalid">
-                      <span class="help-block" *ngIf="opt.controls.Value.errors.required">opt is required.</span>
-                      <span class="help-block" *ngIf="opt.controls.Value.errors.maxlength">opt cannot more than 100 characters.</span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <button type="button" class="btn btn-default btn-flat" (click)="removeLogOpt(i)">
-                      <i class="fa fa-close"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-group no-margin">
-              <button style="margin: 0 15px;" type="button" class="btn btn-default btn-flat btn-sm" (click)="addLogOpt()">
-                <i class="fa fa-plus"></i> Add LogOpt
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="box" *ngIf="form.controls.NetworkMode.value != 'host'">
       <div class="box-header with-border">Ports Binding</div>
       <div class="box-body" formArrayName="Ports">
@@ -314,6 +263,140 @@
               <i class="fa fa-plus"></i> Add Environment
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Labels</div>
+      <div class="box-body" formArrayName="Labels">
+        <div class="equal-fields" *ngFor="let label of form.controls.Labels.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && label.controls.Value.invalid">
+            <input type="text" class="form-control" placeholder="e.g. name:test" required maxlength="100" formControlName="Value" pattern="^[0-9a-zA-Z-_./]*:[0-9a-zA-Z-_./ ]*$">
+            <div *ngIf="submitted && label.controls.Value.invalid">
+              <span class="help-block" *ngIf="label.controls.Value.errors.required">label is required.</span>
+              <span class="help-block" *ngIf="label.controls.Value.errors.maxlength">label cannot more than 100 characters.</span>
+              <span class="help-block" *ngIf="label.controls.Value.errors.pattern">The format of the label is incorrect.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeLabel(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLabel()">
+            <i class="fa fa-plus"></i> Add Label
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+        <label style="font-weight: 700;">
+          <input type="checkbox" formControlName="EnableLogFile">
+          Log Config
+        </label>
+      </div>
+      <div class="box" *ngIf="form.controls.EnableLogFile.value">
+        <div class="box-body">
+          <div style="padding-left: 20px; padding-right: 20px;">
+            <div class="box-second-title">Driver</div>
+            <div class="form-group" style="padding: 0 45px 0 15px;" [class.has-error]="submitted && form.controls.LogDriver.invalid">
+              <input class="form-control" style="width:50%;" formControlName="LogDriver" required maxlength="100"/>
+              <div *ngIf="submitted && form.controls.LogDriver.invalid">
+                <span class="help-block" *ngIf="form.controls.LogDriver.errors.required">log driver is required.</span>
+                <span class="help-block" *ngIf="form.controls.LogDriver.errors.maxlength">log driver cannot more than 100 characters.</span>
+              </div>
+            </div>
+            <div class="alert alert-warning show" style="margin: 0 15px;">
+              For more information on the <strong>log driver</strong>, please refer to the official
+              <a style="color: #155bb3" target="_black" href="https://docs.docker.com/config/containers/logging/configure/#supported-logging-drivers">website link</a>
+            </div>
+            <div style="display:inline-block;width:100%;" formArrayName="LogOpts">
+              <div class="box-second-title" style="margin-top:10px;">Opts</div>
+              <div class="col-md-6" *ngFor="let opt of form.controls.LogOpts.controls; let i = index;" [formGroupName]="i">
+                <div class="equal-fields">
+                  <div class="form-group" [class.has-error]="submitted && opt.controls.Value.invalid">
+                    <input type="text" class="form-control" placeholder="e.g. option=xxx" required maxlength="100" formControlName="Value">
+                    <div *ngIf="submitted && opt.controls.Value.invalid">
+                      <span class="help-block" *ngIf="opt.controls.Value.errors.required">opt is required.</span>
+                      <span class="help-block" *ngIf="opt.controls.Value.errors.maxlength">opt cannot more than 100 characters.</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <button type="button" class="btn btn-default btn-flat" (click)="removeLogOpt(i)">
+                      <i class="fa fa-close"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group no-margin">
+              <button style="margin: 0 15px;" type="button" class="btn btn-default btn-flat btn-sm" (click)="addLogOpt()">
+                <i class="fa fa-plus"></i> Add LogOpt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Ulimit</div>
+      <div class="box-body" formArrayName="Ulimits">
+        <div class="equal-fields" *ngFor="let ulimit of form.controls.Ulimits.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && ulimit.controls.Name.invalid">
+            <select class="form-control" formControlName="Name" required>
+              <option value="">--Select Ulimit Item--</option>
+              <option value="core">core</option>
+              <option value="data">data</option>
+              <option value="fsize">fsize</option>
+              <option value="memlock">memlock</option>
+              <option value="nofile">nofile</option>
+              <option value="rss">rss</option>
+              <option value="stack">stack</option>
+              <option value="cpu">cpu</option>
+              <option value="nproc">nproc</option>
+              <option value="as">as</option>
+              <option value="maxlogins">maxlogins</option>
+              <option value="maxsyslogins">maxsyslogins</option>
+              <option value="priority">priority</option>
+              <option value="locks">locks</option>
+              <option value="sigpending">sigpending</option>
+              <option value="msgqueue">msgqueue</option>
+              <option value="nice">nice</option>
+              <option value="rtprio">rtprio</option>
+            </select>
+            <div *ngIf="submitted && ulimit.controls.Name.invalid">
+              <span class="help-block" *ngIf="ulimit.controls.Name.errors.required">label is required.</span>
+            </div>
+          </div>
+          <div class="form-group" [class.has-error]="submitted && ulimit.controls.Soft.invalid">
+            <input type="text" class="form-control" placeholder="soft item" required maxlength="100" formControlName="Soft" type="number">
+            <div *ngIf="submitted && ulimit.controls.Soft.invalid">
+              <span class="help-block" *ngIf="ulimit.controls.Soft.errors.required">soft item is required.</span>
+              <span class="help-block" *ngIf="ulimit.controls.Soft.errors.maxlength">soft cannot more than 100 characters.</span>
+            </div>
+          </div>
+          <div class="form-group" [class.has-error]="submitted && ulimit.controls.Hard.invalid">
+            <input type="text" class="form-control" placeholder="hard item" maxlength="100" formControlName="Hard" type="number">
+            <div *ngIf="submitted && ulimit.controls.Hard.invalid">
+              <span class="help-block" *ngIf="ulimit.controls.Hard.errors.maxlength">hard cannot more than 100 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeUlimit(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addUlimit()">
+            <i class="fa fa-plus"></i> Add Ulimit
+          </button>
         </div>
       </div>
     </div>

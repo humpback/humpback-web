@@ -43,6 +43,9 @@
       <i class="fa fa-exchange"></i>
       Rename
     </button>
+    <a class="btn btn-default btn-flat" [routerLink]="['/group', groupInfo.ID, ip, 'containers', containerId , 'edit']">
+      <i class="fa fa-pencil"></i> Edit
+    </a>
     <button type="button" [class.disabled]="isComposedData" class="btn btn-default btn-flat" (click)="showUpgradeModal($event)">
       <i class="fa fa-arrow-circle-up"></i>
       Upgrade

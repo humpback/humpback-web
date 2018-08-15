@@ -33,6 +33,15 @@ export class ClusterOverviewPage {
   private currentImages: Array<any> = [];
   private imagePageIndex: number = 1;
 
+  private nodePageIndex: number = 1;
+	private currentNodes: Array<any> = [];
+  private serverStatus: any = {};
+
+  private filterNodeDone: boolean;
+  private filterNodes: Array<any> = [];
+  private nodeFilter: string;
+
+
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
@@ -78,6 +87,7 @@ export class ClusterOverviewPage {
     this.reAssignConfirmModalOptions = _.cloneDeep(modalCommonOptions);
 
     this._route.params.forEach(params => {
+      this.allInstanceIp = [];
       let groupId = params['groupId'];
       this.groupInfo.ID = groupId;
       this._groupService.getById(groupId)
@@ -85,6 +95,7 @@ export class ClusterOverviewPage {
           this.groupInfo = data;
           this.activedTab = 'containers';
           this.getContainers();
+          this.showServerStatus(true);
         })
     });
   }
@@ -132,17 +143,39 @@ export class ClusterOverviewPage {
       });
   }
 
-  private getAllInstanceIp(){
+  private showServerStatus(silent: boolean = false) {
+		this.serverStatus.Status = [];
+		this._clusterService.getServerStatus(this.groupInfo.ID, silent, this.groupInfo)
+			.then(data => {
+				this.serverStatus.Status = data.Data.Engines;
+				let unHealth = _.findIndex(this.serverStatus.Status, (x: any) => x.StateText !== 'Healthy');
+				this.serverStatus.isHealth = (unHealth === -1);
+				this.filterNode();
+			})
+			.catch(err => {
+				if (!silent) {
+					messager.error(err);
+				}
+			});
+	}
+
+
+	private getAllInstanceIp(){
 		if(this.allInstanceIp.length === 0){
-			this.containers.forEach(data => {
-				data.Containers.forEach((container: any) => {
+			this._clusterService.getServerStatus(this.groupInfo.ID, false, this.groupInfo)
+			.then(data => {
+				this.serverStatus.Status = data.Data.Engines;
+				this.serverStatus.Status.forEach((container: any) => {
 					let hasRepeated = !this.allInstanceIp.find((ip: any) => ip == container.IP ||  ip == container.HostName);
 					if(hasRepeated){
 						this.allInstanceIp.push(container.IP || container.HostName);
 					}
 				})
+				this.allInstanceIp = _.sortBy(this.allInstanceIp);
 			})
-			this.allInstanceIp = _.sortBy(this.allInstanceIp);
+			.catch(err => {
+				messager.error(err || 'Get server info failed');
+			});
 		}
 	}
 
@@ -368,5 +401,34 @@ export class ClusterOverviewPage {
       .catch(err => {
         messager.error(err.Detail || err);
       });
+  }
+
+  private filterNodeTimeout: any;
+  private filterNode(value?: any) {
+    this.nodeFilter = value || '';
+    if (this.filterNodeTimeout) {
+      clearTimeout(this.filterNodeTimeout);
+    }
+    this.filterNodeTimeout = setTimeout(() => {
+      let keyWord = this.nodeFilter;
+      if (!keyWord) {
+        this.filterNodes = this.serverStatus.Status;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterNodes = this.serverStatus.Status.filter((item: any) => {
+          return regex.test(`${item.Name} - ${item.IP}`);
+        })
+      }
+      this.setNodePage(this.nodePageIndex);
+      this.filterNodeDone = true;
+    }, 100);
+  }
+
+  private setNodePage(pageIndex: number) {
+    this.nodePageIndex = pageIndex;
+    if (!this.filterNodes) return;
+    let start = (pageIndex - 1) * this.pageSize;
+    let end = start + this.pageSize;
+    this.currentNodes = this.filterNodes.slice(start, end);
   }
 }

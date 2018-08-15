@@ -23,8 +23,74 @@
       <li [ngClass]="{'active': activedTab == 'containers'}">
         <a href="javascript:void(0)" (click)="changeTab('containers')">Containers</a>
       </li>
+      <li [ngClass]="{'active': activedTab == 'nodes'}">
+        <a href="javascript:void(0)" (click)="changeTab('nodes')">
+          <i class="fa fa-exclamation text-danger" *ngIf="!serverStatus?.isHealth"></i>
+          Nodes
+        </a>
+      </li>
     </ul>
     <div class="tab-content no-padding">
+      <div class="tab-pane" [ngClass]="{'active': activedTab == 'nodes'}">
+          <div class="box no-border">
+            <div class="box-body">
+              <div class="flex-display">
+                <div class="form-group form-group-sm has-feedback flex-1 margin-bottom-10">
+                  <input type="text" class="form-control" autocomplete="off" name="nodeFilter" placeholder="Enter key word" [ngModel]="nodeFilter"
+                    (ngModelChange)="filterNode($event)">
+                  <span class="fa fa-search form-control-feedback"></span>
+                </div>
+                <div class="form-group form-group-sm margin-bottom-10">
+                  <button class="btn btn-olive btn-sm btn-flat" (click)="showServerStatus()">
+                    <i class="fa fa-refresh"></i> Refresh
+                  </button>
+                </div>
+              </div>
+              <div class="alert alert-info" *ngIf="!filterNodes?.length">
+                <i class="fa-fw fa fa-info"></i> No nodes found
+              </div>
+              <table class="table table-hover table-bordered" *ngIf="filterNodes?.length > 0">
+                <thead>
+                  <tr>
+                    <th>Server</th>
+                    <th>CPU</th>
+                    <th>Memory</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of currentNodes">
+                      <td>
+                        <a [routerLink]="['/cluster', groupInfo.ID, item.IP, 'node']">
+                          {{ item.Name }}
+                          <span *ngIf="item.Name && item.IP">-</span> {{ item.IP }}
+                        </a>
+                      </td>
+                      <td>
+                        <span *ngIf="item.StateText == 'Healthy'">
+                          {{ item.Cpus }} Core
+                        </span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.StateText == 'Healthy'">
+                          {{ (item.Memory / 1024).toFixed(2) }} GB
+                        </span>
+                      </td>
+                      <td>
+                        <span class="label label-success" *ngIf="item.StateText == 'Healthy'">{{ item.StateText }}</span>
+                        <span class="label label-danger" *ngIf="item.StateText != 'Healthy'">{{ item.StateText }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+              </table>
+            </div>
+          <div class="box-footer clearfix">
+            <hb-pagination [totalCount]="filterNodes.length" [pageSize]="pageSize" [maxSize]="10" [options]="containerPageOption" (onSelectPage)="setNodePage($event)"
+            *ngIf="filterNodes?.length > 0">
+            </hb-pagination>
+          </div>
+        </div>
+      </div>
       <div class="tab-pane" [ngClass]="{'active': activedTab == 'containers'}">
         <div class="box no-border" *ngIf="groupInfo?.Servers?.length > 0">
           <div class="box-body">
@@ -55,6 +121,7 @@
                   <th>Name</th>
                   <th>Image</th>
                   <th class="status">Instances</th>
+                  <th>Updated at</th>
                   <th></th>
                 </tr>
               </thead>
@@ -82,6 +149,12 @@
                         {{ obj.key }}
                       </div>
                     </div>
+                  </td>
+                  <td *ngIf="item.LastUpdateAt || item.CreateAt">
+                    {{ (item.LastUpdateAt || item.CreateAt) * 1000 | date:'yyyy-MM-dd HH:mm:ss' }}
+                  </td>
+                  <td *ngIf="!(item.LastUpdateAt || item.CreateAt)">
+                    --/--
                   </td>
                   <td class="operate">
                     <div class="btn-group operate" [class.dropup]="last && !first">
