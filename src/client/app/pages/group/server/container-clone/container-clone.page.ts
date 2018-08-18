@@ -391,7 +391,7 @@ export class ContainerClonePage {
       })
     }
     let config: any = {
-      Name: formData.Name,
+      Name: this.form.controls.Name.value,
       Image: formData.Image,
       Command: formData.Command,
       HostName: formData.HostName,

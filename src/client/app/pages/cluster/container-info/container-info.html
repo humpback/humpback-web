@@ -116,6 +116,14 @@
               </li>
             </ul>
           </div>
+          <div *ngIf="containerLabels.length > 0">
+            <p class="text-info title"><strong>Labels</strong></p>
+            <ul class="list-unstyled" *ngIf="containerLabels.length > 0">
+              <li value="-" class="flex-display custom-list" *ngFor="let item of containerLabels">
+                <span class="break-word">{{ item }}</span>
+              </li>
+            </ul>
+          </div>
           <div *ngIf="container.Config?.LogConfig?.Type">
             <p class="text-info title"><strong>Log Config</strong></p>
             <div *ngIf="container.Config?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">

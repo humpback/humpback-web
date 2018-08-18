@@ -454,7 +454,7 @@ export class ClusterContainerEditPage {
     };
     if (this.isNew || this.isClone || this.isEdit) {
       let containerConfig: any = {
-        Name: formData.Name,
+        Name: this.form.controls.Name.value,
         Image: formData.Image,
         Command: formData.Command,
         HostName: formData.HostName,

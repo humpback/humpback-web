@@ -294,6 +294,8 @@ export class ContainerListPage {
     this._imageService.getImages(this.ip)
       .then(data => {
         this.images = [];
+        let index = data.findIndex((item: any) => item == item.RepoTags == null);
+        data.splice(index, 1)
         data.forEach((item: any) => {
           let isDuplicatedImage = item.RepoTags.length > 1;
           item.RepoTags.forEach((repo: any) => {
