@@ -35,13 +35,13 @@
     <a [routerLink]="['/cluster', groupInfo.ID, 'containers', metaId, 'edit']" class="btn btn-default btn-flat">
       <i class="fa fa-pencil"></i> Edit
     </a>
-    <a [routerLink]="['/cluster', groupInfo.ID, 'containers', metaId, 'clone']" class="btn btn-default btn-flat">
-      <i class="fa fa-copy"></i> Clone
-    </a>
     <button type="button" class="btn btn-default btn-flat" (click)="showUpgradeModal()">
       <i class="fa fa-arrow-circle-up"></i>
       Upgrade
     </button>
+    <a [routerLink]="['/cluster', groupInfo.ID, 'containers', metaId, 'clone']" class="btn btn-default btn-flat">
+      <i class="fa fa-copy"></i> Clone
+    </a>
     <!--<button type="button" class="btn btn-default btn-flat" (click)="showReAssignConfirm()">
       <i class="fa fa-exchange"></i>
       Reassign

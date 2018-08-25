@@ -116,7 +116,7 @@ export class ContainerNewPage {
     let data = this.containerInfo || {};
     this.form = this._fb.group({
       Name: [{ value: (data.Name || ''), disabled: (this.isEdit) }],
-      Image: [data.Image ? (data.Image.replace('docker.neg/', '').replace('humpback-hub.newegg.org/', '').replace('humpback-hub.qcloud/', '')) : ''] || [''],
+      Image: [data.Image] || [''],
       Command: [data.CommandWithoutEntryPoint || data.Command] || [''],
       HostName: [''],
       NetworkMode: [data.NetworkMode || 'host'],
