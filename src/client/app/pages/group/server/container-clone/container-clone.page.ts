@@ -208,6 +208,20 @@ export class ContainerClonePage {
     });
     this.subscribers.push(restartSub);
 
+    let logConfigSub = this.form.controls['EnableLogFile'].valueChanges.subscribe(value => {
+      if (value) {
+        let logDriverCtrol = new FormControl('json-file');
+        this.form.addControl('LogDriver', logDriverCtrol);
+
+        let logOptsCtrl = this._fb.array([]);
+        this.form.addControl('LogOpts', logOptsCtrl);
+      } else {
+        this.form.removeControl('LogDriver');
+        this.form.removeControl('LogOpts');
+      }
+    })
+    this.subscribers.push(logConfigSub);
+
     let networkModeSub = this.form.controls['NetworkMode'].valueChanges.subscribe(value => {
       if (value === 'host') {
         this.form.removeControl('HostName');
@@ -370,19 +384,16 @@ export class ContainerClonePage {
 
   private onSubmit() {
     this.submitted = true;
-    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
-    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
-    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
-    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
-    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
-    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid || this.form.controls.ServerEnvs.invalid)) return;
     if (!this.selectedServers || !this.selectedServers.length) {
       messager.error('Please select one server at least');
       return;
     }
+    if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
     let optsObj = {};
+    let postLables = {};
+
     if(this.form.controls.EnableLogFile.value){
       let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
       optsArr.forEach((item: any) => {
@@ -390,6 +401,17 @@ export class ContainerClonePage {
         optsObj[splitArr[0]] = splitArr[1];
       })
     }
+
+    if (formData.Labels) {
+      if (formData.Labels.length > 0) {
+        formData.Labels.forEach((item: any) => {
+          let key = item.Value.split(":")[0];
+          let value = item.Value.split(":")[1];
+          postLables[key] = value;
+        })
+      }
+    }
+
     let config: any = {
       Name: this.form.controls.Name.value,
       Image: formData.Image,
@@ -403,6 +425,7 @@ export class ContainerClonePage {
         return item;
       }),
       Volumes: formData.Volumes,
+      Labels: postLables || {},
       Env: [],
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
@@ -415,6 +438,10 @@ export class ContainerClonePage {
         Type: formData.LogDriver,
         Config: optsObj
       }
+    }
+
+    if (formData.Ulimits.length > 0) {
+      config.Ulimits = formData.Ulimits;
     }
 
     this.cloneProcessMsg = [];

@@ -149,6 +149,20 @@ export class ContainerNewPage {
     });
     this.subscribers.push(restartSub);
 
+    let logConfigSub = this.form.controls['EnableLogFile'].valueChanges.subscribe(value => {
+      if (value) {
+        let logDriverCtrol = new FormControl('json-file');
+        this.form.addControl('LogDriver', logDriverCtrol);
+
+        let logOptsCtrl = this._fb.array([]);
+        this.form.addControl('LogOpts', logOptsCtrl);
+      } else {
+        this.form.removeControl('LogDriver');
+        this.form.removeControl('LogOpts');
+      }
+    })
+    this.subscribers.push(logConfigSub);
+
     let networkModeSub = this.form.controls['NetworkMode'].valueChanges.subscribe(value => {
       if (value === 'host') {
         this.form.removeControl('HostName');
@@ -330,7 +344,7 @@ export class ContainerNewPage {
   }
 
   private getTargetLogDriver(){
-    if(this.form.controls.LogDriver.value && this.form.controls.LogOpts.value.length == 0 && !this.hasGetDockerInfo){
+    if(!this.hasGetDockerInfo && this.form.controls.LogDriver.value && this.form.controls.LogOpts.value.length == 0){
       this._containerService.getDockerInfo(this.ip)
       .then((data:any) => {
         if(data && data.LoggingDriver){
@@ -382,13 +396,7 @@ export class ContainerNewPage {
       messager.error('Please select one server at least');
       return;
     }
-    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
-
-    if (!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
-      || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
-      || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
-      || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.Labels.invalid || this.form.controls.Ulimits.invalid
-      || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
+    if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
     let optsObj = {};

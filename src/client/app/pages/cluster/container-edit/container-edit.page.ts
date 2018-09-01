@@ -93,6 +93,7 @@ export class ClusterContainerEditPage {
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
+      IsRemoveDelay: (data.IsRemoveDelay === true || data.IsRemoveDelay === undefined) ? true : false,
       WebHooks: this._fb.array([]),
       Instances: [data.Instances || ''],
       Constraints: this._fb.array([])
@@ -237,6 +238,20 @@ export class ClusterContainerEditPage {
       }
     });
     this.subscribers.push(restartSub);
+
+    let logConfigSub = this.form.controls['EnableLogFile'].valueChanges.subscribe(value => {
+      if(value){
+        let logDriverCtrol = new FormControl('json-file');
+        this.form.addControl('LogDriver', logDriverCtrol);
+
+        let logOptsCtrl = this._fb.array([]);
+        this.form.addControl('LogOpts', logOptsCtrl);
+      }else{
+        this.form.removeControl('LogDriver');
+        this.form.removeControl('LogOpts');
+      }
+    })
+    this.subscribers.push(logConfigSub);
 
     let networkModeSub = this.form.controls['NetworkMode'].valueChanges.subscribe(value => {
       if (value === 'host') {
@@ -383,13 +398,7 @@ export class ClusterContainerEditPage {
 
   private onSubmit() {
     this.submitted = true;
-    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
-    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
-    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
-    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
-    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.Dns.invalid
-    || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid || this.form.controls.WebHooks.invalid
-    || this.form.controls.Instances.invalid || this.form.controls.Constraints.invalid )) return;
+    if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
     let optsObj = {};
@@ -448,6 +457,9 @@ export class ClusterContainerEditPage {
     let config: any = {
       WebHooks: formData.WebHooks,
       Instances: formData.Instances,
+      Option:{
+        IsRemoveDelay: !!formData.IsRemoveDelay
+      },
       Placement: {
         Constraints: constraintsData
       }
