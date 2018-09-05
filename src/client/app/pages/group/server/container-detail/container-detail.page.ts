@@ -15,6 +15,7 @@ declare let moment: any;
 export class ContainerDetailPage {
 
   private container: any = {};
+  private containerLabels: Array<any> = [];
   private containerBasicInfo: Array<any> = [];
   private groupInfo: any;
   private ip: string;
@@ -110,6 +111,17 @@ export class ContainerDetailPage {
     this._containerService.getById(this.ip, this.containerId)
       .then(data => {
         this.container = data;
+        if (this.container.Config.Labels) {
+          if (this.container.Config.Labels == {}) {
+            this.containerLabels = [];
+          } else {
+            for (let key in this.container.Config.Labels) {
+              this.containerLabels.push(`${key}:${this.container.Config.Labels[key]}`);
+            }
+          }
+        } else {
+          this.containerLabels = [];
+        }
         let stateText = '';
         if (this.container.State.Running) {
           stateText = 'Running';

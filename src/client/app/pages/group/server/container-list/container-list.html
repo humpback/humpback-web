@@ -56,6 +56,11 @@
               <tbody>
                 <tr *ngFor="let item of currentContainers; let last = last;">
                   <td class="container-name">
+                    <ng-template #containerIdTemplate>
+                        <div style="word-break: break-all;">{{item.Id}}</div>
+                    </ng-template>
+                    <i class="fa fa-info-circle text-muted" (click)="copyId(cIdInput)" style="cursor: pointer; margin-right: 5px;" title="Click To Copy" [tooltip]="containerIdTemplate" triggers="hover"></i>
+                    <input type="text" #cIdInput value="{{item.Id}}" class="empty-input">
                     <a [routerLink]="['/group', groupInfo.ID, ip, 'containers', item.Names[0].substring(1)]">
                       {{ item.Names[0].substring(1) }}
                     </a>

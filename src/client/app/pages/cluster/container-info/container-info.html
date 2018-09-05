@@ -61,7 +61,7 @@
               <ng-template ngFor let-item let-i="index" let-isEven="even" [ngForOf]="containerBasicInfo">
                 <tr *ngIf="isEven">
                   <td class="basic-info-title">{{ containerBasicInfo[i].title }}</td>
-                  <td>
+                  <td class="basic-value">
                     {{ containerBasicInfo[i].content || 'N/A' }}
                     <small class="text-info" *ngIf="containerBasicInfo[i].title == 'Restart Policy' && containerBasicInfo[i].content == 'on-failure'">
                       with {{ container.Config?.RestartRetryCount }} retry count
@@ -78,9 +78,31 @@
               </ng-template>
             </tbody>
           </table>
-          <div *ngIf="container.Config?.Ports && container.Config?.Ports?.length > 0">
+          <div *ngIf="containerLabels.length > 0">
+            <p class="text-info title"><strong>Labels</strong></p>
+            <ul class="list-unstyled" *ngIf="containerLabels.length > 0">
+              <li value="-" class="flex-display custom-list" *ngFor="let item of containerLabels">
+                <span class="break-word">{{ item }}</span>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="container.Config?.LogConfig?.Type">
+            <p class="text-info title"><strong>Log Config</strong></p>
+            <div *ngIf="container.Config?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">
+                <span *ngIf="container.Config?.LogConfig?.Type">Driver : {{ container.Config.LogConfig.Type }}</span>
+              </div>
+              <ul class="list-unstyled" *ngIf="container.Config?.LogConfig?.Config | isEmptyObj">
+                <div style="padding-bottom: 10px;">
+                  Opts :
+                </div>
+                <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let log of container.Config?.LogConfig.Config | objLoop">
+                  <span class="break-word">{{log.key}}={{ log.value }}</span>
+                </li>
+              </ul>
+          </div>
+          <div>
             <p class="text-info title"><strong>Ports Binding</strong></p>
-            <ul class="list-unstyled">
+            <ul class="list-unstyled" *ngIf="container.Config?.NetworkMode != 'host' && container.Config?.Ports && container.Config?.Ports?.length > 0">
               <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let item of container.Config.Ports">
                 <span class="no-margin" *ngIf="item.PublicPort > 0">
                   {{ (item.Ip || '0.0.0.0') + ":" + item.PublicPort }}
@@ -91,6 +113,7 @@
                 <i class="fa fa-long-arrow-right"></i> {{ item.PrivatePort }}
               </li>
             </ul>
+            <div *ngIf="container.Config?.NetworkMode == 'host' || !container.Config?.Ports || container.Config?.Ports?.length <= 0">No port binding defined.</div>
           </div>
           <div *ngIf="container.Config?.Dns?.length > 0">
             <p class="text-info title"><strong>DNS</strong></p>
@@ -115,28 +138,6 @@
                 <span class="break-word">{{ item }}</span>
               </li>
             </ul>
-          </div>
-          <div *ngIf="containerLabels.length > 0">
-            <p class="text-info title"><strong>Labels</strong></p>
-            <ul class="list-unstyled" *ngIf="containerLabels.length > 0">
-              <li value="-" class="flex-display custom-list" *ngFor="let item of containerLabels">
-                <span class="break-word">{{ item }}</span>
-              </li>
-            </ul>
-          </div>
-          <div *ngIf="container.Config?.LogConfig?.Type">
-            <p class="text-info title"><strong>Log Config</strong></p>
-            <div *ngIf="container.Config?.LogConfig | isEmptyObj" style="margin-bottom: 10px;">
-                <span *ngIf="container.Config?.LogConfig?.Type">Driver : {{ container.Config.LogConfig.Type }}</span>
-              </div>
-              <ul class="list-unstyled" *ngIf="container.Config?.LogConfig?.Config | isEmptyObj">
-                <div style="padding-bottom: 10px;">
-                  Opts :
-                </div>
-                <li value="-" class="flex-display flex-align-center custom-list" *ngFor="let log of container.Config?.LogConfig.Config | objLoop">
-                  <span class="break-word">{{log.key}}={{ log.value }}</span>
-                </li>
-              </ul>
           </div>
           <div *ngIf="container.WebHooks?.length > 0">
             <p class="text-info title"><strong>WebHooks</strong></p>
@@ -204,7 +205,7 @@
                           <strong>Status</strong>
                         </p>
                         <ul class="list-unstyled">
-                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="item.NetworkMode == 'host'">
+                          <li value="-" class="flex-display flex-align-center custom-list" *ngIf="item.HostName">
                             HostName: {{ item.HostName }}
                           </li>
                           <li value="-" class="flex-display flex-align-center custom-list">
