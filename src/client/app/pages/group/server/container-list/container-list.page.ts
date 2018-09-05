@@ -148,7 +148,7 @@ export class ContainerListPage {
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
         this.containers = this.containers.filter((item: any) => {
-          if ((item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}")) {
+          if (item.Names[0] && item.Names[0].startsWith('/CLUSTER-') || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}" && item.Labels["com.docker.compose.service"])) {
             return false;
           }
           return true;
