@@ -77,3 +77,8 @@ p.title {
   margin-top: 20px;
   border-bottom: 1px solid lightgray;
 }
+
+.important-text {
+  color: tomato;
+  padding: 0 10px;
+}

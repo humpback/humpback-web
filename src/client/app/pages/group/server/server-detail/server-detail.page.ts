@@ -200,6 +200,20 @@ export class ServerDetailPage {
     this.deleteContainerModalOptions.show = true;
   }
 
+  private deleteService() {
+    let name = this.serviceName;
+    this._composeService.removeService(this.ip, name)
+      .then((data) => {
+        messager.success('succeed');
+        this.deleteContainerModalOptions.show = false;
+        this._router.navigate(['/group', this.groupId, this.ip, 'overview']);
+      })
+      .catch((err) => {
+        messager.error(err.Detail || err);
+      })
+  }
+
+
   private getLogs() {
     let instance = this.logsViewModalOptions.selectedInstance;
     this._containerService.getLogs(instance.ip, instance.container, this.logsViewModalOptions.tailNum)

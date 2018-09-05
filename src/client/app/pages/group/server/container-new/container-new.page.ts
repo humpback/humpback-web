@@ -450,7 +450,7 @@ export class ContainerNewPage {
       config.Ulimits = formData.Ulimits;
     }
     if (this.isEdit) {
-      config.Id = this.containerInfo.Id;
+      config.Id = this.form.controls.Name.value;
       this.selectedServers.forEach((item: any) => {
         this._containerService.create(item, config)
           .then(data => {
