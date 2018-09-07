@@ -9,7 +9,7 @@
       <li class="pull-left header">
         <i class="fa fa-th"></i> {{ activedTab == 'containers' ? 'Containers' : (activedTab == 'images' ? 'Docker Images' : 'Service') }}
       </li>
-      <li [ngClass]="{'active': activedTab == 'images'}" *ngIf="containers.length > 0">
+      <li [ngClass]="{'active': activedTab == 'images'}">
         <a href="javascript:void(0)" data-toggle="dropdown" (click)="getAllInstanceIp()">
           Docker Images
           <span class="fa fa-caret-down"></span>
@@ -307,11 +307,12 @@
     </div>
     <div class="form-group" [ngClass]="{'has-error': upgradeContainerModalOptions.formSubmitted && newTagInput.invalid}">
       <label class="control-label">New Tag</label>
-      <select class="form-control" name="newTag" required [(ngModel)]="newTag" #newTagInput="ngModel" [validateNotEqual]="upgradeContainerTarget?.Config.Image | imageNameFmt:'Tag'">
-        <option value="{{item.tag}}" *ngFor="let item of candidateTags">{{ item.tag }} ({{ item.time*1000 | date:'yyyy/MM/dd HH:mm' }})</option>
-      </select>
+      <input type="text" autocomplete="off" class="form-control" name="newTag" [(ngModel)]="newTag" #newTagInput="ngModel" required
+        maxlength="128" pattern="^[0-9a-z._-]*$" [validateNotEqual]="container?.Config?.Image | imageNameFmt:'Tag'">
       <div [hidden]="newTagInput.valid || !upgradeContainerModalOptions.formSubmitted">
         <span class="help-block" *ngIf="newTagInput.errors?.required">Tag cannot be empty.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.maxlength">Tag cannot more than 128 characters.</span>
+        <span class="help-block" *ngIf="newTagInput.errors?.pattern">Tag must match ^[0-9a-z._-]*$.</span>
         <span class="help-block" *ngIf="newTagInput.errors?.validateNotEqual">New tag must be different with the old tag.</span>
       </div>
     </div>
@@ -320,6 +321,34 @@
       <button type="submit" class="btn btn-success btn-flat">Confirm</button>
     </div>
   </form>
+</hb-modal>
+
+<hb-modal [options]="pullImageModalOptions">
+  <form novalidate #pullForm="ngForm" (ngSubmit)="pullImage(pullForm)">
+    <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
+      <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
+        autocomplete="off" #imageName="ngModel" required pattern="^[0-9a-z.\/:_-]*$">
+      <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
+        <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
+        <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-flat" (click)="pullImageModalOptions.show = fasle">Cancel</button>
+      <button type="submit" class="btn btn-success btn-flat">Pull</button>
+    </div>
+  </form>
+</hb-modal>
+
+<hb-modal [options]="rmImageModalOptions">
+  <div class="description" *ngIf="rmImageTarget?._repo">
+    Are you sure you want to delete
+    <strong class="important-text">{{ rmImageTarget?._repo }}</strong> ?
+  </div>
+  <hb-modal-footer>
+    <button type="button" class="btn btn-default btn-flat" (click)="rmImageModalOptions.show = fasle">Cancel</button>
+    <button type="button" class="btn btn-success btn-flat" (click)="rmImage()">Confirm</button>
+  </hb-modal-footer>
 </hb-modal>
 
 <!-- Modal Define End -->

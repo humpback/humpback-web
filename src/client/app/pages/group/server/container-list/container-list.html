@@ -344,10 +344,9 @@
   <form novalidate #pullForm="ngForm" (ngSubmit)="pullImage(pullForm)">
     <div class="form-group" [ngClass]="{'has-error': pullImageModalOptions.formSubmitted && imageName.invalid}">
       <input type="text" class="form-control" name="pullImageName" placeholder="Docker image name" [(ngModel)]="pullImageName"
-        autocomplete="off" #imageName="ngModel" required maxlength="30" pattern="^[0-9a-z.\/:_-]*$">
+        autocomplete="off" #imageName="ngModel" required pattern="^[0-9a-z.\/:_-]*$">
       <div [hidden]="imageName.valid || !pullImageModalOptions.formSubmitted">
         <span class="help-block" *ngIf="imageName.errors?.required">Image name cannot be empty.</span>
-        <span class="help-block" *ngIf="imageName.errors?.maxlength">Image name cannot more than 30 characters.</span>
         <span class="help-block" *ngIf="imageName.errors?.pattern">Image name must match ^[0-9a-z.\/:_-]*$.</span>
       </div>
     </div>

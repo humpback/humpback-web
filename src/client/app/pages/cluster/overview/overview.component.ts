@@ -84,6 +84,13 @@ export class ClusterOverviewPage {
     this.upgradeContainerModalOptions = _.cloneDeep(modalCommonOptions);
     this.upgradeContainerModalOptions.title = "Upgrade";
     this.upgradeContainerModalOptions.hideFooter = true;
+
+    this.pullImageModalOptions = _.cloneDeep(modalCommonOptions);
+		this.pullImageModalOptions.hideFooter = true;
+    this.pullImageModalOptions.title = 'Pull Docker Image';
+
+    this.rmImageModalOptions = _.cloneDeep(modalCommonOptions);
+
     this.reAssignConfirmModalOptions = _.cloneDeep(modalCommonOptions);
 
     this._route.params.forEach(params => {
@@ -303,17 +310,8 @@ export class ClusterOverviewPage {
   private showUpgradeModal(target: any) {
     this.upgradeContainerTarget = target;
     this.selectTag = '';
-    let imageName = this.upgradeContainerTarget.Config.Image.replace(`${this.groupInfo.RegistryAdd}/`, '');
-    imageName = imageName.split(':')[0];
-    this._hubService.getTags(this.groupInfo.RegistryLocation, imageName, true)
-      .then(data => {
-        this.candidateTags = data;
-        this.upgradeContainerModalOptions.formSubmitted = false;
-        this.upgradeContainerModalOptions.show = true;
-      })
-      .catch(err => {
-        messager.error("Get tags failed. Please try again.")
-      });
+    this.upgradeContainerModalOptions.formSubmitted = false;
+    this.upgradeContainerModalOptions.show = true;
   }
 
   private upgrade(form: any) {
@@ -346,7 +344,7 @@ export class ClusterOverviewPage {
           return regex.test(item.Name);
         })
       }
-      this.setImagePage(this.imagePageIndex);
+      this.setImagePage(1);
       this.filterImageDone = true;
     }, 100);
   }
@@ -367,7 +365,16 @@ export class ClusterOverviewPage {
   private pullImage(form: any) {
     this.pullImageModalOptions.formSubmitted = true;
     if (form.invalid) return;
-    let imageName = `${this.groupInfo.RegistryAdd}/${form.value.pullImageName}`;
+    let imageName = form.value.pullImageName;
+    if (!imageName) {
+      messager.error('Image name cannot be empty or null');
+      return;
+    }
+    let regex = new RegExp('^[0-9a-zA-Z-_:./]+$');
+    if (!regex.test(imageName)) {
+      messager.error('Image name cannot contain any special character');
+      return;
+    }
     this.pullImageModalOptions.show = false;
     this._imageService.pullImage(this.ip, imageName)
       .then(data => {
