@@ -288,7 +288,7 @@
   </form>
 </hb-modal>
 
-<hb-modal [options]="advanceSettingModalOptions">
+<!-- <hb-modal [options]="advanceSettingModalOptions">
   <form novalidate [formGroup]="advanceSettingForm" (ngSubmit)="updateAdvanceSetting()" *ngIf="advanceSettingForm">
     <div class="form-group" [class.has-error]="advanceSettingModalOptions.submitted && advanceSettingForm.controls.Instances.invalid">
       <label>Number of Instances (Server Num {{groupInfo.Servers.length}})</label>
@@ -340,7 +340,7 @@
       <button type="submit" class="btn btn-success btn-flat">Confirm</button>
     </div>
   </form>
-</hb-modal>
+</hb-modal> -->
 
 <hb-modal [options]="logsViewModalOptions">
   <div class="flex-display" style="margin-bottom: 10px;">

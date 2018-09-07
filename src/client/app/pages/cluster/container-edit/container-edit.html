@@ -385,14 +385,14 @@
       </div>
 
       <div class="form-group" [class.has-error]="submitted && form.controls.Instances.invalid">
-        <label>Number of Instances (Server Num {{groupInfo.Servers.length}})</label>
-        <input type="number" #instancesNum class="form-control" formControlName="Instances" required min="1" validateInteger validateRange>
+        <label>Number of Instances (Server Num {{ isClone ? selectedGroup?.Servers?.length : groupInfo.Servers.length }})</label>
+        <input type="number" #instancesNum class="form-control" formControlName="Instances" required min="0" validateInteger validateRange>
         <div *ngIf="submitted && form.controls.Instances.invalid">
           <span class="help-block" *ngIf="form.controls.Instances.errors.required">Instances cannot be empty.</span>
-          <span class="help-block" *ngIf="form.controls.Instances.errors.numberRange">Instances must grather than 1.</span>
+          <span class="help-block" *ngIf="form.controls.Instances.errors.numberRange">Instances must grather than 0.</span>
           <span class="help-block" *ngIf="form.controls.Instances.errors.integer">Instances must be an integer.</span>
         </div>
-        <div class="alert alert-warning" style="margin-top: 5px; display: none;" [class.show]="instancesNum.value > groupInfo.Servers.length">
+        <div class="alert alert-warning" style="margin-top: 5px; display: none;" [class.show]="instancesNum.value > ( isClone ? selectedGroup?.Servers?.length : groupInfo.Servers.length )">
           Instance num is more than server num. It's can be created but may cause some unpredictable errors.
         </div>
       </div>
