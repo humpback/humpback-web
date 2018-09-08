@@ -95,7 +95,7 @@ export class ClusterContainerEditPage {
       Memory: data.Memory === 0 ? '' : data.Memory,
       IsRemoveDelay: (data.IsRemoveDelay === true || data.IsRemoveDelay === undefined) ? true : false,
       WebHooks: this._fb.array([]),
-      Instances: [data.Instances || ''],
+      Instances: [data.Instances ? data.Instances : (data.Instances === 0 ? 0 : '')],
       Constraints: this._fb.array([])
     });
 

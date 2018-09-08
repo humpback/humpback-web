@@ -128,9 +128,10 @@
               <tbody>
                 <tr *ngFor="let item of currentContainers; let last = last; let first = first;">
                   <td>
-                    <i class="fa fa-circle text-success" title="Health" *ngIf="item.Instances == item.Running"></i>
+                    <i class="fa fa-circle text-success" title="Health" *ngIf="item.Instances == item.Running && item.Instances != 0"></i>
                     <i class="fa fa-circle text-warning" title="Not Health" *ngIf="item.Running < item.Instances && item.Running > 0"></i>
-                    <i class="fa fa-circle text-danger" title="Danger" *ngIf="item.Running == 0"></i>
+                    <i class="fa fa-circle text-danger" title="Danger" *ngIf="item.Running == 0 && item.Instances != 0"></i>
+                    <i class="fa fa-circle text-muted" title="No Instance" *ngIf="item.Instances == 0"></i>
                   </td>
                   <td class="container-name">
                     <a [routerLink]="['/cluster', groupInfo.ID, 'containers', item.MetaId, 'info']">
