@@ -16,7 +16,7 @@ export class SystemConfigService {
   }
   set Config(value: any) {
     this._config = value;
-    this.ConfigSubject.next(this._config);    
+    this.ConfigSubject.next(this._config);
   }
   private _config: any;
 
@@ -54,5 +54,18 @@ export class SystemConfigService {
           reject(err.json ? err.json() : err);
         })
     });
+  }
+
+  notifyCenter(value: any, event: string) {
+    if (!value) return;
+    let url = `${value}/v1/cluster/event`;
+    let body = {
+      Event: event
+    };
+    this._http.post(url, body)
+      .then(res => {
+
+      })
+      .catch(err => { });
   }
 }
