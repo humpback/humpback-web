@@ -33,6 +33,7 @@ export class ClusterContainerInfoPage {
   private advanceSettingForm: FormGroup;
   private selectTag: string;
   private candidateTags: Array<any>;
+  private containerLabels: Array<any> = [];
 
   private subscribers: Array<any> = [];
 
@@ -105,6 +106,17 @@ export class ClusterContainerInfoPage {
         if (this.container.Containers && this.container.Containers.length) {
           this.container.Containers = _.sortBy(this.container.Containers, ['IP', "HostName"]);
           this.activedTab = this.container.Containers[0].IP;
+        }
+        if(this.container.Config.Labels){
+          if(this.container.Config.Labels == {}){
+            this.containerLabels = [];
+          } else {
+            for (let key in this.container.Config.Labels) {
+              this.containerLabels.push(`${key}:${this.container.Config.Labels[key]}`);
+            }
+          }
+        } else {
+          this.containerLabels = [];
         }
         let basicInfo = {
           'Image': data.Config.Image,

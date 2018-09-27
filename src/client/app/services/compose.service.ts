@@ -111,6 +111,20 @@ export class ComposeService {
     });
   }
 
+  removeService(ip: string, name: any, hidenLoading: boolean = false): Promise<any> {
+    let reqConfig = this.buildReq(ip, hidenLoading);
+    let url: string = `${reqConfig.url}/services/${name}`;
+    return new Promise((resolve, reject) => {
+      this._http.delete(url, reqConfig.options)
+        .then(res => {
+          resolve(res.json ? res.json() : res.text());
+        })
+        .catch(err => {
+          reject(err.json ? err.json() : err);
+        });
+    });
+  }
+
   addCompose(ip: string, data: any): Promise<any>{
     let reqConfig = this.buildReq(ip);
     let url: string = `${reqConfig.url}/services`;

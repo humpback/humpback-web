@@ -1,5 +1,6 @@
-<section class="content-header">
-  <h1> New Container</h1>
+<section class="content-header" *ngIf="!agentInvalid">
+  <h1 *ngIf="isNew"> New Container</h1>
+  <h1 *ngIf="isEdit"> Edit Container</h1>
   <ol class="breadcrumb">
     <li>
       <a [routerLink]="['/group', groupInfo.ID, ip, 'overview']"><i class="fa fa-th"></i> Container List</a>
@@ -7,8 +8,17 @@
     <li class="active">New Container</li>
   </ol>
 </section>
-<section class="content">
+<section class="content" *ngIf="!agentInvalid">
   <form novalidate [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+    <div *ngIf="isEdit" class="form-group" [ngClass]="{'has-error': !selectedServers.length && submitted}">
+        <label>Servers</label>
+        <div>
+          <select2 [data]="servers" [value]="selectedServers" (valueChanged)="refreshSelectedServer($event)" [cssImport]="false" [width]="'100%'"
+            [options]="serversSelect2Options"></select2>
+        </div>
+        <span class="help-block" *ngIf="!selectedServers.length && submitted">Servers cannot be empty.</span>
+      </div>
+
     <div class="form-group" [class.has-error]="submitted && form.controls.Name.invalid">
       <label>Name</label>
       <input type="text" class="form-control" formControlName="Name" maxlength="30" required pattern="^[0-9a-zA-Z-_.]*$">
@@ -157,6 +167,114 @@
       </div>
     </div>
 
+    <div class="box">
+      <div class="box-header with-border">Volumes Binding</div>
+      <div class="box-body" formArrayName="Volumes">
+        <div class="equal-fields" *ngFor="let volume of form.controls.Volumes.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && volume.controls.ContainerVolume.invalid">
+            <input type="text" class="form-control" placeholder="Container volume" required maxlength="200" formControlName="ContainerVolume">
+            <div *ngIf="submitted && volume.controls.ContainerVolume.invalid">
+              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.required">Container volume port is required.</span>
+              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.maxlength">Container volume cannot more than 20 characters.</span>
+            </div>
+          </div>
+          <div class="form-group" [class.has-error]="submitted && volume.controls.HostVolume.invalid">
+            <input type="text" class="form-control" placeholder="Host volume" required maxlength="200" formControlName="HostVolume">
+            <div *ngIf="submitted && volume.controls.HostVolume.invalid">
+              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.required">Host volume is required.</span>
+              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.maxlength">Host volume cannot more than 20 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeVolumeBinding(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addVolumeBinding()">
+            <i class="fa fa-plus"></i> Add Volume
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Links</div>
+      <div class="box-body" formArrayName="Links">
+        <div class="equal-fields" *ngFor="let link of form.controls.Links.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && link.controls.Value.invalid">
+            <input type="text" class="form-control" placeholder="e.g. container_name:alias" required maxlength="100" formControlName="Value">
+            <div *ngIf="submitted && link.controls.Value.invalid">
+              <span class="help-block" *ngIf="link.controls.Value.errors.required">Link is required.</span>
+              <span class="help-block" *ngIf="link.controls.Value.errors.maxlength">Link cannot more than 100 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeLink(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLink()">
+            <i class="fa fa-plus"></i> Add Link
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Environment Variables</div>
+      <div class="box-body" formArrayName="Envs">
+        <div class="equal-fields" *ngFor="let env of form.controls.Envs.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && env.controls.Value.invalid">
+            <input type="text" class="form-control" placeholder="e.g. APP_VERION=1.0.0" required maxlength="500" formControlName="Value">
+            <div *ngIf="submitted && env.controls.Value.invalid">
+              <span class="help-block" *ngIf="env.controls.Value.errors.required">Value is required.</span>
+              <span class="help-block" *ngIf="env.controls.Value.errors.maxlength">Value cannot more than 500 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeEnv(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addEnv()">
+            <i class="fa fa-plus"></i> Add Environment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">Labels</div>
+      <div class="box-body" formArrayName="Labels">
+        <div class="equal-fields" *ngFor="let label of form.controls.Labels.controls; let i = index;" [formGroupName]="i">
+          <div class="form-group" [class.has-error]="submitted && label.controls.Value.invalid">
+            <input type="text" class="form-control" placeholder="e.g. name:test" required maxlength="100" formControlName="Value" pattern="^[0-9a-zA-Z-_./]*:[0-9a-zA-Z-_./ ]*$">
+            <div *ngIf="submitted && label.controls.Value.invalid">
+              <span class="help-block" *ngIf="label.controls.Value.errors.required">label is required.</span>
+              <span class="help-block" *ngIf="label.controls.Value.errors.maxlength">label cannot more than 100 characters.</span>
+              <span class="help-block" *ngIf="label.controls.Value.errors.pattern">The format of the label is incorrect.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-flat" (click)="removeLabel(i)">
+              <i class="fa fa-close"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group no-margin">
+          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLabel()">
+            <i class="fa fa-plus"></i> Add Label
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <div class="checkbox">
         <label style="font-weight: 700;">
@@ -209,89 +327,70 @@
     </div>
 
     <div class="box">
-      <div class="box-header with-border">Volumes Binding</div>
-      <div class="box-body" formArrayName="Volumes">
-        <div class="equal-fields" *ngFor="let volume of form.controls.Volumes.controls; let i = index;" [formGroupName]="i">
-          <div class="form-group" [class.has-error]="submitted && volume.controls.ContainerVolume.invalid">
-            <input type="text" class="form-control" placeholder="Container volume" required maxlength="200" formControlName="ContainerVolume">
-            <div *ngIf="submitted && volume.controls.ContainerVolume.invalid">
-              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.required">Container volume port is required.</span>
-              <span class="help-block" *ngIf="volume.controls.ContainerVolume.errors.maxlength">Container volume cannot more than 20 characters.</span>
+        <div class="box-header with-border">Ulimit</div>
+        <div class="box-body" formArrayName="Ulimits">
+          <div class="equal-fields" *ngFor="let ulimit of form.controls.Ulimits.controls; let i = index;" [formGroupName]="i">
+            <div class="form-group" [class.has-error]="submitted && ulimit.controls.Name.invalid">
+              <select class="form-control" formControlName="Name" required>
+                <option value="">--Select Ulimit Item--</option>
+                <option value="core">core</option>
+                <option value="data">data</option>
+                <option value="fsize">fsize</option>
+                <option value="memlock">memlock</option>
+                <option value="nofile">nofile</option>
+                <option value="rss">rss</option>
+                <option value="stack">stack</option>
+                <option value="cpu">cpu</option>
+                <option value="nproc">nproc</option>
+                <option value="as">as</option>
+                <option value="maxlogins">maxlogins</option>
+                <option value="maxsyslogins">maxsyslogins</option>
+                <option value="priority">priority</option>
+                <option value="locks">locks</option>
+                <option value="sigpending">sigpending</option>
+                <option value="msgqueue">msgqueue</option>
+                <option value="nice">nice</option>
+                <option value="rtprio">rtprio</option>
+              </select>
+              <div *ngIf="submitted && ulimit.controls.Name.invalid">
+                <span class="help-block" *ngIf="ulimit.controls.Name.errors.required">label is required.</span>
+              </div>
+            </div>
+            <div class="form-group" [class.has-error]="submitted && ulimit.controls.Soft.invalid">
+              <input type="text" class="form-control" placeholder="soft item" required maxlength="100" formControlName="Soft" type="number">
+              <div *ngIf="submitted && ulimit.controls.Soft.invalid">
+                <span class="help-block" *ngIf="ulimit.controls.Soft.errors.required">soft item is required.</span>
+                <span class="help-block" *ngIf="ulimit.controls.Soft.errors.maxlength">soft cannot more than 100 characters.</span>
+              </div>
+            </div>
+            <div class="form-group" [class.has-error]="submitted && ulimit.controls.Hard.invalid">
+              <input type="text" class="form-control" placeholder="hard item" maxlength="100" formControlName="Hard" type="number">
+              <div *ngIf="submitted && ulimit.controls.Hard.invalid">
+                <span class="help-block" *ngIf="ulimit.controls.Hard.errors.maxlength">label cannot more than 100 characters.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-default btn-flat" (click)="removeUlimit(i)">
+                <i class="fa fa-close"></i>
+              </button>
             </div>
           </div>
-          <div class="form-group" [class.has-error]="submitted && volume.controls.HostVolume.invalid">
-            <input type="text" class="form-control" placeholder="Host volume" required maxlength="200" formControlName="HostVolume">
-            <div *ngIf="submitted && volume.controls.HostVolume.invalid">
-              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.required">Host volume is required.</span>
-              <span class="help-block" *ngIf="volume.controls.HostVolume.errors.maxlength">Host volume cannot more than 20 characters.</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <button type="button" class="btn btn-default btn-flat" (click)="removeVolumeBinding(i)">
-              <i class="fa fa-close"></i>
+          <div class="form-group no-margin">
+            <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addUlimit()">
+              <i class="fa fa-plus"></i> Add Ulimit
             </button>
           </div>
         </div>
-        <div class="form-group no-margin">
-          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addVolumeBinding()">
-            <i class="fa fa-plus"></i> Add Volume
-          </button>
-        </div>
       </div>
-    </div>
-
-    <div class="box">
-      <div class="box-header with-border">Environment Variables</div>
-      <div class="box-body" formArrayName="Envs">
-        <div class="equal-fields" *ngFor="let env of form.controls.Envs.controls; let i = index;" [formGroupName]="i">
-          <div class="form-group" [class.has-error]="submitted && env.controls.Value.invalid">
-            <input type="text" class="form-control" placeholder="e.g. APP_VERION=1.0.0" required maxlength="500" formControlName="Value">
-            <div *ngIf="submitted && env.controls.Value.invalid">
-              <span class="help-block" *ngIf="env.controls.Value.errors.required">Value is required.</span>
-              <span class="help-block" *ngIf="env.controls.Value.errors.maxlength">Value cannot more than 500 characters.</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <button type="button" class="btn btn-default btn-flat" (click)="removeEnv(i)">
-              <i class="fa fa-close"></i>
-            </button>
-          </div>
-        </div>
-        <div class="form-group no-margin">
-          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addEnv()">
-            <i class="fa fa-plus"></i> Add Environment
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="box">
-      <div class="box-header with-border">Links</div>
-      <div class="box-body" formArrayName="Links">
-        <div class="equal-fields" *ngFor="let link of form.controls.Links.controls; let i = index;" [formGroupName]="i">
-          <div class="form-group" [class.has-error]="submitted && link.controls.Value.invalid">
-            <input type="text" class="form-control" placeholder="e.g. container_name:alias" required maxlength="100" formControlName="Value">
-            <div *ngIf="submitted && link.controls.Value.invalid">
-              <span class="help-block" *ngIf="link.controls.Value.errors.required">Link is required.</span>
-              <span class="help-block" *ngIf="link.controls.Value.errors.maxlength">Link cannot more than 100 characters.</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <button type="button" class="btn btn-default btn-flat" (click)="removeLink(i)">
-              <i class="fa fa-close"></i>
-            </button>
-          </div>
-        </div>
-        <div class="form-group no-margin">
-          <button type="button" class="btn btn-default btn-flat btn-sm" (click)="addLink()">
-            <i class="fa fa-plus"></i> Add Link
-          </button>
-        </div>
-      </div>
-    </div>
 
     <div class="form-group">
       <button type="submit" class="btn bg-olive btn-flat">Save</button>
     </div>
   </form>
 </section>
+
+<div *ngIf="agentInvalid" style="padding: 15px;">
+  <div class="alert alert-danger show">
+      Please update humpback-agent to the <a href="https://hub.docker.com/r/humpbacks/humpback-agent/">latest version</a>
+  </div>
+</div>

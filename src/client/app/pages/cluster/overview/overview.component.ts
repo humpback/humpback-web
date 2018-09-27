@@ -33,6 +33,15 @@ export class ClusterOverviewPage {
   private currentImages: Array<any> = [];
   private imagePageIndex: number = 1;
 
+  private nodePageIndex: number = 1;
+	private currentNodes: Array<any> = [];
+  private serverStatus: any = {};
+
+  private filterNodeDone: boolean;
+  private filterNodes: Array<any> = [];
+  private nodeFilter: string;
+
+
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
   private rmImageModalOptions: any = {};
@@ -75,9 +84,17 @@ export class ClusterOverviewPage {
     this.upgradeContainerModalOptions = _.cloneDeep(modalCommonOptions);
     this.upgradeContainerModalOptions.title = "Upgrade";
     this.upgradeContainerModalOptions.hideFooter = true;
+
+    this.pullImageModalOptions = _.cloneDeep(modalCommonOptions);
+		this.pullImageModalOptions.hideFooter = true;
+    this.pullImageModalOptions.title = 'Pull Docker Image';
+
+    this.rmImageModalOptions = _.cloneDeep(modalCommonOptions);
+
     this.reAssignConfirmModalOptions = _.cloneDeep(modalCommonOptions);
 
     this._route.params.forEach(params => {
+      this.allInstanceIp = [];
       let groupId = params['groupId'];
       this.groupInfo.ID = groupId;
       this._groupService.getById(groupId)
@@ -85,6 +102,7 @@ export class ClusterOverviewPage {
           this.groupInfo = data;
           this.activedTab = 'containers';
           this.getContainers();
+          this.showServerStatus(true);
         })
     });
   }
@@ -132,17 +150,39 @@ export class ClusterOverviewPage {
       });
   }
 
-  private getAllInstanceIp(){
+  private showServerStatus(silent: boolean = false) {
+		this.serverStatus.Status = [];
+		this._clusterService.getServerStatus(this.groupInfo.ID, silent, this.groupInfo)
+			.then(data => {
+				this.serverStatus.Status = data.Data.Engines;
+				let unHealth = _.findIndex(this.serverStatus.Status, (x: any) => x.StateText !== 'Healthy');
+				this.serverStatus.isHealth = (unHealth === -1);
+				this.filterNode();
+			})
+			.catch(err => {
+				if (!silent) {
+					messager.error(err);
+				}
+			});
+	}
+
+
+	private getAllInstanceIp(){
 		if(this.allInstanceIp.length === 0){
-			this.containers.forEach(data => {
-				data.Containers.forEach((container: any) => {
+			this._clusterService.getServerStatus(this.groupInfo.ID, false, this.groupInfo)
+			.then(data => {
+				this.serverStatus.Status = data.Data.Engines;
+				this.serverStatus.Status.forEach((container: any) => {
 					let hasRepeated = !this.allInstanceIp.find((ip: any) => ip == container.IP ||  ip == container.HostName);
 					if(hasRepeated){
 						this.allInstanceIp.push(container.IP || container.HostName);
 					}
 				})
+				this.allInstanceIp = _.sortBy(this.allInstanceIp);
 			})
-			this.allInstanceIp = _.sortBy(this.allInstanceIp);
+			.catch(err => {
+				messager.error(err || 'Get server info failed');
+			});
 		}
 	}
 
@@ -270,17 +310,8 @@ export class ClusterOverviewPage {
   private showUpgradeModal(target: any) {
     this.upgradeContainerTarget = target;
     this.selectTag = '';
-    let imageName = this.upgradeContainerTarget.Config.Image.replace(`${this.groupInfo.RegistryAdd}/`, '');
-    imageName = imageName.split(':')[0];
-    this._hubService.getTags(this.groupInfo.RegistryLocation, imageName, true)
-      .then(data => {
-        this.candidateTags = data;
-        this.upgradeContainerModalOptions.formSubmitted = false;
-        this.upgradeContainerModalOptions.show = true;
-      })
-      .catch(err => {
-        messager.error("Get tags failed. Please try again.")
-      });
+    this.upgradeContainerModalOptions.formSubmitted = false;
+    this.upgradeContainerModalOptions.show = true;
   }
 
   private upgrade(form: any) {
@@ -313,7 +344,7 @@ export class ClusterOverviewPage {
           return regex.test(item.Name);
         })
       }
-      this.setImagePage(this.imagePageIndex);
+      this.setImagePage(1);
       this.filterImageDone = true;
     }, 100);
   }
@@ -334,7 +365,16 @@ export class ClusterOverviewPage {
   private pullImage(form: any) {
     this.pullImageModalOptions.formSubmitted = true;
     if (form.invalid) return;
-    let imageName = `${this.groupInfo.RegistryAdd}/${form.value.pullImageName}`;
+    let imageName = form.value.pullImageName;
+    if (!imageName) {
+      messager.error('Image name cannot be empty or null');
+      return;
+    }
+    let regex = new RegExp('^[0-9a-zA-Z-_:./]+$');
+    if (!regex.test(imageName)) {
+      messager.error('Image name cannot contain any special character');
+      return;
+    }
     this.pullImageModalOptions.show = false;
     this._imageService.pullImage(this.ip, imageName)
       .then(data => {
@@ -368,5 +408,34 @@ export class ClusterOverviewPage {
       .catch(err => {
         messager.error(err.Detail || err);
       });
+  }
+
+  private filterNodeTimeout: any;
+  private filterNode(value?: any) {
+    this.nodeFilter = value || '';
+    if (this.filterNodeTimeout) {
+      clearTimeout(this.filterNodeTimeout);
+    }
+    this.filterNodeTimeout = setTimeout(() => {
+      let keyWord = this.nodeFilter;
+      if (!keyWord) {
+        this.filterNodes = this.serverStatus.Status;
+      } else {
+        let regex = new RegExp(keyWord, 'i');
+        this.filterNodes = this.serverStatus.Status.filter((item: any) => {
+          return regex.test(`${item.Name} - ${item.IP}`);
+        })
+      }
+      this.setNodePage(this.nodePageIndex);
+      this.filterNodeDone = true;
+    }, 100);
+  }
+
+  private setNodePage(pageIndex: number) {
+    this.nodePageIndex = pageIndex;
+    if (!this.filterNodes) return;
+    let start = (pageIndex - 1) * this.pageSize;
+    let end = start + this.pageSize;
+    this.currentNodes = this.filterNodes.slice(start, end);
   }
 }

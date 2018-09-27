@@ -46,6 +46,8 @@ export class ContainerListPage {
 
   private rmContainerTarget: any;
   private rmContainerModalOptions: any = {};
+  private rmServiceTarget: any;
+  private rmServiceModalOptions: any = {};
   private forceDeletion: boolean = false;
   private pullImageModalOptions: any = {};
   private rmImageTarget: any;
@@ -77,6 +79,7 @@ export class ContainerListPage {
       closable: false
     };
     this.rmContainerModalOptions = _.cloneDeep(modalCommonOptions);
+    this.rmServiceModalOptions = _.cloneDeep(modalCommonOptions);
     this.pullImageModalOptions = _.cloneDeep(modalCommonOptions);
     this.pullImageModalOptions.hideFooter = true;
     this.pullImageModalOptions.title = 'Pull Docker Image';
@@ -148,7 +151,7 @@ export class ContainerListPage {
       .then(data => {
         this.containers = _.sortBy(data, 'Names');
         this.containers = this.containers.filter((item: any) => {
-          if ((item.Names[0] && item.Names[0].startsWith('/CLUSTER-')) || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}")) {
+          if (item.Names[0] && item.Names[0].startsWith('/CLUSTER-') || (item.Labels && typeof(item.Labels) == 'object' && JSON.stringify(item.Labels) !== "{}" && item.Labels["com.docker.compose.service"])) {
             return false;
           }
           return true;
@@ -163,7 +166,7 @@ export class ContainerListPage {
   private getService() {
     this._composeService.getAgentInfo(this.ip)
       .then(data => {
-        if (data.AppVersion >= "1.3.2") {
+        if (data.AppVersion >= "1.3.3") {
           this.agentInvalid = false;
           this._composeService.getDockerVersion(this.ip)
             .then(data => {
@@ -294,6 +297,10 @@ export class ContainerListPage {
     this._imageService.getImages(this.ip)
       .then(data => {
         this.images = [];
+        let index = data.findIndex((item: any) => item.RepoTags == null);
+        if(index > -1){
+          data.splice(index, 1);
+        }
         data.forEach((item: any) => {
           let isDuplicatedImage = item.RepoTags.length > 1;
           item.RepoTags.forEach((repo: any) => {
@@ -428,7 +435,7 @@ export class ContainerListPage {
       });
   }
 
-  private ServiceOperate(service: any, action: any) {
+  private serviceOperate(service: any, action: any) {
     this._composeService.ComposeOperate(this.ip, service.Name, action)
       .then(data => {
         messager.success('succeed');
@@ -438,6 +445,24 @@ export class ContainerListPage {
       .catch(err => {
         messager.error(err.Detail || err);
       });
+  }
+
+  private showRmServiceModal(service: any) {
+    this.rmServiceTarget = service;
+    this.rmServiceModalOptions.show = true;
+  }
+
+  private rmService() {
+    let name = this.rmServiceTarget.Name;
+    this._composeService.removeService(this.ip, name)
+      .then((data) => {
+        messager.success('succeed');
+        this.rmServiceModalOptions.show = false;
+        this.getService();
+      })
+      .catch((err) => {
+        messager.error(err.Detail || err);
+      })
   }
 
   private downloadComposeData(item: any) {

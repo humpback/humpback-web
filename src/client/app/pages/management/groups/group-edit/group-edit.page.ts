@@ -22,7 +22,6 @@ export class ManageGroupEditPage {
     OpenToPublic: false,
     ContactInfo: '',
     IsCluster: false,
-    IsRemoveDelay: true,
     Owners: [],
     Servers: [],
   };
@@ -110,7 +109,6 @@ export class ManageGroupEditPage {
       Description: data.Description || '',
       OpenToPublic: data.OpenToPublic === true ? true : false,
       IsCluster: data.IsCluster === true ? true : false,
-      IsRemoveDelay: (data.IsRemoveDelay === true ||  data.IsRemoveDelay === undefined) ? true : false,
       Servers: this._fb.array([]),
       ContactInfo: data.ContactInfo || ''
     });
@@ -151,7 +149,6 @@ export class ManageGroupEditPage {
       Description: form.value.Description,
       OpenToPublic: !!form.value.OpenToPublic,
       IsCluster: !!form.value.IsCluster,
-      IsRemoveDelay: !! form.value.IsRemoveDelay || !!! form.value.IsCluster,
       Owners: this.groupInfo.Owners || [],
       Servers: form.value.Servers,
       ContactInfo: form.value.ContactInfo

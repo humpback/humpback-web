@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormArray, FormBuilder, FormControl } from '@angular/forms';
-import { ContainerService, GroupService, LogService } from './../../../../services';
+import { ContainerService, GroupService, LogService, ComposeService } from './../../../../services';
 import { IContainer } from './../../../../interfaces';
 import { IPValidator } from './../../../../validators';
 
@@ -22,6 +22,16 @@ export class ContainerNewPage {
   private submitted: boolean = false;
   private hasGetDockerInfo: boolean = false;
 
+  private isNew: boolean;
+  private isEdit: boolean;
+
+  private agentInvalid: boolean = false;
+  private containerId: string;
+  private containerInfo: any;
+  private servers: any;
+  private serversSelect2Options: Select2Options;
+  private selectedServers: Array<any> = [];
+
   private subscribers: Array<any> = [];
 
   constructor(
@@ -29,21 +39,67 @@ export class ContainerNewPage {
     private _router: Router,
     private _fb: FormBuilder,
     private _containerService: ContainerService,
+    private _composeService: ComposeService,
     private _groupService: GroupService,
     private _logService: LogService) {
 
   }
 
   ngOnInit() {
+    this.isNew = !!this._route.snapshot.data['IsNew'];
+    this.isEdit = !!this._route.snapshot.data['IsEdit'];
+
+    this.serversSelect2Options = {
+      multiple: true,
+      closeOnSelect: false,
+      minimumResultsForSearch: -1,
+      placeholder: 'Select server',
+      dropdownAutoWidth: true
+    };
+
     let paramSub = this._route.params.subscribe(params => {
       let groupId = params["groupId"];
+      this.ip = params["ip"];
+      this.selectedServers = [this.ip];
+      this.containerId = params["containerId"];
       this.groupInfo = { ID: groupId };
       this._groupService.getById(groupId)
         .then(data => {
           this.groupInfo = data;
         });
-      this.ip = params["ip"];
-      this.buildForm();
+        if (this.isNew) {
+          this.buildForm();
+        }
+        if (this.isEdit) {
+          this._composeService.getAgentInfo(this.ip)
+            .then(data => {
+              if (data.AppVersion >= "1.3.4") {
+                this.agentInvalid = false;
+                this._containerService.getById(this.ip, this.containerId, true)
+                  .then(containerInfo => {
+                    this.containerInfo = containerInfo;
+                    this.buildForm();
+                    this.servers = [];
+                    this.groupInfo.Servers.forEach((item: any) => {
+                      let temp: any = { id: item.IP || item.Name, text: item.IP };
+                      if (item.Name) {
+                        temp.text = item.Name;
+                        if (item.IP) temp.text = `${item.Name}(${item.IP})`;
+                      }
+                      this.servers.push({
+                        id: item.IP || item.Name,
+                        text: item.Name || item.IP
+                      })
+                    });
+                  })
+              } else {
+                this.agentInvalid = true;
+              }
+            })
+            .catch(err => {
+              messager.error(err.message || "Server is no response");
+            })
+        }
     });
     this.subscribers.push(paramSub);
   }
@@ -52,25 +108,36 @@ export class ContainerNewPage {
     this.subscribers.forEach(item => item.unsubscribe());
   }
 
+  private refreshSelectedServer(data: any) {
+    this.selectedServers = data.value || [];
+  }
+
   private buildForm() {
+    let data = this.containerInfo || {};
     this.form = this._fb.group({
-      Name: [''],
-      Image: [''],
-      Command: [''],
+      Name: [{ value: (data.Name || ''), disabled: (this.isEdit) }],
+      Image: [data.Image] || [''],
+      Command: [data.CommandWithoutEntryPoint || data.Command] || [''],
       HostName: [''],
-      NetworkMode: ['host'],
-      RestartPolicy: ['no'],
+      NetworkMode: [data.NetworkMode || 'host'],
+      RestartPolicy: [data.RestartPolicy || 'no'],
       Ports: this._fb.array([]),
       Volumes: this._fb.array([]),
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
-      EnableLogFile: 0,
-      LogDriver: 'json-file',
+      Labels: this._fb.array([]),
+      Ulimits: this._fb.array([]),
+      EnableLogFile: data.LogConfig ? (data.LogConfig.Type ? 1 : 0) : 0 || 0,
+      LogDriver: data.LogConfig ? (data.LogConfig.Type || 'json-file') : 'json-file' || 'json-file',
       LogOpts: this._fb.array([]),
-      Dns: [[]],
-      CPUShares: [''],
-      Memory: ['']
+      Dns: [data.Dns] || [[]],
+      CPUShares: data.CPUShares === 0 ? '' : data.CPUShares || [''],
+      Memory: data.Memory === 0 ? '' : data.Memory || ['']
     });
+
+    if (this.form.controls.EnableLogFile.value) {
+      this.hasGetDockerInfo = true;
+    }
 
     let restartSub = this.form.controls['RestartPolicy'].valueChanges.subscribe(value => {
       if (value === 'on-failure') {
@@ -82,11 +149,24 @@ export class ContainerNewPage {
     });
     this.subscribers.push(restartSub);
 
+    let logConfigSub = this.form.controls['EnableLogFile'].valueChanges.subscribe(value => {
+      if (value) {
+        let logDriverCtrol = new FormControl('json-file');
+        this.form.addControl('LogDriver', logDriverCtrol);
+
+        let logOptsCtrl = this._fb.array([]);
+        this.form.addControl('LogOpts', logOptsCtrl);
+      } else {
+        this.form.removeControl('LogDriver');
+        this.form.removeControl('LogOpts');
+      }
+    })
+    this.subscribers.push(logConfigSub);
+
     let networkModeSub = this.form.controls['NetworkMode'].valueChanges.subscribe(value => {
       if (value === 'host') {
         this.form.removeControl('HostName');
         this.form.removeControl('Ports');
-        this.form.removeControl('NetworkName');
       } else {
         let hostNameCtrl = new FormControl('');
         this.form.addControl('HostName', hostNameCtrl);
@@ -97,9 +177,97 @@ export class ContainerNewPage {
       if (value === "custom") {
         let networkNameCtrl = new FormControl('');
         this.form.addControl('NetworkName', networkNameCtrl);
+      } else {
+        this.form.removeControl('NetworkName');
       }
     });
     this.subscribers.push(networkModeSub);
+
+
+    if (this.isEdit) {
+      if (data.RestartPolicy === 'on-failure') {
+        let tempCtrl = new FormControl(data.RestartRetryCount);
+        this.form.addControl('RestartRetryCount', tempCtrl);
+      }
+
+      if (data.NetworkMode !== 'host' && data.Ports && data.Ports.length > 0) {
+        let portsCtrl = <FormArray>this.form.controls['Ports'];
+        data.Ports.forEach((item: any) => {
+          portsCtrl.push(this._fb.group({
+            PrivatePort: [item.PrivatePort],
+            Type: [item.Type || 'tcp'],
+            PublicPort: [item.PublicPort === 0 ? '' : item.PublicPort],
+            IP: [item.Ip]
+          }))
+        });
+      }
+
+      if (data.Volumes) {
+        let volumeCtrl = <FormArray>this.form.controls['Volumes'];
+        data.Volumes.forEach((item: any) => {
+          volumeCtrl.push(this._fb.group({
+            ContainerVolume: item.ContainerVolume,
+            HostVolume: item.HostVolume
+          }));
+        });
+      }
+
+      if (data.Links) {
+        let control = <FormArray>this.form.controls['Links'];
+        data.Links.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Value": [item]
+          }));
+        })
+      }
+
+      if (data.Env) {
+        let control = <FormArray>this.form.controls['Envs'];
+        data.Env.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Value": [item]
+          }));
+        })
+      }
+
+      if (data.Labels) {
+        let control = <FormArray>this.form.controls['Labels'];
+        for (let key in data.Labels) {
+          control.push(this._fb.group({
+            "Value": [`${key}:${data.Labels[key]}`]
+          }));
+        }
+      }
+
+      if (data.LogConfig) {
+        if (data.LogConfig.Config) {
+          let cloneOptsArr = [];
+          for (let key in data.LogConfig.Config) {
+            cloneOptsArr.push(`${key}=${data.LogConfig.Config[key]}`)
+          }
+          let control = <FormArray>this.form.controls['LogOpts'];
+          cloneOptsArr.forEach((item: any) => {
+            control.push(this._fb.group({
+              "Value": [item]
+            }));
+          })
+        }
+      }
+
+      if (data.Ulimits) {
+        let control = <FormArray>this.form.controls['Ulimits'];
+        data.Ulimits.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Name": [item['Name']],
+            "Soft": [item['Soft']],
+            "Hard": [item['Hard']]
+          }));
+        })
+      }
+      // if (this.form.controls.EnableLogFile.value || data.Ulimits) {
+      //   this.AdvancedDisplay = true;
+      // }
+    }
   }
 
   private addPortBinding() {
@@ -149,8 +317,34 @@ export class ContainerNewPage {
     }));
   }
 
+  private addLabel() {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLabel(i: number) {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.removeAt(i);
+  }
+
+  private addUlimit() {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.push(this._fb.group({
+      Name: [''],
+      Soft: [''],
+      Hard: ['']
+    }));
+  }
+
+  private removeUlimit(i: number) {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.removeAt(i);
+  }
+
   private getTargetLogDriver(){
-    if(this.form.controls.LogDriver.value && this.form.controls.LogOpts.value.length == 0 && !this.hasGetDockerInfo){
+    if(!this.hasGetDockerInfo && this.form.controls.LogDriver.value && this.form.controls.LogOpts.value.length == 0){
       this._containerService.getDockerInfo(this.ip)
       .then((data:any) => {
         if(data && data.LoggingDriver){
@@ -198,15 +392,15 @@ export class ContainerNewPage {
 
   private onSubmit() {
     this.submitted = true;
-    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
-    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
-    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
-    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
-    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
-    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
+    if (!this.selectedServers || !this.selectedServers.length) {
+      messager.error('Please select one server at least');
+      return;
+    }
+    if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
     let optsObj = {};
+    let postLables = {};
     if(this.form.controls.EnableLogFile.value){
       let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
       optsArr.forEach((item: any) => {
@@ -214,8 +408,19 @@ export class ContainerNewPage {
         optsObj[splitArr[0]] = splitArr[1];
       })
     }
+
+    if (formData.Labels) {
+      if (formData.Labels.length > 0) {
+        formData.Labels.forEach((item: any) => {
+          let key = item.Value.split(":")[0];
+          let value = item.Value.split(":")[1];
+          postLables[key] = value;
+        })
+      }
+    }
+
     let config: any = {
-      Name: formData.Name,
+      Name: this.form.controls.Name.value,
       Image: formData.Image,
       Command: formData.Command,
       HostName: formData.HostName,
@@ -230,6 +435,7 @@ export class ContainerNewPage {
       Env: (formData.Envs || []).map((item: any) => item.Value),
       Dns: formData.Dns,
       Links: (formData.Links || []).map((item: any) => item.Value),
+      Labels: postLables || {},
       CPUShares: formData.CPUShares || 0,
       Memory: formData.Memory || 0
     }
@@ -239,14 +445,33 @@ export class ContainerNewPage {
         Config: optsObj
       }
     }
-    this._containerService.create(this.ip, config)
-      .then(data => {
-        messager.success('succeed');
-        this._logService.addLog(`Created container ${config.Name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
-        this._router.navigate(['/group', this.groupInfo.ID, this.ip, 'containers', config.Name]);
+
+    if (formData.Ulimits.length > 0) {
+      config.Ulimits = formData.Ulimits;
+    }
+    if (this.isEdit) {
+      config.Id = this.form.controls.Name.value;
+      this.selectedServers.forEach((item: any) => {
+        this._containerService.create(item, config)
+          .then(data => {
+            messager.success('succeed');
+            this._logService.addLog(`Edit container ${config.Name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
+            this._router.navigate(['/group', this.groupInfo.ID, this.ip, 'containers', config.Name]);
+          })
+          .catch(err => {
+            messager.error(err.Detail || err);
+          });
       })
-      .catch(err => {
-        messager.error(err.Detail || err);
-      });
+    } else {
+      this._containerService.create(this.ip, config)
+        .then(data => {
+          messager.success('succeed');
+          this._logService.addLog(`Create container ${config.Name} on ${this.ip}`, 'Container', this.groupInfo.ID, this.ip);
+          this._router.navigate(['/group', this.groupInfo.ID, this.ip, 'containers', config.Name]);
+        })
+        .catch(err => {
+          messager.error(err.Detail || err);
+        });
+    }
   }
 }

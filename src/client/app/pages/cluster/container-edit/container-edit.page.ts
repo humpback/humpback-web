@@ -19,6 +19,7 @@ export class ClusterContainerEditPage {
   private clusterGroups: Array<any>;
   private isNew: boolean;
   private isClone: boolean;
+  private isEdit: boolean;
   private metaId: string;
 
   private form: FormGroup;
@@ -40,6 +41,7 @@ export class ClusterContainerEditPage {
   ngOnInit() {
     this.isNew = !!this._route.snapshot.data['IsNew'];
     this.isClone = !!this._route.snapshot.data['IsClone'];
+    this.isEdit = !!this._route.snapshot.data['IsEdit'];
     let paramSub = this._route.params.subscribe(params => {
       let groupId = params["groupId"];
       this.metaId = params["metaId"];
@@ -73,7 +75,7 @@ export class ClusterContainerEditPage {
 
   private buildForm(data?: any) {
     this.form = this._fb.group({
-      Name: [data.Name || ''],
+      Name: [{ value: (data.Name || ''), disabled: (this.isEdit) }],
       Image: [(data.Image || '')],
       Command: [data.Command || ''],
       HostName: [data.HostName || ''],
@@ -84,13 +86,17 @@ export class ClusterContainerEditPage {
       Envs: this._fb.array([]),
       Links: this._fb.array([]),
       EnableLogFile: data.LogConfig ? (data.LogConfig.Type ? 1 : 0) : 0,
-      LogDriver: data.LogConfig ? (data.LogConfig.LogDriver  || 'json-file') : 'json-file',
+      Labels: this._fb.array([]),
+      Ulimits: this._fb.array([]),
+      LogDriver: data.LogConfig ? (data.LogConfig.Type  || 'json-file') : 'json-file',
       LogOpts: this._fb.array([]),
       Dns: [data.Dns],
       CPUShares: data.CPUShares === 0 ? '' : data.CPUShares,
       Memory: data.Memory === 0 ? '' : data.Memory,
+      IsRemoveDelay: (data.IsRemoveDelay === true || data.IsRemoveDelay === undefined) ? true : false,
       WebHooks: this._fb.array([]),
-      Instances: [data.Instances || '']
+      Instances: [data.Instances ? data.Instances : (data.Instances === 0 ? 0 : '')],
+      Constraints: this._fb.array([])
     });
 
     if (!this.isNew) {
@@ -130,6 +136,26 @@ export class ClusterContainerEditPage {
         })
       }
 
+      if (data.Labels) {
+        let control = <FormArray>this.form.controls['Labels'];
+          for (let key in data.Labels){
+            control.push(this._fb.group({
+              "Value": [`${key}:${data.Labels[key]}`]
+            }));
+          }
+      }
+
+      if (data.Ulimits) {
+        let control = <FormArray>this.form.controls['Ulimits'];
+        data.Ulimits.forEach((item: any) => {
+          control.push(this._fb.group({
+            "Name": [item['Name']],
+            "Soft": [item['Soft']],
+            "Hard": [item['Hard']]
+          }));
+        })
+      }
+
       if (data.Env && data.Env.length > 0) {
         let envCtrl = <FormArray>this.form.controls['Envs'];
         data.Env.forEach((item: any) => {
@@ -147,6 +173,32 @@ export class ClusterContainerEditPage {
             SecretToken: item.SecretToken
           }));
         });
+      }
+
+      if (data.Placement) {
+        if(data.Placement.Constraints && data.Placement.Constraints.length > 0){
+          let equalRegExp = new RegExp('==');
+          let NotEqualRegExp = new RegExp('!=');
+          let constraintsCtrl = <FormArray>this.form.controls['Constraints'];
+          data.Placement.Constraints.forEach((item: any) => {
+            let constraintArr, name, equal, value;
+            if(equalRegExp.test(item)){
+              constraintArr = item.split('==');
+              equal = '==';
+            }
+            if(NotEqualRegExp.test(item)){
+              constraintArr = item.split('!=');
+              equal = '!=';
+            }
+            name = constraintArr[0];
+            value = constraintArr[1];
+            constraintsCtrl.push(this._fb.group({
+              Name: [name],
+              Equal: [equal],
+              Value: [value]
+            }));
+          });
+        }
       }
 
       if(data.LogConfig){
@@ -186,6 +238,20 @@ export class ClusterContainerEditPage {
       }
     });
     this.subscribers.push(restartSub);
+
+    let logConfigSub = this.form.controls['EnableLogFile'].valueChanges.subscribe(value => {
+      if(value){
+        let logDriverCtrol = new FormControl('json-file');
+        this.form.addControl('LogDriver', logDriverCtrol);
+
+        let logOptsCtrl = this._fb.array([]);
+        this.form.addControl('LogOpts', logOptsCtrl);
+      }else{
+        this.form.removeControl('LogDriver');
+        this.form.removeControl('LogOpts');
+      }
+    })
+    this.subscribers.push(logConfigSub);
 
     let networkModeSub = this.form.controls['NetworkMode'].valueChanges.subscribe(value => {
       if (value === 'host') {
@@ -277,6 +343,32 @@ export class ClusterContainerEditPage {
     control.removeAt(i);
   }
 
+  private addLabel() {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.push(this._fb.group({
+      "Value": ['']
+    }));
+  }
+
+  private removeLabel(i: number) {
+    let control = <FormArray>this.form.controls['Labels'];
+    control.removeAt(i);
+  }
+
+  private addUlimit() {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.push(this._fb.group({
+      Name: [''],
+      Soft: [''],
+      Hard: ['']
+    }));
+  }
+
+  private removeUlimit(i: number) {
+    let control = <FormArray>this.form.controls['Ulimits'];
+    control.removeAt(i);
+  }
+
   private removeWebhook(index: number) {
     let hooksCtrl = <FormArray>this.form.controls['WebHooks'];
     hooksCtrl.removeAt(index);
@@ -290,17 +382,28 @@ export class ClusterContainerEditPage {
     }));
   }
 
+  private addConstraint() {
+    let constraintsCtrl = <FormArray>this.form.controls['Constraints'];
+    constraintsCtrl.push(this._fb.group({
+      Name: [''],
+      Equal: ['=='],
+      Value: ['']
+    }));
+  }
+
+  private removeConstraint(index: number) {
+    let constraintsCtrl = <FormArray>this.form.controls['Constraints'];
+    constraintsCtrl.removeAt(index);
+  }
+
   private onSubmit() {
     this.submitted = true;
-    if (this.form.controls.EnableLogFile.value && this.form.invalid) return;
-    if(!this.form.controls.EnableLogFile.value && (this.form.controls.Name.invalid || this.form.controls.Image.invalid
-    || this.form.controls.Command.invalid || this.form.controls.HostName.invalid || this.form.controls.NetworkMode.invalid
-    || this.form.controls.RestartPolicy.invalid || this.form.controls.Ports.invalid || this.form.controls.Volumes.invalid
-    || this.form.controls.Envs.invalid || this.form.controls.Links.invalid || this.form.controls.LogDriver.invalid
-    || this.form.controls.Dns.invalid || this.form.controls.CPUShares.invalid || this.form.controls.Memory.invalid)) return;
+    if (this.form.invalid) return;
     let formData = _.cloneDeep(this.form.value);
 
     let optsObj = {};
+    let postLables = {};
+    let constraintsData = [];
     if(this.form.controls.EnableLogFile.value){
       let optsArr = (formData.LogOpts || []).map((item: any) => item.Value);
       optsArr.forEach((item: any) => {
@@ -308,6 +411,17 @@ export class ClusterContainerEditPage {
         optsObj[splitArr[0]] = splitArr[1];
       })
     }
+
+    if (formData.Labels) {
+      if (formData.Labels.length > 0) {
+        formData.Labels.forEach((item: any) => {
+          let key = item.Value.split(":")[0];
+          let value = item.Value.split(":")[1];
+          postLables[key] = value;
+        })
+      }
+    }
+
     if (formData.WebHooks.length > 0) {
       let temp = {};
       let duplicates: Array<any> = [];
@@ -325,6 +439,12 @@ export class ClusterContainerEditPage {
       }
     }
 
+    if(formData.Constraints){
+      constraintsData =  formData.Constraints.map((item: any) => {
+        return `${item.Name}${item.Equal}${item.Value}`;
+      })
+    }
+
     let customerPort = _.findIndex(formData.Ports, (item: any) => {
       return item.PublicPort > 0;
     });
@@ -336,11 +456,17 @@ export class ClusterContainerEditPage {
 
     let config: any = {
       WebHooks: formData.WebHooks,
-      Instances: formData.Instances
+      Instances: formData.Instances,
+      Option:{
+        IsRemoveDelay: !!formData.IsRemoveDelay
+      },
+      Placement: {
+        Constraints: constraintsData
+      }
     };
-    if (this.isNew || this.isClone) {
+    if (this.isNew || this.isClone || this.isEdit) {
       let containerConfig: any = {
-        Name: formData.Name,
+        Name: this.form.controls.Name.value,
         Image: formData.Image,
         Command: formData.Command,
         HostName: formData.HostName,
@@ -355,10 +481,7 @@ export class ClusterContainerEditPage {
         Env: (formData.Envs || []).map((item: any) => item.Value),
         Dns: formData.Dns,
         Links: [],
-        LogConfig: {
-          Type: formData.LogDriver,
-          Config: optsObj
-        },
+        Labels: postLables || {},
         CPUShares: formData.CPUShares || 0,
         Memory: formData.Memory || 0
       };
@@ -368,22 +491,28 @@ export class ClusterContainerEditPage {
           Config: optsObj
         }
       }
+      if (formData.Ulimits.length > 0) {
+        containerConfig.Ulimits = formData.Ulimits;
+      }
       config.Config = containerConfig;
-      config.GroupId = this.isClone ? this.selectedGroupId : this.groupInfo.ID;
-      this._clusterService.addContainer(config)
-        .then(res => {
-          messager.success('Create Succeed!');
-          this._router.navigate(['/cluster', this.groupInfo.ID, 'overview']);
-        })
-        .catch(err => messager.error(err));
-    } else {
-      config.MetaId = this.metaId;
-      this._clusterService.updateContainer(config)
-        .then(res => {
-          messager.success('Update Succeed!');
-          this._router.navigate(['/cluster', this.groupInfo.ID, 'containers', this.metaId, 'info']);
-        })
-        .catch(err => messager.error(err));
+      if(this.isNew || this.isClone) {
+        config.GroupId = this.isClone ? this.selectedGroupId : this.groupInfo.ID;
+        let postGroupInfo = this.isClone ? this.selectedGroup : this.groupInfo;
+        this._clusterService.addContainer(config)
+          .then(res => {
+            messager.success('Create Succeed!');
+            this._router.navigate(['/cluster', this.groupInfo.ID, 'overview']);
+          })
+          .catch(err => messager.error(err));
+      } else {
+        config.MetaId = this.metaId;
+        this._clusterService.updateContainer(config)
+          .then(res => {
+            messager.success('Update Succeed!');
+            this._router.navigate(['/cluster', this.groupInfo.ID, 'containers', this.metaId, 'info']);
+          })
+          .catch(err => messager.error(err));
+      }
     }
   }
 }
