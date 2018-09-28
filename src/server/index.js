@@ -98,6 +98,7 @@ user.initAdmin()
   .then(() => {
     app.listen(config.listenPort, () => {
       console.debug('Init system succeed');
+      console.log('start');
       console.log(`Humpback Website is started on port ${config.listenPort}`);
     });
   })
