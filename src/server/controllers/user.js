@@ -30,10 +30,7 @@ exports.getAll = (req, res, next) => {
   if (req.query.q) {
     let regStr = `.*${req.query.q}.*`;
     queryOption = {
-      $or: [
-        { UserID: { $regex: new RegExp(regStr) } },
-        { FullName: { $regex: new RegExp(regStr) } }
-      ]
+      $or: [{ UserID: { $regex: new RegExp(regStr) } }, { FullName: { $regex: new RegExp(regStr) } }]
     };
   }
   let skipCount = (pageIndex - 1) * pageSize;
@@ -54,7 +51,7 @@ exports.getAll = (req, res, next) => {
         res.json(result);
       });
   });
-}
+};
 
 exports.getById = (req, res, next) => {
   db.findOne({ _id: req.params.userId.toLowerCase() }, { Password: -1 }, (err, doc) => {
@@ -65,13 +62,13 @@ exports.getById = (req, res, next) => {
       res.status(404).json({ result: false });
     }
   });
-}
+};
 
 exports.getAvatar = (req, res, next) => {
   let userId = req.params.userId.toLowerCase();
   let avatarDir = path.join(__dirname, `./../public/avatar`);
   let avatarPath = `${avatarDir}/${userId}.png`;
-  fs.exists(avatarPath, (exists) => {
+  fs.exists(avatarPath, exists => {
     if (!exists) {
       avatarPath = `${avatarDir}/default.png`;
     }
@@ -84,7 +81,7 @@ exports.getAvatar = (req, res, next) => {
       res.end(data);
     });
   });
-}
+};
 
 exports.isLogin = (req, res, next) => {
   let result = {
@@ -101,7 +98,7 @@ exports.isLogin = (req, res, next) => {
   } else {
     res.json(result);
   }
-}
+};
 
 exports.login = (req, res, next) => {
   let password = util.md5Crypto(req.body.Password);
@@ -114,7 +111,7 @@ exports.login = (req, res, next) => {
       res.json(userInfo);
     })
     .catch(err => next(err));
-}
+};
 
 exports.logout = (req, res, next) => {
   let cookies = req.cookies;
@@ -126,7 +123,7 @@ exports.logout = (req, res, next) => {
   }
   req.session.currentUser = null;
   res.json({ result: true });
-}
+};
 
 exports.getCurrentUser = (req, res, next) => {
   let userId = req.session.currentUser.UserID;
@@ -135,7 +132,7 @@ exports.getCurrentUser = (req, res, next) => {
       res.json(userInfo);
     })
     .catch(err => next(err));
-}
+};
 
 exports.search = (req, res, next) => {
   let q = req.query.q;
@@ -144,16 +141,15 @@ exports.search = (req, res, next) => {
   }
   let regStr = `.*${q}.*`;
   let queryOption = {
-    $or: [
-      { UserID: { $regex: new RegExp(regStr) } },
-      { FullName: { $regex: new RegExp(regStr) } }
-    ]
+    $or: [{ UserID: { $regex: new RegExp(regStr) } }, { FullName: { $regex: new RegExp(regStr) } }]
   };
-  db.find(queryOption, { UserID: 1, FullName: 1 }).sort({ UserID: 1 }).exec((err, docs) => {
-    if (err) return next(err);
-    res.json(docs);
-  });
-}
+  db.find(queryOption, { UserID: 1, FullName: 1 })
+    .sort({ UserID: 1 })
+    .exec((err, docs) => {
+      if (err) return next(err);
+      res.json(docs);
+    });
+};
 
 exports.register = (req, res, next) => {
   let password = util.md5Crypto(req.body.Password);
@@ -167,7 +163,7 @@ exports.register = (req, res, next) => {
   isExists(userInfo.UserID)
     .then(result => {
       if (result) {
-        return next(new Error('UserID is exists.'))
+        return next(new Error('UserID is exists.'));
       }
       db.insert(userInfo, (err, newDoc) => {
         if (err) return next(err);
@@ -177,7 +173,7 @@ exports.register = (req, res, next) => {
       });
     })
     .catch(err => next(err));
-}
+};
 
 exports.changePassword = (req, res, next) => {
   let oldPassword = util.md5Crypto(req.body.OldPassword);
@@ -200,7 +196,7 @@ exports.changePassword = (req, res, next) => {
       });
     });
   });
-}
+};
 
 exports.resetPassword = (req, res, next) => {
   let userID = req.body.UserID;
@@ -218,8 +214,8 @@ exports.resetPassword = (req, res, next) => {
         });
       }
     })
-    .catch(err => next(err))
-}
+    .catch(err => next(err));
+};
 
 exports.update = (req, res, next) => {
   let reqUser = req.session.currentUser;
@@ -229,7 +225,7 @@ exports.update = (req, res, next) => {
       EditUser: reqUser.UserID,
       EditDate: new Date().valueOf()
     }
-  }
+  };
   if (req.body.Avatar) {
     updateOpt['$set'].Avatar = req.body.Avatar;
   }
@@ -239,7 +235,7 @@ exports.update = (req, res, next) => {
   if (req.body.Email) {
     updateOpt['$set'].Email = req.body.Email;
   }
-  if (reqUser.IsAdmin && (typeof req.body.IsAdmin === 'boolean')) {
+  if (reqUser.IsAdmin && typeof req.body.IsAdmin === 'boolean') {
     updateOpt['$set'].IsAdmin = req.body.IsAdmin;
   }
   let userId = req.params.userId.toLowerCase();
@@ -257,7 +253,7 @@ exports.update = (req, res, next) => {
       }
     })
     .catch(err => next(err));
-}
+};
 
 exports.remove = (req, res, next) => {
   let userId = req.params.userId;
@@ -273,7 +269,7 @@ exports.remove = (req, res, next) => {
       result: true
     });
   });
-}
+};
 
 exports.initAdmin = () => {
   return new Promise((resolve, reject) => {
@@ -296,7 +292,7 @@ exports.initAdmin = () => {
           InUser: 'system',
           EditDate: new Date().valueOf(),
           EditUser: 'system'
-        }
+        };
         db.insert(user, (err, newDoc) => {
           if (err) {
             return reject(err);
@@ -306,17 +302,17 @@ exports.initAdmin = () => {
       }
     });
   });
-}
+};
 
-let isExists = (userId) => {
+let isExists = userId => {
   return new Promise((resolve, reject) => {
     let regStr = `^${userId}$`;
     db.findOne({ UserID: { $regex: new RegExp(regStr, 'i') } }, (err, userInfo) => {
       if (err) return reject(err);
       resolve(!!userInfo);
     });
-  })
-}
+  });
+};
 
 let login = (userId, password, needCrypto) => {
   if (needCrypto) {
@@ -338,9 +334,9 @@ let login = (userId, password, needCrypto) => {
       return resolve(userInfo);
     });
   });
-}
+};
 
-let getUserById = (userId) => {
+let getUserById = userId => {
   return new Promise((resolve, reject) => {
     db.findOne({ UserID: userId }, (err, userInfo) => {
       if (err) return next(err);
@@ -351,4 +347,4 @@ let getUserById = (userId) => {
       return resolve(userInfo);
     });
   });
-}
+};

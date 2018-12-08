@@ -23,41 +23,40 @@ exports.getBasicGroupsInfo = (req, res, next) => {
   let queryOption = {};
   if (!user.IsAdmin) {
     queryOption = {
-      $or: [
-        { "Owners": user.UserID },
-        { "OpenToPublic": true }
-      ]
+      $or: [{ Owners: user.UserID }, { OpenToPublic: true }]
     };
   }
-  db.find(queryOption, { ID: 1, Name: 1 }).sort({ Name: 1 }).exec((err, docs) => {
-    if (err) return next(err);
-    res.json(docs);
-  });
-}
+  db.find(queryOption, { ID: 1, Name: 1 })
+    .sort({ Name: 1 })
+    .exec((err, docs) => {
+      if (err) return next(err);
+      res.json(docs);
+    });
+};
 
 exports.getAllServers = (req, res, next) => {
   db.find({}, { Servers: 1 }, (err, docs) => {
     if (err) return next(err);
     let servers = [];
     if (docs && docs.length > 0) {
-      docs.forEach((item) => {
+      docs.forEach(item => {
         servers = servers.concat(item.Servers);
       });
     }
     res.json(servers);
   });
-}
+};
 
 exports.getByUser = (req, res, next) => {
   let user = req.session.currentUser;
   let type = req.query.type || 'normal';
   let queryOption = {};
   if (!user.IsAdmin) {
-    queryOption = { $or: [{ "Owners": user.UserID }] };
+    queryOption = { $or: [{ Owners: user.UserID }] };
     if (!req.query.formanage) {
-      queryOption['$or'].push({ "OpenToPublic": true });
+      queryOption['$or'].push({ OpenToPublic: true });
     }
-  };
+  }
   if (!req.query.formanage) {
     if (type === 'cluster') {
       queryOption.IsCluster = true;
@@ -65,43 +64,47 @@ exports.getByUser = (req, res, next) => {
       queryOption['$not'] = { IsCluster: true };
     }
   }
-  db.find(queryOption).sort({ Name: 1 }).exec((err, docs) => {
-    if (err) return next(err);
-    res.json(docs);
-  });
-}
+  db.find(queryOption)
+    .sort({ Name: 1 })
+    .exec((err, docs) => {
+      if (err) return next(err);
+      res.json(docs);
+    });
+};
 
 exports.getClusters = (req, res, next) => {
   let groupID = req.query.groupid;
   let queryOption = { IsCluster: true };
   if (groupID) {
-    queryOption["ID"] = groupID;
+    queryOption['ID'] = groupID;
   }
-  db.find(queryOption).sort({ Name: 1 }).exec((err, docs) => {
-    if (err) return next(err);
-    // docs.map((data) => {
-    //   if (data.IsRemoveDelay === undefined) {
-    //     data.IsRemoveDelay = true;
-    //   }
-    // })
-    res.json(docs || []);
-  });
-}
+  db.find(queryOption)
+    .sort({ Name: 1 })
+    .exec((err, docs) => {
+      if (err) return next(err);
+      // docs.map((data) => {
+      //   if (data.IsRemoveDelay === undefined) {
+      //     data.IsRemoveDelay = true;
+      //   }
+      // })
+      res.json(docs || []);
+    });
+};
 
 exports.getByID = (req, res, next) => {
   let groupID = req.params.groupID;
   getById(groupID)
     .then(group => res.json(group))
     .catch(err => next(err));
-}
+};
 
 exports.create = (req, res, next) => {
   let userID = req.session.currentUser.UserID;
   let group = req.body;
   isExists(group.Name, '')
-    .then((result) => {
+    .then(result => {
       if (result === true) {
-        return next(new Error("Group is exists."));
+        return next(new Error('Group is exists.'));
       }
       group.ID = uuid.v4();
       group.InUser = userID;
@@ -116,7 +119,7 @@ exports.create = (req, res, next) => {
       });
     })
     .catch(err => next(err));
-}
+};
 
 exports.update = (req, res, next) => {
   let userID = req.session.currentUser.UserID;
@@ -131,7 +134,7 @@ exports.update = (req, res, next) => {
       });
     })
     .catch(err => next(err));
-}
+};
 
 exports.remove = (req, res, next) => {
   let groupID = req.params.groupID;
@@ -141,40 +144,43 @@ exports.remove = (req, res, next) => {
       result: true
     });
   });
-}
+};
 
-let getById = (groupID) => {
+let getById = groupID => {
   return new Promise((resolve, reject) => {
     db.findOne({ ID: groupID }, (err, doc) => {
       if (err) return reject(err);
       resolve(doc);
     });
   });
-}
+};
 
 let isExists = (name, groupID) => {
   return new Promise((resolve, reject) => {
     let regStr = `^${name}$`;
-    db.find({
-      Name: { $regex: new RegExp(regStr, 'i') },
-      ID: { $ne: groupID }
-    }, (err, docs) => {
-      if (err) return reject(err);
-      resolve(docs.length > 0);
-    });
+    db.find(
+      {
+        Name: { $regex: new RegExp(regStr, 'i') },
+        ID: { $ne: groupID }
+      },
+      (err, docs) => {
+        if (err) return reject(err);
+        resolve(docs.length > 0);
+      }
+    );
   });
-}
+};
 
 exports.getComposeExample = (req, res, next) => {
   let avatarDir = path.join(__dirname, `./../public`);
   let avatarPath = `${avatarDir}/docker-compose-example.yaml`;
-  fs.exists(avatarPath, (exists) => {
+  fs.exists(avatarPath, exists => {
     fs.readFile(avatarPath, (err, data) => {
       if (err) return next(err);
       res.writeHead(200, {
-        'Content-Type': 'text/x-yaml',
+        'Content-Type': 'text/x-yaml'
       });
       res.end(data);
     });
   });
-}
+};

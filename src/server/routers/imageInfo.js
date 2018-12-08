@@ -4,13 +4,8 @@ const imageInfoValidator = require('./../validators/imageInfo');
 
 let router = express.Router();
 
-router.get('/:imageName',
-  imageInfoCtrl.get
-);
+router.get('/:imageName', imageInfoCtrl.get);
 
-router.post('/',
-  imageInfoValidator.validate,
-  imageInfoCtrl.save
-);
+router.post('/', imageInfoValidator.validate, imageInfoCtrl.save);
 
 module.exports = router;

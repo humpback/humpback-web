@@ -34,7 +34,7 @@ class DBFactory {
       }
       let db = new Datastore(option);
       if (item.ttl) {
-        db.ensureIndex({ fieldName: 'createdAt', expireAfterSeconds: item.ttl }, function (err) {
+        db.ensureIndex({ fieldName: 'createdAt', expireAfterSeconds: item.ttl }, function(err) {
           if (err) console.log(err);
         });
       }

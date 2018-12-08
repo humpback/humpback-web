@@ -1,5 +1,4 @@
 let getConfig = () => {
-  let env = process.env.HUMPBACK_ENV || 'gdev';
   let configInfo = {
     version: '1.0.0',
     isDebugMode: true,
@@ -16,6 +15,6 @@ let getConfig = () => {
     encryptKey: 'humpback@123'
   };
   return configInfo;
-}
+};
 
 module.exports = getConfig();

@@ -26,7 +26,7 @@ exports.get = (req, res, next) => {
     };
     res.send(imageInfo);
   });
-}
+};
 
 exports.save = (req, res, next) => {
   let userID = req.session.currentUser.UserID;
@@ -48,4 +48,4 @@ exports.save = (req, res, next) => {
       result: true
     });
   });
-}
+};

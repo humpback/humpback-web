@@ -24,7 +24,7 @@ exports.add = (req, res, next) => {
     Type: req.body.Type,
     Content: req.body.Content,
     UserId: req.session.currentUser.UserID,
-    FullName: req.session.currentUser.FullName,    
+    FullName: req.session.currentUser.FullName,
     InDate: new Date().valueOf()
   };
   db.insert(log, (err, newDoc) => {
@@ -33,12 +33,12 @@ exports.add = (req, res, next) => {
       result: true
     });
   });
-}
+};
 
 exports.get = (req, res, next) => {
   let pageSize = +(req.query.pageSize || 10);
   let pageIndex = +(req.query.pageIndex || 1);
-  let sortField = "InDate";
+  let sortField = 'InDate';
   let queryOption = {};
   if (req.query.Group) {
     queryOption.Group = req.query.Group;
@@ -51,17 +51,21 @@ exports.get = (req, res, next) => {
   }
 
   let skiped = pageSize * (pageIndex - 1);
-  db.find(queryOption).sort({ InDate: -1 }).skip(skiped).limit(pageSize).exec((err, docs) => {
-    if (err) return next(err);
-    db.count(queryOption, (err, count) => {
+  db.find(queryOption)
+    .sort({ InDate: -1 })
+    .skip(skiped)
+    .limit(pageSize)
+    .exec((err, docs) => {
       if (err) return next(err);
-      let data = {
-        pageIndex: pageIndex,
-        pageSize: pageSize,
-        rows: docs,
-        total_rows: count
-      };
-      res.json(data);
+      db.count(queryOption, (err, count) => {
+        if (err) return next(err);
+        let data = {
+          pageIndex: pageIndex,
+          pageSize: pageSize,
+          rows: docs,
+          total_rows: count
+        };
+        res.json(data);
+      });
     });
-  });
-}
+};

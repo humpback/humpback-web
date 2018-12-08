@@ -9,7 +9,7 @@ exports.get = (req, res, next) => {
     if (err) return next(err);
     res.json(doc || {});
   });
-}
+};
 
 exports.save = (req, res, next) => {
   let clientConfig = req.body;
@@ -20,4 +20,4 @@ exports.save = (req, res, next) => {
       result: true
     });
   });
-}
+};

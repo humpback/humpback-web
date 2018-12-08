@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const helpers = require('./helpers');
+const util = require('./util');
 
 module.exports = {
   entry: {
@@ -39,7 +39,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: helpers.root('src', 'client', 'app'),
+        exclude: util.root('src', 'client', 'app'),
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: 'css-loader?sourceMap'
@@ -47,7 +47,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        include: helpers.root('src', 'client', 'app'),
+        include: util.root('src', 'client', 'app'),
         use: 'raw-loader'
       },
     ]
@@ -57,7 +57,7 @@ module.exports = {
     new ProgressBarPlugin(),
     new webpack.ContextReplacementPlugin(
       /angular(\\|\/)core(\\|\/)@angular/,
-      helpers.root('src', 'client')
+      util.root('src', 'client')
     ),
     new webpack.optimize.CommonsChunkPlugin({
       name: ['app', 'angular2']

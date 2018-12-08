@@ -1,15 +1,14 @@
 var webpackMerge = require('webpack-merge');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
 var commonConfig = require('./webpack.common.js');
-var helpers = require('./helpers');
+var util = require('./util');
 
 module.exports = webpackMerge(commonConfig, {
   devtool: 'inline-source-map',
   watch: true,
 
   output: {
-    path: helpers.root('dist', 'client'),
+    path: util.root('dist', 'client'),
     publicPath: '/',
     filename: 'js/[name].js',
     chunkFilename: 'js/[id].chunk.js'
