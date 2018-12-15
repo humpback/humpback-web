@@ -1,9 +1,9 @@
-import { Directive, ElementRef, Input, Renderer } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
+import { Directive, ElementRef, Input, Renderer } from "@angular/core";
+import { Router, NavigationEnd } from "@angular/router";
+import { Subscription } from "rxjs";
 
 @Directive({
-  selector: '[hb-router-active]'
+  selector: "[hb-router-active]"
 })
 export class RouterActiveDirective {
   @Input("hb-router-active")
@@ -14,9 +14,8 @@ export class RouterActiveDirective {
   constructor(
     private el: ElementRef,
     private renderer: Renderer,
-    private router: Router) {
-
-  }
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.mRouterActive = this.mRouterActive || {};
@@ -37,16 +36,23 @@ export class RouterActiveDirective {
 
   private update() {
     let currentUrl = this.router.url.toLowerCase();
-    if (!this.mRouterActive.url) return;
+    if (!this.mRouterActive.url) { return; }
     let addCls = false;
     if (this.mRouterActive.fullMatch && this.mRouterActive.url === currentUrl) {
       addCls = true;
     }
-    if (!this.mRouterActive.fullMatch && currentUrl.startsWith(this.mRouterActive.url)) {
+    if (
+      !this.mRouterActive.fullMatch &&
+      currentUrl.startsWith(this.mRouterActive.url)
+    ) {
       addCls = true;
     }
     if (this.mRouterActive.cls) {
-      this.renderer.setElementClass(this.el.nativeElement, this.mRouterActive.cls, addCls);
+      this.renderer.setElementClass(
+        this.el.nativeElement,
+        this.mRouterActive.cls,
+        addCls
+      );
     }
   }
 }

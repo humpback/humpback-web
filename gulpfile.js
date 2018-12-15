@@ -35,7 +35,7 @@ const showWebpackError = (err, stats) => {
 };
 
 gulp.task('client:prd-build', callback => {
-  let config = require('./build/webpack.prod.js');
+  let config = require('./build/webpack.prod.conf');
   webpack(config, (err, stats) => {
     showWebpackError(err, stats);
     callback();
@@ -43,7 +43,7 @@ gulp.task('client:prd-build', callback => {
 });
 
 gulp.task('client:dev-build', () => {
-  let config = require('./build/webpack.dev.js');
+  let config = require('./build/webpack.dev.conf');
   let compiler = webpack(config);
   compiler.watch(200, (err, stats) => {
     showWebpackError(err, stats);

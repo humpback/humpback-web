@@ -1,18 +1,12 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { CusHttpService } from './custom-http.service';
-import { SystemConfigService } from './system-config.service';
+import { Injectable } from "@angular/core";
+import { CusHttpService } from "./custom-http.service";
+import { SystemConfigService } from "./system-config.service";
 
 @Injectable()
 export class HubService {
+  constructor(private _http: CusHttpService, private _systemConfigService: SystemConfigService) {}
 
-  constructor(
-    private _http: CusHttpService,
-    private _systemConfigService: SystemConfigService) {
-
-  }
-
-  private genURL(location?: string) {
+  genURL(location?: string) {
     return `${this._systemConfigService.Config.PrivateRegistry}/v2`;
   }
 
@@ -20,10 +14,11 @@ export class HubService {
     let url = this.genURL(location);
     url = `${url}/_catalog?n=1000`;
     return new Promise((resolve, reject) => {
-      this._http.get(url)
+      this._http
+        .get(url)
         .then(res => {
           let resBody = res.json ? res.json() : {};
-          let result = location === 'gdev' ? resBody.repositories : resBody.data.repositories;
+          let result = location === "gdev" ? resBody.repositories : resBody.data.repositories;
           resolve(result || []);
         })
         .catch(err => {

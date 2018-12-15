@@ -1,5 +1,4 @@
 import { Injectable, Inject } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { EventNotifyService, EventType } from './event-notify.service';
 import { CusHttpService } from './custom-http.service';
 import { IUserLogin } from './../interfaces';

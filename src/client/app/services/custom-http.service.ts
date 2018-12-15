@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { GlobalLoadingService } from './global-loading.service';
 
 @Injectable()
@@ -65,9 +65,9 @@ export class CusHttpService {
       default:
         throw new Error('Not Supported Method');
     }
-    if (options.timeout) {
-      p = p.timeout(options.timeout);
-    }
+    // if (options.timeout) {
+    //   p = p.timeout(options.timeout);
+    // }
     return new Promise((resolve, reject) => {
       if (!options.disableLoading) {
         this._globalLoading.sub();

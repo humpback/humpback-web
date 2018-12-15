@@ -1,19 +1,22 @@
-import { Component, ViewChild, ElementRef, Renderer } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService, EventNotifyService, SystemConfigService, EventType } from './../../services';
+import { Component, ViewChild, ElementRef, Renderer } from "@angular/core";
+import { Router } from "@angular/router";
+import {
+  AuthService,
+  EventNotifyService,
+  SystemConfigService,
+  EventType
+} from "./../../services";
 
 declare let $: any;
 declare let messager: any;
 
 @Component({
-  selector: 'hb-sidebar',
-  templateUrl: './sidebar.html',
-  styleUrls: ['./sidebar.css']
+  selector: "hb-sidebar",
+  templateUrl: "./sidebar.html",
+  styleUrls: ["./sidebar.css"]
 })
-
 export class SideBarComponent {
-
-  @ViewChild('mainSidebar')
+  @ViewChild("mainSidebar")
   private mainSidebar: ElementRef;
   private sideBar: HTMLElement;
 
@@ -21,7 +24,7 @@ export class SideBarComponent {
   private userInfo: any;
   private config: any;
 
-  private activeSubMenu: string = '';
+  private activeSubMenu: string = "";
 
   private subscribers: Array<any> = [];
 
@@ -30,15 +33,16 @@ export class SideBarComponent {
     private _renderer: Renderer,
     private _authService: AuthService,
     private _eventNotifyService: EventNotifyService,
-    private _systemConfigService: SystemConfigService) {
-
-  }
+    private _systemConfigService: SystemConfigService
+  ) {}
 
   ngOnInit() {
     this.config = {};
-    let configSubscriber = this._systemConfigService.ConfigSubject.subscribe(data => {
-      this.config = data;
-    });
+    let configSubscriber = this._systemConfigService.ConfigSubject.subscribe(
+      (data: any) => {
+        this.config = data;
+      }
+    );
     this.subscribers.push(configSubscriber);
 
     this.userInfo = this._authService.getUserInfoFromCache();
@@ -47,17 +51,19 @@ export class SideBarComponent {
         state = !state;
       }
       if (state) {
-        $(this.sideBar).slimScroll({ destroy: true }).height("auto");
+        $(this.sideBar)
+          .slimScroll({ destroy: true })
+          .height("auto");
         this.sideBar.style.overflow = null;
       } else {
         this.fixSidebar();
       }
     });
     let currentUrl = this._router.url;
-    if (currentUrl.startsWith('/account')) {
-      this.activeSubMenu = 'account';
-    } else if (currentUrl.startsWith('/manage')) {
-      this.activeSubMenu = 'manage';
+    if (currentUrl.startsWith("/account")) {
+      this.activeSubMenu = "account";
+    } else if (currentUrl.startsWith("/manage")) {
+      this.activeSubMenu = "manage";
     }
   }
 
@@ -66,7 +72,7 @@ export class SideBarComponent {
   }
 
   ngAfterViewInit() {
-    this.sideBar = this.mainSidebar.nativeElement.querySelector('.sidebar');
+    this.sideBar = this.mainSidebar.nativeElement.querySelector(".sidebar");
     $(window, ".wrapper").resize(() => {
       this.fixSidebar();
     });
@@ -74,9 +80,11 @@ export class SideBarComponent {
   }
 
   private fixSidebar() {
-    $(this.sideBar).slimScroll({ destroy: true }).height("auto");
+    $(this.sideBar)
+      .slimScroll({ destroy: true })
+      .height("auto");
     $(this.sideBar).slimscroll({
-      height: ($(window).height() - $(".main-header").height()) + "px",
+      height: $(window).height() - $(".main-header").height() + "px",
       color: "rgba(255,255,255,0.7)",
       size: "3px"
     });
@@ -84,11 +92,11 @@ export class SideBarComponent {
 
   private toggleSubMenu(element: HTMLElement, subMenuName: string) {
     if (this.activeSubMenu === subMenuName) {
-      this.activeSubMenu = '';
+      this.activeSubMenu = "";
     } else {
       this.activeSubMenu = subMenuName;
     }
-    let isActive = element.classList.contains('active');
-    this._renderer.setElementClass(element, 'active', !isActive);
+    let isActive = element.classList.contains("active");
+    this._renderer.setElementClass(element, "active", !isActive);
   }
 }
