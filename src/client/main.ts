@@ -8,7 +8,7 @@ if (process.env.ENV === 'production') {
   enableProdMode();
 } else {
   require('light-reload/client');
-  lightReload.init(9107, { maxReconnectCount: 10 });
+  lightReload.init(process.env.WS_PORT || 9107, { maxReconnectCount: 10, wsUrl: process.env.WS_URL });
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule);
