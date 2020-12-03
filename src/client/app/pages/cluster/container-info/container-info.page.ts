@@ -202,7 +202,9 @@ export class ClusterContainerInfoPage {
   private upgrade(form: any) {
     this.upgradeContainerModalOptions.formSubmitted = true;
     if (form.invalid) return;
-    let newImage = `${this.container.Config.Image.split(':')[0]}:${form.value.newTag}`;
+    let tempPaths = this.container.Config.Image.split('/');
+    tempPaths[tempPaths.length-1] = `${tempPaths[tempPaths.length-1].split(':')[0]}:${form.value.newTag}`;
+    let newImage = tempPaths.join('/');
     this._clusterService.upgradeImage(this.metaId, form.value.newTag)
       .then(res => {
         messager.success('succeed');

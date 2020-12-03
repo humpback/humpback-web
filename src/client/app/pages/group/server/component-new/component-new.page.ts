@@ -164,7 +164,7 @@ export class ComponentNewPage {
     this.checkComposeData(true);
     if (this.composeDataError && this.composeDataError !== 'succeed') return;
     if (this.inputValue && form.controls.EnablePackageFile.value) {
-      this._fileUploader.upload(`http://${this.ip}:8500/dockerapi/v2/services/${form.controls.Name.value}/upload?filename=${this.inputValue.name}`, this.inputValue, { disableLoading: false })
+      this._fileUploader.upload(`/proxy/${this.ip}:8500/dockerapi/v2/services/${form.controls.Name.value}/upload?filename=${this.inputValue.name}`, this.inputValue, { disableLoading: false })
         .then((res: any) => {
           let config: any = {
             Name: form.value.Name,
