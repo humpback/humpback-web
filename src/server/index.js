@@ -38,7 +38,7 @@ app.use(compression());
 app.use((req, res, next) => {
   let ext = path.extname(req.url);
   if (ext && ext.length > 6) ext = null;
-  if (req.method === 'GET' && !req.url.startsWith('/api') && !ext) {
+  if (req.method === 'GET' && !req.url.startsWith('/api') && !req.url.startsWith('/api') && !ext) {
     req.url = '/index.html';
   }
   next();
@@ -94,11 +94,11 @@ app.use('/api/dashboard', require('./routers/dashboard'));
 // proxy to agent api
 app.use('/proxy', proxy((req)=>{
   const paths = req.path.split('/');
-  return 'http://' + paths[2];
+  return 'http://' + paths[1];
 },{
   proxyReqPathResolver:(req)=>{
     const paths = req.path.split('/');
-    paths.splice(1,2);
+    paths.splice(1,1);
     return paths.join('/');
   }
 }));
