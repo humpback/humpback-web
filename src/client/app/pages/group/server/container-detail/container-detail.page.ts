@@ -243,7 +243,9 @@ export class ContainerDetailPage {
     this.upgradeContainerModalOptions.formSubmitted = true;
     if (form.invalid || !this.selectedServers.length) return;
     let destTag = form.value.newTag;
-    let image = `${this.container.Config.Image.split(':')[0]}:${destTag}`;
+    let tempPaths = this.container.Config.Image.split('/');
+    tempPaths[tempPaths.length-1] = `${tempPaths[tempPaths.length-1].split(':')[0]}:${destTag}`;
+    let image = tempPaths.join('/');
 
     this.upgradeContainerModalOptions.show = false;
     this.upgradeProgressModalOptions.show = true;
