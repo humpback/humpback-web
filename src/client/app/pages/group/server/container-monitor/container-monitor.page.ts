@@ -46,7 +46,7 @@ export class ContainerMonitorPage {
       this.containerId = params['containerId'];
       clearInterval(this.refreshInterval);
     });
-    this.subscribers.push(paramSub);    
+    this.subscribers.push(paramSub);
   }
 
   ngOnDestroy() {
@@ -173,7 +173,7 @@ export class ContainerMonitorPage {
   private updateChart() {
     let time = new Date();
     let self = this;
-    let url = `http://${this.ip}:8500/v1/containers/${this.containerId}/stats`;
+    let url = `/proxy/${this.ip}:8500/v1/containers/${this.containerId}/stats`;
     fetch(url)
       .then((res: any) => {
         res.json().then((data: any) => {

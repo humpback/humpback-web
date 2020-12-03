@@ -7,6 +7,7 @@ const session = require('express-session');
 const errorHandler = require('errorhandler');
 require("console-stamp")(console, 'yyyy/mm/dd HH:MM:ss.l');
 const NedbStore = require('nedb-session-store')(session);
+const proxy = require('express-http-proxy');
 
 const user = require('./controllers/user');
 const config = require('./config.js');
@@ -89,6 +90,18 @@ app.use('/api/images', require('./routers/imageInfo'));
 app.use('/api/logs', require('./routers/log'));
 app.use('/api/system-config', require('./routers/systemConfig'));
 app.use('/api/dashboard', require('./routers/dashboard'));
+
+// proxy to agent api
+app.use('/proxy', proxy((req)=>{
+  const paths = req.path.split('/');
+  return 'http://' + paths[2];
+},{
+  proxyReqPathResolver:(req)=>{
+    const paths = req.path.split('/');
+    paths.splice(1,2);
+    return paths.join('/');
+  }
+}));
 
 errorHandler.title = `Humpback WebSite - ${config.version}`;
 app.use(errorHandler({ log: false }));

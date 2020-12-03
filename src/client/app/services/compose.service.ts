@@ -30,7 +30,7 @@ export class ComposeService {
         'x-proxy-ip': ip
       };
     }
-    let url: string = `http://${ip}:8500/dockerapi/v2`;
+    let url: string = `/proxy/${ip}:8500/dockerapi/v2`;
     let req = {
       url: url,
       options: options
