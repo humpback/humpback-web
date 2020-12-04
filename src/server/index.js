@@ -38,7 +38,7 @@ app.use(compression());
 app.use((req, res, next) => {
   let ext = path.extname(req.url);
   if (ext && ext.length > 6) ext = null;
-  if (req.method === 'GET' && !req.url.startsWith('/api') && !req.url.startsWith('/api') && !ext) {
+  if (req.method === 'GET' && !req.url.startsWith('/api') && !req.url.startsWith('/proxy') && !ext) {
     req.url = '/index.html';
   }
   next();
@@ -62,7 +62,7 @@ let ignoreAuthPaths = [
   '/api/dashboard'
 ];
 
-app.all('/api/*', (req, res, next) => {
+app.all(['/api/*','/proxy/*'], (req, res, next) => {
   let ignored = false;
   for (let i = 0; i < ignoreAuthPaths.length; i++) {
     if (req.path.startsWith(ignoreAuthPaths[i])) {
@@ -96,7 +96,7 @@ app.use('/proxy', proxy((req)=>{
   const paths = req.path.split('/');
   return 'http://' + paths[1];
 },{
-  proxyReqPathResolver:(req)=>{ 
+  proxyReqPathResolver:(req)=>{
     const parts = req.url.split('?');
     const queryString = parts[1];
     const updatedPath = parts[0].split('/').splice(1,1).join('/');
