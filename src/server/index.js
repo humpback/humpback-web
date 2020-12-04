@@ -96,10 +96,11 @@ app.use('/proxy', proxy((req)=>{
   const paths = req.path.split('/');
   return 'http://' + paths[1];
 },{
-  proxyReqPathResolver:(req)=>{
-    const paths = req.path.split('/');
-    paths.splice(1,1);
-    return paths.join('/');
+  proxyReqPathResolver:(req)=>{ 
+    const parts = req.url.split('?');
+    const queryString = parts[1];
+    const updatedPath = parts[0].split('/').splice(1,1).join('/');
+    return updatedPath + (queryString ? '?' + queryString : '');
   }
 }));
 
