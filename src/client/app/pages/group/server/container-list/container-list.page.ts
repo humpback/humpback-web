@@ -296,12 +296,11 @@ export class ContainerListPage {
   private getImages() {
     this._imageService.getImages(this.ip)
       .then(data => {
-        this.images = [];
-        let index = data.findIndex((item: any) => item.RepoTags == null);
-        if(index > -1){
-          data.splice(index, 1);
-        }
+        this.images = []; 
         data.forEach((item: any) => {
+          if (!item.RepoTags){
+            return;
+          }
           let isDuplicatedImage = item.RepoTags.length > 1;
           item.RepoTags.forEach((repo: any) => {
             let temp = {
