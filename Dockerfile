@@ -8,7 +8,7 @@ ADD package-lock.json /humpback-web/package-lock.json
 
 WORKDIR /humpback-web
 
-RUN npm config set registry https://registry.npm.taobao.org
+RUN npm config set registry https://registry.npmmirror.com
 RUN npm config set strict-ssl false
 RUN npm install --production
 
