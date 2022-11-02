@@ -61,7 +61,7 @@
         "del": "^2.2.2",
         "extract-text-webpack-plugin": "^2.1.0",
         "file-loader": "^0.9.0",
-        "gulp": "^3.9.1",
+        "gulp": "^4.0.2",
         "gulp-clean-css": "^2.4.0",
         "gulp-develop-server": "^0.5.2",
         "gulp-if": "^2.0.2",
